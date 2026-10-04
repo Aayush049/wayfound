@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "996641688296",
+    "project_id": "wayfound-51b4d",
+    "storage_bucket": "wayfound-51b4d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996641688296:android:7a176becdb875ea9ab975d",
+        "android_client_info": {
+          "package_name": "com.ayush.wayfound"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996641688296-ju9une00fstticn0lp1has9tlck0t7od.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCj5b75PoQP4TTGH5OcKMbqlqKjpcMyrFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996641688296-ju9une00fstticn0lp1has9tlck0t7od.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
