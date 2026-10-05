@@ -22,7 +22,7 @@ Future<void> setupFirebaseEmulators() async {
     await FirebaseAuth.instance.useAuthEmulator(kEmulatorHost, 9099);
 
     // Connect Firestore emulator
-    FirebaseFirestore.instance.useFirestoreEmulator(kEmulatorHost, 8088);
+    FirebaseFirestore.instance.useFirestoreEmulator(kEmulatorHost, 8092);
   }
 }
 
