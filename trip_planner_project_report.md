@@ -3,7 +3,7 @@
 *Wayfound is a collaborative trip planner for groups.*
 
 **Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026
-**Status:** Planning complete; build in progress (Milestone 0 partly done, see Section 15)
+**Status:** Milestone 0 complete (Phase 0 setup finished)
 
 ---
 
@@ -297,8 +297,8 @@ FlutterFire CLI for per-platform config. Firebase Emulator Suite (Firestore, Aut
 
 ## 10. Testing Plan
 
-1. **Unit tests** (pure Dart): split rounding, balances, settle-up, vote deltas. Include the worked example in 8.5.
-2. **Rules tests** (emulator): every row of the permission matrix, plus join rule cases below.
+1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation, and app shell build tests (`flutter test`).
+2. **Rules tests** (Firebase Emulator): baseline deny-all test harness in `rules_test/` using `@firebase/rules-unit-testing`. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
 
@@ -317,7 +317,7 @@ FlutterFire CLI for per-platform config. Firebase Emulator Suite (Firestore, Aut
 
 | # | Milestone | Effort | Done when |
 |---|---|---|---|
-| 0 | Setup | S | App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from the palette; theme provider in place |
+| 0 | Setup | S | **DONE** — App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from palette; theme provider in place |
 | 1 | Auth | S-M | Email and Google sign-in, persistent session, `users` doc, redirect works; theme selector in Settings works |
 | 2 | Trips and joining | L | Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
 | 3 | Suggestions and voting | M-L | CRUD, vote transaction (all six cases), sorting, rules enforced |
@@ -407,7 +407,7 @@ Rules: hex values live only in `app_colors.dart`; widgets always read colours fr
 - Check the contrast of every text and background pair in both modes before finalizing screens.
 
 ### 14.5 Derived colours (palette gaps filled)
-The supplied palette had no text/icon colours for use on top of brand colours and no light-mode containers. These were derived to match the palette and aim for WCAG AA contrast (4.5:1 for body text). Verify each pair with a contrast checker during Milestone 0.
+The supplied palette had no text/icon colours for use on top of brand colours and no light-mode containers. These were derived to match the palette and aim for WCAG AA contrast (4.5:1 for body text). All derived colors and the StatusColors ThemeExtension are fully implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart`.
 
 | Role | Light | Dark | Used for |
 |---|---|---|---|
@@ -461,7 +461,7 @@ lib/
 ```
 Settlements live inside the **expenses** feature.
 
-### 15.5 Image assets prepared (not yet registered in `pubspec.yaml`)
+### 15.5 Image assets prepared and registered in `pubspec.yaml`
 
 | File | Location | Format | Purpose |
 |---|---|---|---|
@@ -481,13 +481,39 @@ Settlements live inside the **expenses** feature.
 | Remaining packages added | Done |
 | Folder structure created | Done |
 | Logo, icon and Google logo files prepared | Done |
-| Register assets in `pubspec.yaml`; apply launcher icon | Next |
-| Theme system (light/dark palette, theme provider, toggle) | Next |
-| Router skeleton with placeholder screens | To do |
-| Shared loading / error / empty widgets | To do |
-| Firebase rules and emulator project files | To do |
+| Register assets in `pubspec.yaml`; apply launcher icon | Done |
+| Theme system (light/dark palette, theme provider, toggle) | Done |
+| Router skeleton with placeholder screens | Done |
+| Shared loading / error / empty widgets | Done |
+| Firebase rules and emulator project files | Done |
 
-### 15.7 Follow-ups to remember
+### 15.7 How to Run & Test Emulators
+
+#### Firebase Rules Baseline Test
+The rules test harness is located in `rules_test/`. Run the deny-all baseline test against the Firestore emulator via:
+```bash
+firebase emulators:exec --only firestore "npm --prefix rules_test test"
+```
+
+#### Running Flutter App with Emulators
+- **Android Emulator (Virtual Device):**
+  ```bash
+  flutter run --dart-define=USE_EMULATORS=true
+  ```
+  (Connects to `10.0.2.2:9099` for Auth and `10.0.2.2:8088` for Firestore).
+
+- **Physical Android Phone:**
+  First reverse the emulator ports via ADB:
+  ```bash
+  adb reverse tcp:9099 tcp:9099
+  adb reverse tcp:8088 tcp:8088
+  ```
+  Then launch the app pointing to localhost (`127.0.0.1`):
+  ```bash
+  flutter run --dart-define=USE_EMULATORS=true --dart-define=EMULATOR_HOST=127.0.0.1
+  ```
+
+### 15.8 Follow-ups to remember
 - **Milestone 1:** register the computer's SHA-1 fingerprint in Firebase so Google sign-in works on Android
 - **Dark mode:** check the logo's contrast against the dark background; add a lighter `logo_dark.png` if needed
-- **Rules:** Firestore is locked in production mode, so nothing can be read or written until rules are written and deployed (planned alongside Milestones 1 to 3)
+- **Rules:** Firestore baseline is deny-all; feature rules will be added alongside Milestones 1 to 3
