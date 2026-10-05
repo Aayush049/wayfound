@@ -1,0 +1,12 @@
+{
+  "name": "wayfound-rules-test",
+  "version": "1.0.0",
+  "description": "Firebase Security Rules unit tests for Wayfound",
+  "scripts": {
+    "test": "jest --forceExit"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.3",
+    "jest": "^29.7.0"
+  }
+}
