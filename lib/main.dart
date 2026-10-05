@@ -9,7 +9,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const WayfoundApp());
-}
+} 
 
 class WayfoundApp extends StatelessWidget {
   const WayfoundApp({super.key});
