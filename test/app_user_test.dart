@@ -46,7 +46,7 @@ void main() {
         'displayName': 'Alice',
         'email': 'alice@example.com',
         'photoUrl': 'https://example.com/alice.png',
-        'createdAt': FieldValue.serverTimestamp(),
+        'createdAt': Timestamp.now(),
       });
 
       final doc = await docRef.get();

@@ -1,22 +1,38 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wayfound/app/theme/theme_provider.dart';
+import 'package:wayfound/features/auth/data/auth_provider.dart';
+import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/main.dart';
 
 void main() {
   group('App Shell & Router Tests', () {
     late SharedPreferences prefs;
+    late FakeFirebaseFirestore firestore;
+    late MockFirebaseAuth auth;
+    late AuthRepository repository;
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       prefs = await SharedPreferences.getInstance();
+      firestore = FakeFirebaseFirestore();
+      auth = MockFirebaseAuth();
+      repository = AuthRepository(auth: auth, firestore: firestore);
     });
 
-    Widget createTestApp({ThemeMode initialThemeMode = ThemeMode.system}) {
+    Widget createTestApp({AsyncValue<User?>? authUserValue}) {
       return ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          authRepositoryProvider.overrideWithValue(repository),
+          if (authUserValue != null)
+            authUserProvider.overrideWithValue(authUserValue),
+        ],
         child: const WayfoundApp(),
       );
     }
@@ -24,7 +40,9 @@ void main() {
     testWidgets('App shell builds and starts on Welcome Screen', (
       tester,
     ) async {
-      await tester.pumpWidget(createTestApp());
+      await tester.pumpWidget(
+        createTestApp(authUserValue: const AsyncData(null)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Wayfound'), findsOneWidget);
@@ -32,26 +50,32 @@ void main() {
         find.text('Collaborative trip planner for groups'),
         findsOneWidget,
       );
-      expect(find.text('Go to Home (TEMP)'), findsOneWidget);
+      expect(find.text('Sign In'), findsOneWidget);
+      expect(find.text('Create Account'), findsOneWidget);
     });
 
-    testWidgets('Router navigates from Welcome to Home', (tester) async {
-      await tester.pumpWidget(createTestApp());
+    testWidgets('Router navigates from Welcome to Sign In', (tester) async {
+      await tester.pumpWidget(
+        createTestApp(authUserValue: const AsyncData(null)),
+      );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Go to Home (TEMP)'));
+      await tester.tap(find.text('Sign In'));
       await tester.pumpAndSettle();
 
-      expect(find.text('My Trips'), findsOneWidget);
-      expect(find.text('Home Screen Placeholder'), findsOneWidget);
+      expect(find.text('Welcome back'), findsOneWidget);
     });
 
     testWidgets('Home theme toggle button flips theme mode', (tester) async {
-      await tester.pumpWidget(createTestApp());
-      await tester.pumpAndSettle();
+      final user = MockUser(
+        uid: 'user-123',
+        email: 'test@example.com',
+        photoURL: '',
+      );
+      auth = MockFirebaseAuth(signedIn: true, mockUser: user);
+      repository = AuthRepository(auth: auth, firestore: firestore);
 
-      // Navigate to Home
-      await tester.tap(find.text('Go to Home (TEMP)'));
+      await tester.pumpWidget(createTestApp(authUserValue: AsyncData(user)));
       await tester.pumpAndSettle();
 
       // Find toggle IconButton

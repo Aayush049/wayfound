@@ -1,47 +1,45 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:wayfound/app/theme/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wayfound/app/theme/theme_provider.dart';
-import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/features/auth/presentation/settings_screen.dart';
+
+import 'helpers/pump_app.dart';
 
 void main() {
   late FakeFirebaseFirestore firestore;
   late MockFirebaseAuth auth;
   late AuthRepository repository;
+  late SharedPreferences prefs;
 
-  setUp(() {
+  setUp(() async {
     firestore = FakeFirebaseFirestore();
     auth = MockFirebaseAuth(
+      signedIn: true,
       mockUser: MockUser(
         uid: 'user-123',
         email: 'test@example.com',
         displayName: 'Test User',
+        photoURL: '',
       ),
     );
     repository = AuthRepository(auth: auth, firestore: firestore);
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
   });
-
-  Widget buildSettingsScreen() {
-    return ProviderScope(
-      overrides: [authRepositoryProvider.overrideWithValue(repository)],
-      child: MaterialApp(
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        home: const SettingsScreen(),
-      ),
-    );
-  }
 
   group('SettingsScreen', () {
     testWidgets('renders user profile details and appearance controls', (
       tester,
     ) async {
-      await tester.pumpWidget(buildSettingsScreen());
+      await tester.pumpApp(
+        const SettingsScreen(),
+        authRepository: repository,
+        sharedPreferences: prefs,
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Settings'), findsOneWidget);
@@ -53,7 +51,11 @@ void main() {
     });
 
     testWidgets('shows edit display name dialog on tap', (tester) async {
-      await tester.pumpWidget(buildSettingsScreen());
+      await tester.pumpApp(
+        const SettingsScreen(),
+        authRepository: repository,
+        sharedPreferences: prefs,
+      );
       await tester.pumpAndSettle();
 
       final editIcon = find.byIcon(Icons.edit_outlined);
@@ -68,7 +70,11 @@ void main() {
     });
 
     testWidgets('shows sign out confirmation dialog on tap', (tester) async {
-      await tester.pumpWidget(buildSettingsScreen());
+      await tester.pumpApp(
+        const SettingsScreen(),
+        authRepository: repository,
+        sharedPreferences: prefs,
+      );
       await tester.pumpAndSettle();
 
       final signOutTile = find.text('Sign Out');
@@ -82,29 +88,29 @@ void main() {
     testWidgets('theme selector segment button updates theme state', (
       tester,
     ) async {
-      late WidgetRef savedRef;
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [authRepositoryProvider.overrideWithValue(repository)],
-          child: MaterialApp(
-            home: Consumer(
-              builder: (context, ref, _) {
-                savedRef = ref;
-                return const SettingsScreen();
-              },
-            ),
-          ),
-        ),
+      await tester.pumpApp(
+        const SettingsScreen(),
+        authRepository: repository,
+        sharedPreferences: prefs,
       );
       await tester.pumpAndSettle();
 
-      // Tap 'Dark' segment
-      final darkSegment = find.text('Dark');
-      await tester.tap(darkSegment);
+      // Find SegmentedButton
+      final segmentedButton = find.byType(SegmentedButton<ThemeMode>);
+      expect(segmentedButton, findsOneWidget);
+
+      // Verify initial state
+      expect(
+        tester.widget<SegmentedButton<ThemeMode>>(segmentedButton).selected,
+        {ThemeMode.system},
+      );
+
+      // Tap Light
+      await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();
 
-      expect(savedRef.read(themeProvider), equals(ThemeMode.dark));
+      // Verify state changed in shared prefs
+      expect(prefs.getString(kThemeModeKey), equals('light'));
     });
   });
 }

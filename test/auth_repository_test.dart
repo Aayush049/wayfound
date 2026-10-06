@@ -29,7 +29,7 @@ void main() {
 
       test('returns user when signed in', () async {
         final user = MockUser(uid: 'test-uid', email: 'test@example.com');
-        auth = MockFirebaseAuth(mockUser: user);
+        auth = MockFirebaseAuth(signedIn: true, mockUser: user);
         repository = AuthRepository(
           auth: auth,
           googleSignIn: googleSignIn,
@@ -110,7 +110,7 @@ void main() {
     group('signOut', () {
       test('signs out from providers without errors', () async {
         final user = MockUser(uid: 'test-uid');
-        auth = MockFirebaseAuth(mockUser: user);
+        auth = MockFirebaseAuth(signedIn: true, mockUser: user);
         repository = AuthRepository(
           auth: auth,
           googleSignIn: googleSignIn,

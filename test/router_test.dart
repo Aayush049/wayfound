@@ -18,7 +18,10 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [authRepositoryProvider.overrideWithValue(repository)],
+            overrides: [
+              authRepositoryProvider.overrideWithValue(repository),
+              authUserProvider.overrideWithValue(const AsyncData(null)),
+            ],
             child: Consumer(
               builder: (context, ref, _) {
                 final router = ref.watch(routerProvider);
@@ -38,18 +41,21 @@ void main() {
       tester,
     ) async {
       final firestore = FakeFirebaseFirestore();
-      final auth = MockFirebaseAuth(
-        mockUser: MockUser(
-          uid: 'user-123',
-          email: 'test@example.com',
-          displayName: 'Test User',
-        ),
+      final user = MockUser(
+        uid: 'user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        photoURL: '',
       );
+      final auth = MockFirebaseAuth(signedIn: true, mockUser: user);
       final repository = AuthRepository(auth: auth, firestore: firestore);
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [authRepositoryProvider.overrideWithValue(repository)],
+          overrides: [
+            authRepositoryProvider.overrideWithValue(repository),
+            authUserProvider.overrideWithValue(AsyncData(user)),
+          ],
           child: Consumer(
             builder: (context, ref, _) {
               final router = ref.watch(routerProvider);
