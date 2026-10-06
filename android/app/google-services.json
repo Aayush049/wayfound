@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "996641688296-808fl07quqev9tqpjr61ans9k5u1raf9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ayush.wayfound",
+            "certificate_hash": "568848821deb279d6186f008c47784a275104095"
+          }
+        },
+        {
           "client_id": "996641688296-ju9une00fstticn0lp1has9tlck0t7od.apps.googleusercontent.com",
           "client_type": 3
         }

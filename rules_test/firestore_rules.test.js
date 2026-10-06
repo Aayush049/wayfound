@@ -1,6 +1,7 @@
 const {
   initializeTestEnvironment,
   assertFails,
+  assertSucceeds,
 } = require('@firebase/rules-unit-testing');
 const fs = require('fs');
 const path = require('path');
@@ -34,20 +35,56 @@ beforeEach(async () => {
   }
 });
 
-describe('Baseline Deny-All Firestore Rules', () => {
-  test('Signed-out user cannot read or write documents', async () => {
+describe('Users Collection Rules', () => {
+  test('Signed-out user cannot read or write user documents', async () => {
     const unauthedDb = testEnv.unauthenticatedContext().firestore();
-    const docRef = unauthedDb.collection('test').doc('doc1');
-
-    await assertFails(docRef.get());
-    await assertFails(docRef.set({ name: 'test' }));
-  });
-
-  test('Signed-in user cannot read or write documents under deny-all', async () => {
-    const authedDb = testEnv.authenticatedContext('user_123').firestore();
-    const docRef = authedDb.collection('users').doc('user_123');
+    const docRef = unauthedDb.collection('users').doc('user_123');
 
     await assertFails(docRef.get());
     await assertFails(docRef.set({ displayName: 'Alice' }));
+  });
+
+  test('Signed-in user can read any user document', async () => {
+    const authedDb = testEnv.authenticatedContext('user_abc').firestore();
+    const docRef = authedDb.collection('users').doc('other_user');
+
+    await assertSucceeds(docRef.get());
+  });
+
+  test('Signed-in user can write their own user document', async () => {
+    const authedDb = testEnv.authenticatedContext('user_123').firestore();
+    const docRef = authedDb.collection('users').doc('user_123');
+
+    await assertSucceeds(docRef.set({ displayName: 'Alice', email: 'alice@test.com' }));
+  });
+
+  test('Signed-in user cannot write another user document', async () => {
+    const authedDb = testEnv.authenticatedContext('user_abc').firestore();
+    const docRef = authedDb.collection('users').doc('other_user');
+
+    await assertFails(docRef.set({ displayName: 'Bob' }));
+  });
+
+  test('Signed-in user cannot create user document with wrong uid', async () => {
+    const authedDb = testEnv.authenticatedContext('user_abc').firestore();
+    const docRef = authedDb.collection('users').doc('wrong_user');
+
+    await assertFails(docRef.set({ uid: 'wrong_user', displayName: 'Fake' }));
+  });
+});
+
+describe('Trips Collection Rules (baseline deny-all)', () => {
+  test('Signed-in user cannot read trips collection', async () => {
+    const authedDb = testEnv.authenticatedContext('user_123').firestore();
+    const docRef = authedDb.collection('trips').doc('trip_1');
+
+    await assertFails(docRef.get());
+  });
+
+  test('Signed-in user cannot write trips collection', async () => {
+    const authedDb = testEnv.authenticatedContext('user_123').firestore();
+    const docRef = authedDb.collection('trips').doc('trip_1');
+
+    await assertFails(docRef.set({ name: 'Trip' }));
   });
 });

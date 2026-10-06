@@ -20,6 +20,11 @@ dependencies:
   go_router: ^18.0.2
   intl: ^0.20.3
   shared_preferences: ^2.5.5
+  fake_cloud_firestore: ^4.3.0
+  firebase_auth_mocks: ^0.15.2
+  google_sign_in_mocks: ^0.4.2
+  state_notifier: ^1.0.0
+  riverpod: ^3.4.3
 
 dev_dependencies:
   flutter_test:

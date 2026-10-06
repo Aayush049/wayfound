@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-// TEMP(phase-1): Placeholder Welcome Screen for Phase 0 setup testing.
+/// Welcome screen - entry point for unauthenticated users.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -45,15 +45,28 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              // TEMP(phase-1): Temporary button to navigate to Home for Phase 0 testing
+              // Sign In button
               ElevatedButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go('/signin'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
                 ),
-                child: const Text('Go to Home (TEMP)'),
+                child: const Text('Sign In'),
+              ),
+              const SizedBox(height: 16),
+              // Learn more (placeholder for now)
+              TextButton(
+                onPressed: () {
+                  // TODO: Add about/landing page
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Wayfound helps groups plan trips together.'),
+                    ),
+                  );
+                },
+                child: const Text('Learn more'),
               ),
               const SizedBox(height: 48),
             ],
