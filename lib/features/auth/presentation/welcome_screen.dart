@@ -62,7 +62,9 @@ class WelcomeScreen extends StatelessWidget {
                   // TODO: Add about/landing page
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Wayfound helps groups plan trips together.'),
+                      content: Text(
+                        'Wayfound helps groups plan trips together.',
+                      ),
                     ),
                   );
                 },

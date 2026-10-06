@@ -68,10 +68,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: Icon(Icons.logout, color: colorScheme.error),
-            title: Text(
-              'Sign Out',
-              style: TextStyle(color: colorScheme.error),
-            ),
+            title: Text('Sign Out', style: TextStyle(color: colorScheme.error)),
             onTap: () => _signOut(context, ref),
           ),
           ListTile(
@@ -119,8 +116,9 @@ class SettingsScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 32,
             backgroundColor: colorScheme.primaryContainer,
-            backgroundImage:
-                user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+            backgroundImage: user.photoURL != null
+                ? NetworkImage(user.photoURL!)
+                : null,
             child: user.photoURL == null
                 ? Text(
                     (user.displayName ?? user.email ?? '?')[0].toUpperCase(),
@@ -138,15 +136,13 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 Text(
                   user.displayName ?? 'User',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   user.email ?? '',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -263,9 +259,8 @@ class SettingsScreen extends ConsumerWidget {
         await repository.deleteAccount();
         if (context.mounted) {
           context.go('/welcome');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account deleted')),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Account deleted')));
         }
       } catch (e) {
         if (context.mounted) {

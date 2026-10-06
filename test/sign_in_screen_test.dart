@@ -1,14 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wayfound/features/auth/presentation/sign_in_screen.dart';
 
 void main() {
   group('SignInScreen', () {
     testWidgets('renders all UI elements', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SignInScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
 
       // Verify logo/title
       expect(find.text('Wayfound'), findsOneWidget);
@@ -26,11 +23,7 @@ void main() {
     });
 
     testWidgets('toggles between sign in and sign up modes', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SignInScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
 
       // Initial state: Sign In mode
       expect(find.text('Welcome back'), findsOneWidget);
@@ -47,11 +40,7 @@ void main() {
     });
 
     testWidgets('validates empty email', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SignInScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
 
       // Try to submit without entering email
       await tester.tap(find.text('Sign In'));
@@ -62,13 +51,12 @@ void main() {
     });
 
     testWidgets('validates empty password', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SignInScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
 
-      await tester.enterText(find.byType(TextFormField).first, 'test@example.com');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'test@example.com',
+      );
       await tester.tap(find.text('Sign In'));
       await tester.pumpAndSettle();
 
@@ -76,11 +64,7 @@ void main() {
     });
 
     testWidgets('password field can be obscured', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SignInScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
 
       // Find password field
       final passwordField = find.byType(TextFormField).last;

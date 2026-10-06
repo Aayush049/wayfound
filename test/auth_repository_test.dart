@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 
@@ -9,13 +10,16 @@ void main() {
   group('AuthRepository', () {
     late FakeFirebaseFirestore firestore;
     late MockFirebaseAuth auth;
+    late MockGoogleSignIn googleSignIn;
     late AuthRepository repository;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       auth = MockFirebaseAuth();
+      googleSignIn = MockGoogleSignIn();
       repository = AuthRepository(
         auth: auth,
+        googleSignIn: googleSignIn,
         firestore: firestore,
       );
     });
@@ -28,7 +32,12 @@ void main() {
       test('returns user when signed in', () async {
         final user = MockUser(uid: 'test-uid', email: 'test@example.com');
         auth = MockFirebaseAuth(mockUser: user);
-        repository = AuthRepository(auth: auth, firestore: firestore);
+        googleSignIn = MockGoogleSignIn();
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
 
         expect(repository.currentUser?.uid, equals('test-uid'));
         expect(repository.currentUser?.email, equals('test@example.com'));
@@ -44,7 +53,11 @@ void main() {
       test('emits user after sign-in', () async {
         final user = MockUser(uid: 'test-uid', email: 'test@example.com');
         auth = MockFirebaseAuth(mockUser: user);
-        repository = AuthRepository(auth: auth, firestore: firestore);
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
 
         expect(repository.authStateChanges, emits(user));
       });
@@ -64,7 +77,10 @@ void main() {
         expect(doc.data()?['uid'], equals('user-123'));
         expect(doc.data()?['email'], equals('test@example.com'));
         expect(doc.data()?['displayName'], equals('Test User'));
-        expect(doc.data()?['photoUrl'], equals('https://example.com/photo.jpg'));
+        expect(
+          doc.data()?['photoUrl'],
+          equals('https://example.com/photo.jpg'),
+        );
         expect(doc.data()?['createdAt'], isNotNull);
         expect(doc.data()?['updatedAt'], isNotNull);
       });
@@ -110,13 +126,22 @@ void main() {
     group('signInWithEmailAndPassword', () {
       test('creates user document on successful sign-in', () async {
         auth = MockFirebaseAuth(signedIn: false);
-        repository = AuthRepository(auth: auth, firestore: firestore);
+        googleSignIn = MockGoogleSignIn();
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
 
         // Mock sign-in creates the user
         auth = MockFirebaseAuth(
           mockUser: MockUser(uid: 'new-user-uid', email: 'new@example.com'),
         );
-        repository = AuthRepository(auth: auth, firestore: firestore);
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
 
         // Sign in and verify doc is created
         await repository.signInWithEmailAndPassword(
@@ -124,7 +149,10 @@ void main() {
           password: 'password123',
         );
 
-        final doc = await firestore.collection('users').doc('new-user-uid').get();
+        final doc = await firestore
+            .collection('users')
+            .doc('new-user-uid')
+            .get();
         expect(doc.exists, isTrue);
       });
     });
@@ -133,7 +161,11 @@ void main() {
       test('signs out from Firebase Auth', () async {
         final user = MockUser(uid: 'test-uid');
         auth = MockFirebaseAuth(mockUser: user);
-        repository = AuthRepository(auth: auth, firestore: firestore);
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
 
         await repository.signOut();
 

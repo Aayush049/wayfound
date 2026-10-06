@@ -14,7 +14,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/welcome',
     redirect: (BuildContext context, GoRouterState state) {
       final isSignedIn = ref.read(isSignedInProvider);
-      final isOnAuthScreen = state.matchedLocation.startsWith('/welcome') ||
+      final isOnAuthScreen =
+          state.matchedLocation.startsWith('/welcome') ||
           state.matchedLocation.startsWith('/signin');
 
       // Redirect signed-in users away from auth screens
@@ -42,10 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Protected routes (require auth)
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
+      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),

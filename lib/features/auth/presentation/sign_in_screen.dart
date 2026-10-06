@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../core/widgets/async_value_widget.dart';
 import '../data/auth_provider.dart';
@@ -74,7 +73,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       return 'Please enter a valid email address.';
     }
     if (errorStr.contains('weak-password')) {
-      return 'Password must be at least 6 characters.';
+      return 'Password must be at least 8 characters.';
     }
     if (errorStr.contains('network-request-failed')) {
       return 'Network error. Please check your connection.';
@@ -128,8 +127,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   child: Image.asset(
                     'assets/images/logo.png',
                     height: 80,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.explore, size: 64, color: colorScheme.primary),
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.explore,
+                      size: 64,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),

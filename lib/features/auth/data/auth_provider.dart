@@ -30,7 +30,8 @@ final isSignedInProvider = Provider<bool>((ref) {
 class AuthNotifier extends AsyncNotifier<void> {
   final AuthRepository _repository;
 
-  AuthNotifier() : _repository = AuthRepository();
+  AuthNotifier({AuthRepository? repository})
+      : _repository = repository ?? AuthRepository();
 
   @override
   Future<void> build() async {
@@ -43,15 +44,15 @@ class AuthNotifier extends AsyncNotifier<void> {
     required String email,
     required String password,
   }) async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     try {
       await _repository.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      state = const AsyncValue.data(null);
+      state = const AsyncData(null);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
@@ -60,54 +61,54 @@ class AuthNotifier extends AsyncNotifier<void> {
     required String email,
     required String password,
   }) async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     try {
       await _repository.signUpWithEmailAndPassword(
         email: email,
         password: password,
       );
-      state = const AsyncValue.data(null);
+      state = const AsyncData(null);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
   /// Signs in with Google.
   Future<void> signInWithGoogle() async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     try {
       await _repository.signInWithGoogle();
-      state = const AsyncValue.data(null);
+      state = const AsyncData(null);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
   /// Signs out.
   Future<void> signOut() async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     try {
       await _repository.signOut();
-      state = const AsyncValue.data(null);
+      state = const AsyncData(null);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
   /// Sends password reset email.
   Future<void> sendPasswordReset(String email) async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
     try {
       await _repository.sendPasswordResetEmail(email);
-      state = const AsyncValue.data(null);
+      state = const AsyncData(null);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
     }
   }
 
   /// Clears the error state after user has handled it.
   void clearError() {
-    state = const AsyncValue.data(null);
+    state = const AsyncData(null);
   }
 }
 

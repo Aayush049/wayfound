@@ -8,6 +8,7 @@ class AuthRepository {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
+  bool _googleInitialized = false;
 
   AuthRepository({
     FirebaseAuth? auth,
@@ -15,9 +16,13 @@ class AuthRepository {
     FirebaseFirestore? firestore,
   })  : _auth = auth ?? FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance {
-    // Initialize GoogleSignIn if not already initialized
-    _googleSignIn.initialize();
+        _firestore = firestore ?? FirebaseFirestore.instance;
+
+  void _ensureGoogleInitialized() {
+    if (!_googleInitialized) {
+      _googleInitialized = true;
+      _googleSignIn.initialize();
+    }
   }
 
   /// Stream of authentication state changes.
@@ -98,6 +103,9 @@ class AuthRepository {
   /// Signs in with Google.
   /// Requires SHA-1 fingerprint registered in Firebase Console.
   Future<UserCredential> signInWithGoogle() async {
+    // Ensure GoogleSignIn is initialized
+    _ensureGoogleInitialized();
+
     // Trigger the authentication flow using the 7.x API
     final GoogleSignInAccount account;
     try {
@@ -138,10 +146,7 @@ class AuthRepository {
 
   /// Signs out from all providers.
   Future<void> signOut() async {
-    await Future.wait([
-      _auth.signOut(),
-      _googleSignIn.signOut(),
-    ]);
+    await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
   }
 
   /// Sends a password reset email.
