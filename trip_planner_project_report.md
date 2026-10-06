@@ -265,7 +265,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings (SegmentedButton theme change, edit display name dialog, sign-out confirmation dialog).
+1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings (SegmentedButton theme change, edit display name dialog, sign-out confirmation dialog). All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
 2. **Rules tests** (Firebase Emulator): unit test suite in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
@@ -344,7 +344,9 @@ Implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart
 - Auth-driven `go_router` redirects configured for `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`.
 - Settings screen updated with profile display, display name editing, non-deprecated `SegmentedButton` theme selector, and sign-out confirmation dialog.
 - Analyzer reports ZERO issues (`flutter analyze`).
-- Unit, widget, and rules test suites written and verified.
+- Unit, widget, and rules test suites written and verified. All widget tests pass after consolidating provider overrides.
+
+---
 
 ### 15.4 How to Run & Test Emulators
 
@@ -373,7 +375,7 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
 
 ## 16. Development Workflow
 
-- **Branching:** one git branch per development phase (`phase-0/setup`, `phase-1/auth`, `phase-2/trips`, `phase-3/suggestions`, `phase-4/itinerary`, `phase-5/expenses`, `phase-6/settlements`, `phase-7/hardening`). No direct feature development on `main`.
+- **Branching:** one git branch per development phase (`phase-0/setup`, `phase-1/auth`, `phase-2/trips`, ...). `fix/` branches are explicitly allowed for cross-phase patches like test fixes. No direct feature development on `main`.
 - **Commits:** logical, concise commit messages prefixed by type (`feat`, `fix`, `test`, `refactor`, `docs`, `chore`).
 - **Phase Completion:** a phase branch is merged into `main` only when all phase requirements are complete, `flutter analyze` reports zero issues, and all tests pass.
 - **Remote Synchronization:** after merging into `main`, push both `main` and the phase branch to origin, confirming local `main` equals `origin/main`.
