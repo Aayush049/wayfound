@@ -74,10 +74,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: CircleAvatar(
                   radius: 16,
                   backgroundColor: theme.colorScheme.primaryContainer,
-                  backgroundImage: user?.photoURL != null
-                      ? NetworkImage(user!.photoURL!)
+                  backgroundImage:
+                      user?.photoURL != null && user!.photoURL!.isNotEmpty
+                      ? NetworkImage(user.photoURL!)
                       : null,
-                  child: user?.photoURL == null
+                  child: (user?.photoURL == null || user!.photoURL!.isEmpty)
                       ? Text(
                           initial,
                           style: TextStyle(

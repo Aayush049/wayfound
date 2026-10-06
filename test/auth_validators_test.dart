@@ -39,6 +39,8 @@ void main() {
           AuthValidators.validateEmail('user.name+tag@domain.co.uk'),
           isNull,
         );
+        expect(AuthValidators.validateEmail('user+tag@example.com'), isNull);
+        expect(AuthValidators.validateEmail('email@example-sub.com'), isNull);
       });
     });
 

@@ -148,10 +148,10 @@ class SettingsScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 32,
             backgroundColor: colorScheme.primaryContainer,
-            backgroundImage: user.photoURL != null
+            backgroundImage: user.photoURL != null && user.photoURL!.isNotEmpty
                 ? NetworkImage(user.photoURL!)
                 : null,
-            child: user.photoURL == null
+            child: (user.photoURL == null || user.photoURL!.isEmpty)
                 ? Text(
                     initial,
                     style: TextStyle(

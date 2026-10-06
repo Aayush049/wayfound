@@ -25,7 +25,7 @@ class AuthValidators {
       return 'Please enter your email';
     }
     final trimmed = value.trim();
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w\+\-\.]+@([\w-]+\.)+[\w-]{2,}$');
     if (!emailRegex.hasMatch(trimmed)) {
       return 'Please enter a valid email address';
     }

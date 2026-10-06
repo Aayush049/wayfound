@@ -23,7 +23,7 @@ service cloud.firestore {
         && request.resource.data.displayName.size() <= 50
         && request.resource.data.email == request.auth.token.email
         && (request.resource.data.photoUrl == null || request.resource.data.photoUrl is string)
-        && request.resource.data.createdAt == request.time;
+        && (request.resource.data.createdAt == request.time || request.resource.data.createdAt is timestamp);
       allow update: if isOwner(userId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoUrl'])
         && request.resource.data.displayName is string
