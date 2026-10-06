@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/theme/theme_provider.dart';
 import '../data/auth_provider.dart';
+import '../domain/auth_validators.dart';
 
-/// Sign-up screen with email, password, and display name.
+/// Sign-up screen with display name, email, password, and confirm password fields.
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
@@ -15,19 +15,19 @@ class SignUpScreen extends ConsumerStatefulWidget {
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _displayNameController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _displayNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _displayNameController.dispose();
     super.dispose();
   }
 
@@ -36,6 +36,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     final notifier = ref.read(authNotifierProvider.notifier);
     await notifier.signUpWithEmail(
+      displayName: _displayNameController.text.trim(),
       email: _emailController.text.trim().toLowerCase(),
       password: _passwordController.text,
     );
@@ -43,35 +44,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     // Check result
     final state = ref.read(authNotifierProvider);
     if (state.hasError) {
-      if (mounted) {
+      final errorMsg = AuthValidators.formatAuthError(state.error);
+      if (errorMsg.isNotEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_formatError(state.error)),
+            content: Text(errorMsg),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
       ref.read(authNotifierProvider.notifier).clearError();
-    } else {
-      // Navigate to settings after successful sign-up
-      if (mounted) {
-        context.go('/settings');
-      }
     }
-  }
-
-  String _formatError(Object? error) {
-    final errorStr = error?.toString() ?? '';
-    if (errorStr.contains('email-already-in-use')) {
-      return 'An account already exists with this email.';
-    }
-    if (errorStr.contains('invalid-email')) {
-      return 'Please enter a valid email address.';
-    }
-    if (errorStr.contains('weak-password')) {
-      return 'Password must be at least 8 characters.';
-    }
-    return 'Sign-up failed. Please try again.';
   }
 
   @override
@@ -96,8 +79,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   child: Image.asset(
                     'assets/images/logo.png',
                     height: 80,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.explore, size: 64, color: colorScheme.primary),
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.explore,
+                      size: 64,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -128,18 +114,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     prefixIcon: Icon(Icons.person_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your display name';
-                    }
-                    if (value.trim().length < 1) {
-                      return 'Display name cannot be empty';
-                    }
-                    if (value.trim().length > 50) {
-                      return 'Display name must be 50 characters or less';
-                    }
-                    return null;
-                  },
+                  validator: AuthValidators.validateDisplayName,
                 ),
                 const SizedBox(height: 16),
 
@@ -153,15 +128,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email address';
-                    }
-                    return null;
-                  },
+                  validator: AuthValidators.validateEmail,
                 ),
                 const SizedBox(height: 16),
 
@@ -187,15 +154,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       },
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    return null;
-                  },
+                  validator: AuthValidators.validatePassword,
                 ),
                 const SizedBox(height: 16),
 
@@ -222,15 +181,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       },
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
+                  validator: (value) => AuthValidators.validateConfirmPassword(
+                    value,
+                    _passwordController.text,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -252,6 +206,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           ),
                         )
                       : const Text('Create Account'),
+                ),
+                const SizedBox(height: 16),
+
+                // Already have account -> Sign In
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Already have an account?',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    TextButton(
+                      onPressed: () => context.go('/sign-in'),
+                      child: const Text('Sign In'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 

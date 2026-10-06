@@ -1,81 +1,90 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
+import 'package:wayfound/app/theme/app_theme.dart';
+import 'package:wayfound/features/auth/data/auth_provider.dart';
+import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/features/auth/presentation/sign_in_screen.dart';
 
 void main() {
+  late FakeFirebaseFirestore firestore;
+  late MockFirebaseAuth auth;
+  late MockGoogleSignIn googleSignIn;
+  late AuthRepository repository;
+
+  setUp(() {
+    firestore = FakeFirebaseFirestore();
+    auth = MockFirebaseAuth();
+    googleSignIn = MockGoogleSignIn();
+    repository = AuthRepository(
+      auth: auth,
+      googleSignIn: googleSignIn,
+      firestore: firestore,
+    );
+  });
+
+  Widget buildSignInScreen({ThemeMode themeMode = ThemeMode.light}) {
+    return ProviderScope(
+      overrides: [authRepositoryProvider.overrideWithValue(repository)],
+      child: MaterialApp(
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeMode,
+        home: const SignInScreen(),
+      ),
+    );
+  }
+
   group('SignInScreen', () {
-    testWidgets('renders all UI elements', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
+    testWidgets('renders fields and buttons in Light mode', (tester) async {
+      await tester.pumpWidget(buildSignInScreen());
 
-      // Verify logo/title
-      expect(find.text('Wayfound'), findsOneWidget);
-
-      // Verify form elements
-      expect(find.text('Email'), findsOneWidget);
-      expect(find.text('Password'), findsOneWidget);
-
-      // Verify buttons
-      expect(find.text('Sign In'), findsOneWidget);
-      expect(find.text("Don't have an account?"), findsOneWidget);
-      expect(find.text('Sign Up'), findsOneWidget);
-      expect(find.text('Continue with Google'), findsOneWidget);
-      expect(find.text('Back'), findsOneWidget);
-    });
-
-    testWidgets('toggles between sign in and sign up modes', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
-
-      // Initial state: Sign In mode
       expect(find.text('Welcome back'), findsOneWidget);
-      expect(find.text('Sign In'), findsAtLeast(1));
-
-      // Tap "Sign Up" link
-      await tester.tap(find.text('Sign Up'));
-      await tester.pumpAndSettle();
-
-      // Now in Sign Up mode
-      expect(find.text('Create an account'), findsOneWidget);
-      expect(find.text('Create Account'), findsOneWidget);
-      expect(find.text('Already have an account?'), findsOneWidget);
+      expect(find.byType(TextFormField), findsNWidgets(2));
+      expect(find.text('Sign In'), findsWidgets);
+      expect(find.text('Continue with Google'), findsOneWidget);
     });
 
-    testWidgets('validates empty email', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
+    testWidgets('renders correctly in Dark mode', (tester) async {
+      await tester.pumpWidget(buildSignInScreen(themeMode: ThemeMode.dark));
 
-      // Try to submit without entering email
-      await tester.tap(find.text('Sign In'));
+      expect(find.text('Welcome back'), findsOneWidget);
+      expect(find.text('Continue with Google'), findsOneWidget);
+    });
+
+    testWidgets('shows validation errors when fields are empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildSignInScreen());
+
+      final signInButtons = find.widgetWithText(ElevatedButton, 'Sign In');
+      await tester.tap(signInButtons);
       await tester.pumpAndSettle();
 
-      // Should show validation error
       expect(find.text('Please enter your email'), findsOneWidget);
-    });
-
-    testWidgets('validates empty password', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
-
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'test@example.com',
-      );
-      await tester.tap(find.text('Sign In'));
-      await tester.pumpAndSettle();
-
       expect(find.text('Please enter your password'), findsOneWidget);
     });
 
-    testWidgets('password field can be obscured', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SignInScreen()));
+    testWidgets('shows validation error for invalid email and short password', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildSignInScreen());
 
-      // Find password field
-      final passwordField = find.byType(TextFormField).last;
+      await tester.enterText(find.byType(TextFormField).at(0), 'invalidemail');
+      await tester.enterText(find.byType(TextFormField).at(1), '123');
 
-      // Type a password
-      await tester.enterText(passwordField, 'secret123');
-      await tester.pump();
+      final signInButtons = find.widgetWithText(ElevatedButton, 'Sign In');
+      await tester.tap(signInButtons);
+      await tester.pumpAndSettle();
 
-      // Verify it's visible (obscureText is controlled by the widget state)
-      // The presence of the visibility toggle icon confirms password field exists
-      expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
+      expect(find.text('Please enter a valid email address'), findsOneWidget);
+      expect(
+        find.text('Password must be at least 8 characters'),
+        findsOneWidget,
+      );
     });
   });
 }

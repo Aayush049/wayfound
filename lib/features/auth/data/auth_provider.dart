@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/riverpod.dart';
 
 import 'auth_repository.dart';
 
@@ -21,22 +20,18 @@ final isSignedInProvider = Provider<bool>((ref) {
   return authUser.when(
     data: (user) => user != null,
     loading: () => false,
-    error: (_, __) => false,
+    error: (e, st) => false,
   );
 });
 
-/// Notifier for auth actions (sign-in, sign-up, sign-out).
+/// Notifier for auth actions (sign-in, sign-up, sign-out, update profile).
 /// Uses AsyncNotifier for flutter_riverpod 3.x compatibility.
 class AuthNotifier extends AsyncNotifier<void> {
-  final AuthRepository _repository;
-
-  AuthNotifier({AuthRepository? repository})
-      : _repository = repository ?? AuthRepository();
+  late final AuthRepository _repository;
 
   @override
   Future<void> build() async {
-    // Initial state is data(null)
-    return;
+    _repository = ref.watch(authRepositoryProvider);
   }
 
   /// Signs in with email and password.
@@ -56,16 +51,18 @@ class AuthNotifier extends AsyncNotifier<void> {
     }
   }
 
-  /// Signs up with email and password.
+  /// Signs up with email, password, and display name.
   Future<void> signUpWithEmail({
     required String email,
     required String password,
+    required String displayName,
   }) async {
     state = const AsyncLoading();
     try {
       await _repository.signUpWithEmailAndPassword(
         email: email,
         password: password,
+        displayName: displayName,
       );
       state = const AsyncData(null);
     } catch (e, st) {
@@ -84,22 +81,22 @@ class AuthNotifier extends AsyncNotifier<void> {
     }
   }
 
-  /// Signs out.
-  Future<void> signOut() async {
+  /// Updates display name.
+  Future<void> updateDisplayName(String displayName) async {
     state = const AsyncLoading();
     try {
-      await _repository.signOut();
+      await _repository.updateDisplayName(displayName);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
     }
   }
 
-  /// Sends password reset email.
-  Future<void> sendPasswordReset(String email) async {
+  /// Signs out.
+  Future<void> signOut() async {
     state = const AsyncLoading();
     try {
-      await _repository.sendPasswordResetEmail(email);
+      await _repository.signOut();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

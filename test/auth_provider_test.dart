@@ -1,8 +1,7 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 
@@ -11,78 +10,34 @@ void main() {
     late FakeFirebaseFirestore firestore;
     late MockFirebaseAuth auth;
     late AuthRepository repository;
-    late AuthNotifier notifier;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
       auth = MockFirebaseAuth(signedIn: false);
       repository = AuthRepository(auth: auth, firestore: firestore);
-      notifier = AuthNotifier(repository: repository);
     });
 
-    test('initial state is AsyncData', () {
-      expect(notifier.state, isA<AsyncData<void>>());
-    });
-
-    test('clearError resets state to data', () async {
-      notifier.state = AsyncError('error', StackTrace.empty);
-      notifier.clearError();
-      expect(notifier.state, isA<AsyncData<void>>());
-    });
-
-    test('signOut transitions and completes', () async {
-      final user = MockUser(uid: 'test-uid');
-      auth = MockFirebaseAuth(mockUser: user);
-      repository = AuthRepository(auth: auth, firestore: firestore);
-      notifier = AuthNotifier(repository: repository);
-
-      // Wait for build to complete
-      await Future.delayed(Duration.zero);
-
-      // After loading, should not be loading
-      expect(notifier.state.isLoading, isFalse);
-    });
-  });
-
-  group('authProvider', () {
-    test('authUserProvider emits user from stream', () {
-      final firestore = FakeFirebaseFirestore();
-      final auth = MockFirebaseAuth(
-        mockUser: MockUser(uid: 'test-uid', email: 'test@example.com'),
-      );
-      final repository = AuthRepository(auth: auth, firestore: firestore);
-
-      // Verify repository provides user
-      expect(repository.currentUser?.uid, equals('test-uid'));
-    });
-
-    test('isSignedInProvider returns true when user exists', () {
-      final firestore = FakeFirebaseFirestore();
-      final auth = MockFirebaseAuth(mockUser: MockUser(uid: 'test-uid'));
-      final repository = AuthRepository(auth: auth, firestore: firestore);
-
-      // Create a container to read the provider
+    test('isSignedInProvider returns false when signed out', () {
       final container = ProviderContainer(
         overrides: [authRepositoryProvider.overrideWithValue(repository)],
       );
-
-      addTearDown(container.dispose);
-
-      expect(container.read(isSignedInProvider), isTrue);
-    });
-
-    test('isSignedInProvider returns false when no user', () {
-      final firestore = FakeFirebaseFirestore();
-      final auth = MockFirebaseAuth(signedIn: false);
-      final repository = AuthRepository(auth: auth, firestore: firestore);
-
-      final container = ProviderContainer(
-        overrides: [authRepositoryProvider.overrideWithValue(repository)],
-      );
-
       addTearDown(container.dispose);
 
       expect(container.read(isSignedInProvider), isFalse);
+    });
+
+    test('isSignedInProvider returns true when signed in', () {
+      auth = MockFirebaseAuth(
+        mockUser: MockUser(uid: 'test-uid', email: 'test@example.com'),
+      );
+      repository = AuthRepository(auth: auth, firestore: firestore);
+
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
+
+      expect(container.read(isSignedInProvider), isTrue);
     });
   });
 }

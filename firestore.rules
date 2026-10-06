@@ -10,13 +10,29 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Users collection: users can read/write their own document
+    // Users collection: users/{userId}
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow write: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow delete: if false;
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['displayName', 'email', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'photoUrl', 'email', 'createdAt'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 50
+        && request.resource.data.email == request.auth.token.email
+        && (request.resource.data.photoUrl == null || request.resource.data.photoUrl is string)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoUrl'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 50
+        && (request.resource.data.photoUrl == null || request.resource.data.photoUrl is string);
     }
 
-    // Baseline deny-all for all other collections (will be relaxed per milestone)
+    // Baseline deny-all for all other collections
     match /{path=**}/** {
       allow read, write: if false;
     }

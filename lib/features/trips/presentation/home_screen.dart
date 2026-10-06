@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/theme_provider.dart';
+import '../../auth/data/auth_provider.dart';
 
 // Tab destinations for the main navigation (Section 5.1)
 final List<NavigationDestination> kTabDestinations = [
@@ -44,6 +45,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final authUser = ref.watch(authUserProvider);
+
+    final user = authUser.asData?.value;
+    final displayName =
+        user?.displayName ?? user?.email?.split('@').first ?? '';
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
     return Scaffold(
       appBar: AppBar(
@@ -57,11 +64,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(themeProvider.notifier).toggleTheme(theme.brightness);
             },
           ),
-          // Settings
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => context.go('/settings'),
+          // User Avatar button reaching Settings screen
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: GestureDetector(
+              onTap: () => context.go('/settings'),
+              child: Tooltip(
+                message: 'Settings',
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                  backgroundImage: user?.photoURL != null
+                      ? NetworkImage(user!.photoURL!)
+                      : null,
+                  child: user?.photoURL == null
+                      ? Text(
+                          initial,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onPrimaryContainer,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+            ),
           ),
         ],
       ),

@@ -47,7 +47,7 @@ class WelcomeScreen extends StatelessWidget {
               const Spacer(),
               // Sign In button
               ElevatedButton(
-                onPressed: () => context.go('/signin'),
+                onPressed: () => context.go('/sign-in'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: colorScheme.primary,
@@ -55,11 +55,20 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 child: const Text('Sign In'),
               ),
+              const SizedBox(height: 12),
+              // Sign Up button
+              OutlinedButton(
+                onPressed: () => context.go('/sign-up'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: BorderSide(color: colorScheme.primary),
+                ),
+                child: const Text('Create Account'),
+              ),
               const SizedBox(height: 16),
-              // Learn more (placeholder for now)
+              // Learn more button
               TextButton(
                 onPressed: () {
-                  // TODO: Add about/landing page
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text(

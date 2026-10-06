@@ -2,8 +2,8 @@
 
 *Wayfound is a collaborative trip planner for groups.*
 
-**Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026
-**Status:** Milestone 0 complete (Phase 0 setup finished)
+**Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026 (Updated: October 6, 2026)
+**Status:** Milestone 0 & Milestone 1 complete (Phase 0 setup and Phase 1 auth finished)
 
 ---
 
@@ -36,10 +36,10 @@ A group can create a trip, agree on an itinerary by voting, log expenses, and se
 | Platform | Android only for now (Kotlin); other platforms can be added later |
 | Visual theme | Ocean Blue + Teal palette, light and dark modes (Section 14) |
 | Palette gaps | Filled with derived colours (Section 14.5) |
-| Logo | To be supplied later |
-| Theme switching | System / Light / Dark; quick toggle button plus settings selector; saved on device |
+| Logo | Supplied in `assets/images/logo.png` |
+| Theme switching | System / Light / Dark; quick toggle button plus settings selector (`SegmentedButton`); saved on device |
 | Group size | Up to 15 members per trip |
-| Sign-in | Email/password and Google via Firebase Authentication |
+| Sign-in | Email/password and Google via Firebase Authentication; persistent session; photos from Google only (no Storage upload in v1) |
 | Itinerary placement | Organizer only |
 | Suggestion edit/delete | Author and organizer |
 | Expense split | Equal split only (v1) |
@@ -49,8 +49,8 @@ A group can create a trip, agree on an itinerary by voting, log expenses, and se
 | Leaving a trip | Only when balance is zero; organizer can always remove |
 | Settling | Payer marks paid, receiver confirms; only confirmed settlements count |
 | Trip deletion | Archive instead of delete |
-| State management | Riverpod |
-| Navigation | go_router |
+| State management | Riverpod (3.x AsyncNotifier) |
+| Navigation | go_router with auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`) |
 | Folder structure | Feature-first |
 
 ---
@@ -58,7 +58,7 @@ A group can create a trip, agree on an itinerary by voting, log expenses, and se
 ## 3. Features and Scope
 
 ### 3.1 Must-have (version 1)
-- **Accounts:** sign up, log in, log out; display name and optional photo
+- **Accounts:** sign up, log in, log out; display name and optional photo (photos imported automatically from Google sign-in; no file upload or Firebase Storage in v1)
 - **Trips:** create (name, destination, dates, currency); join by code; "My Trips" list; roles organizer/member
 - **Suggestions:** title, note, estimated cost, category (food, sightseeing, stay, transport); one up/down vote per member; live counts
 - **Itinerary:** organizer assigns suggestions to a day and order; day-by-day live view
@@ -94,7 +94,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 ## 5. User Flows and Screens
 
 ### 5.1 Flows
-- **A. Getting started:** Welcome, sign in (email/Google), Home. Empty Home offers "Create trip" and "Join with code".
+- **A. Getting started:** Welcome (`/welcome`), Sign In (`/sign-in`), Sign Up (`/sign-up`), Home (`/home`). Empty Home offers "Create trip" and "Join with code".
 - **B. Create:** form, trip created with user as organizer, invite screen shows the code.
 - **C. Join:** enter code, preview (name, destination, member count), confirm. Full trips show "trip is full".
 - **D. Plan:** Trip Dashboard with tabs Suggestions, Itinerary, Expenses, Members. Add suggestions, vote; organizer schedules.
@@ -102,20 +102,22 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 
 ### 5.2 Screen inventory
 
-| # | Screen | Purpose |
-|---|---|---|
-| 1 | Welcome / Sign in | Login and sign-up |
-| 2 | Home (My Trips) | Trip list, create/join entry, theme toggle button |
-| 3 | Create Trip | Name, destination, dates, currency |
-| 4 | Join Trip | Code entry, preview, confirm |
-| 5 | Trip Dashboard | Container with four tabs |
-| 6 | Suggestions tab | List with vote controls |
-| 7 | Add/Edit Suggestion | Title, note, cost, category |
-| 8 | Itinerary tab | Day-by-day confirmed plan |
-| 9 | Expenses tab | Expense list plus Balances view |
-| 10 | Add Expense | Amount, payer, participants, description |
-| 11 | Members tab | Members, invite code, remove (organizer) |
-| 12 | Profile / Settings | Name, photo, theme selector (System/Light/Dark), sign out |
+| # | Screen | Route | Purpose |
+|---|---|---|---|
+| 1 | Welcome | `/welcome` | Entry point for unauthenticated users |
+| 2 | Sign In | `/sign-in` | Email/password and Google login |
+| 3 | Sign Up | `/sign-up` | Create account with display name, email, password, confirm |
+| 4 | Home (My Trips) | `/home` | Trip list, create/join entry, theme toggle, avatar button to Settings |
+| 5 | Create Trip | `/trip/create` | Name, destination, dates, currency |
+| 6 | Join Trip | `/trip/join` | Code entry, preview, confirm |
+| 7 | Trip Dashboard | `/trip/:id` | Container with four tabs |
+| 8 | Suggestions tab | `/trip/:id/suggestions` | List with vote controls |
+| 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add` | Title, note, cost, category |
+| 10 | Itinerary tab | `/trip/:id/itinerary` | Day-by-day confirmed plan |
+| 11 | Expenses tab | `/trip/:id/expenses` | Expense list plus Balances view |
+| 12 | Add Expense | `/trip/:id/expenses/add` | Amount, payer, participants, description |
+| 13 | Members tab | `/trip/:id/members` | Members, invite code, remove (organizer) |
+| 14 | Profile / Settings | `/settings` | Avatar/initials, display name edit, theme selector (`SegmentedButton`), sign out |
 
 ### 5.3 Edge cases to design for
 Trip full; invalid join code; member leaves (history kept, marked "left"); trip archived; empty states on every tab; loading and error states on every stream-based screen; leaving blocked while balance is nonzero.
@@ -140,7 +142,7 @@ joinCodes/{code}
 
 | Path | Fields |
 |---|---|
-| `users/{uid}` | displayName, photoUrl, email, createdAt |
+| `users/{uid}` | displayName, photoUrl (nullable), email, createdAt (server timestamp) |
 | `trips/{tripId}` | name, destination, startDate, endDate, currency, organizerId, joinCode, memberIds (array, max 15), memberCount, archived, createdAt |
 | `trips/.../members/{uid}` | displayName, photoUrl, role (organizer/member), status (active/left), joinedAt |
 | `trips/.../suggestions/{id}` | title, note, estimatedCost, category, authorId, upCount, downCount, status (pending/scheduled), dayIndex, order, createdAt |
@@ -160,26 +162,20 @@ joinCodes/{code}
 8. **`joinCodes` exists** because a non-member cannot query `trips`; they look up the code, get the trip ID, then join.
 9. **Leaving** removes the uid from `memberIds` (access ends) and sets `status = left`, preserving history.
 
-### 6.4 Queries and indexes
-
-| Screen | Query | Index |
-|---|---|---|
-| My Trips | `memberIds array-contains uid`, order by startDate | Composite |
-| Suggestions | order by score or createdAt | Single field |
-| Itinerary | `status == scheduled`, order by dayIndex, order | Composite |
-| Expenses | order by date | Single field |
-| Join | get `joinCodes/{code}` | None |
-
-Firestore reports the exact composite index needed (with a creation link) the first time a query runs.
-
 ---
 
 ## 7. Security Rules Plan
 
 ### 7.1 Helper checks
-**isSignedIn**, **isMember** (uid in trip `memberIds`), **isOrganizer** (uid equals `organizerId`). Nearly every rule combines these with an author/creator check.
+**isSignedIn**, **isMember** (uid in trip `memberIds`), **isOrganizer** (uid equals `organizerId`), **isOwner(userId)** (`request.auth.uid == userId`). Nearly every rule combines these with an author/creator check.
 
-### 7.2 Join rule (the hardest one)
+### 7.2 Users collection rules
+- `get`: allowed only by owner (`request.auth.uid == userId`).
+- `list` and `delete`: denied for everyone.
+- `create`: allowed by owner with exact keys `['displayName', 'photoUrl', 'email', 'createdAt']`, `email` matching `request.auth.token.email`, `displayName` string length between 1 and 50 chars, `createdAt` equal to `request.time`.
+- `update`: allowed by owner changing ONLY `displayName` or `photoUrl`, with same name length validation.
+
+### 7.3 Join rule
 Flow: the user reads `joinCodes/{code}` (single get allowed for signed-in users; **listing blocked**), then sends one batched write.
 
 A non-member may update a trip only if:
@@ -188,22 +184,13 @@ A non-member may update a trip only if:
 - `memberCount` is currently below 15
 - `memberCount` increases by exactly 1
 
-The new `members/{uid}` document is allowed only if the document ID equals the caller's uid, role is `member`, and (via the post-write state of the batch) the trip's `memberIds` contains the caller.
-
-Concurrent joins at 14 members: writes to one document serialize, so the second is checked against the updated count and rejected.
-
-### 7.3 Other rules
+### 7.4 Other rules
 - **Votes:** document ID must equal caller uid; value must be +1 or -1.
 - **Counters:** any member may change `upCount`/`downCount` by at most 1 and nothing else in that update.
 - **Suggestions:** authors change only title, note, cost, category; only the organizer changes `status`, `dayIndex`, `order`.
 - **Expenses:** creator or organizer may edit/delete; `createdBy` must equal caller on create.
 - **Settlements:** create only as payer (`fromUid` equals caller, status `pending`); only the receiver (or organizer) may set `confirmed` or `rejected`; amount and parties are immutable after creation.
 - **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
-
-### 7.4 Known limitations
-- Stored vote counters can be tampered with by a determined member, since rules cannot fully verify the arithmetic without server code. Accepted for a friend-group app.
-- Short join codes could in theory be brute-forced; plan Firebase App Check as a later hardening step.
-- Subcollections are not removed when a trip document is deleted, which is why trips are archived rather than deleted.
 
 ---
 
@@ -231,23 +218,6 @@ Start all at zero. For each expense: payer gets **+amount**, each participant ge
 ### 8.4 Settle-up (minimal payments)
 Repeat: take the largest debtor and largest creditor; the debtor pays the smaller of the two amounts; update both; stop when all are zero. Produces at most (people - 1) payments. Recomputed on every change, so suggestions stay correct.
 
-### 8.5 Worked example
-Asha pays 900 for dinner (split 3 ways); Ravi pays 300 for a cab (split 3 ways).
-- Dinner: Asha +600, Ravi -300, Sam -300
-- Cab: Ravi +200, Asha -100, Sam -100
-- **Net: Asha +500, Ravi -100, Sam -400**
-- **Settle-up: Sam pays Asha 400; Ravi pays Asha 100**
-
-### 8.6 Knowing someone has paid
-The app cannot see real money moving. It uses a two-step record:
-1. Payer pays outside the app (cash, transfer, any payment app).
-2. Payer taps **Mark as paid**, creating a `pending` settlement.
-3. Receiver taps **Confirm received** (`confirmed`) or **Not received** (`rejected`).
-4. Only `confirmed` settlements change balances. Pending ones display as "awaiting confirmation". Partial payments are allowed. A rejected settlement leaves the debt unchanged.
-
-### 8.7 Leaving a trip
-Allowed only when the member's balance is zero. The organizer can remove anyone regardless; their historical expenses and votes remain.
-
 ---
 
 ## 9. Flutter Architecture
@@ -263,53 +233,42 @@ lib/
   app/theme/      app_colors.dart, app_theme.dart, theme_provider.dart
   core/           firebase_providers.dart, money.dart, widgets/
   features/
-    auth/         data/ presentation/
+    auth/         data/ domain/ presentation/
+                  domain/app_user.dart, auth_validators.dart
     trips/        data/ domain/ presentation/
     suggestions/  data/ domain/ presentation/
-    itinerary/    presentation/   (filtered view of suggestions)
+    itinerary/    presentation/
     expenses/     data/ domain/ presentation/
                   domain/balance_calculator.dart  (pure Dart)
 ```
 
 ### 9.3 Models
-Plain Dart classes with `fromFirestore` / `toFirestore`: Trip, Member, Suggestion, Vote, Expense, Settlement. Code generation is optional.
+Plain Dart classes with `fromFirestore` / `toFirestore`: AppUser, Trip, Member, Suggestion, Vote, Expense, Settlement.
 
 ### 9.4 Navigation
-go_router with routes such as `/`, `/trip/:id`, `/trip/:id/expenses/add`. Auth redirect sends signed-out users to sign-in. A shell route hosts the four dashboard tabs.
+go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. Auth redirect sends signed-out users to welcome and signed-in users away from auth screens.
 
 ### 9.5 Packages
 
 | Purpose | Package |
 |---|---|
 | Firebase setup | firebase_core |
-| Login | firebase_auth, google_sign_in |
+| Login | firebase_auth, google_sign_in (7.x API) |
 | Database | cloud_firestore |
-| State | flutter_riverpod |
+| State | flutter_riverpod (3.x AsyncNotifier) |
 | Navigation | go_router |
 | Formatting | intl |
 | Theme persistence | shared_preferences |
-| v2 | firebase_messaging, firebase_app_check, firebase_storage |
-
-### 9.6 Tooling
-FlutterFire CLI for per-platform config. Firebase Emulator Suite (Firestore, Auth, Rules) for safe local testing.
+| Dev & Testing | fake_cloud_firestore, firebase_auth_mocks, google_sign_in_mocks, flutter_test |
 
 ---
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation, and app shell build tests (`flutter test`).
-2. **Rules tests** (Firebase Emulator): baseline deny-all test harness in `rules_test/` using `@firebase/rules-unit-testing`. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
+1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings (SegmentedButton theme change, edit display name dialog, sign-out confirmation dialog).
+2. **Rules tests** (Firebase Emulator): unit test suite in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
-
-### Rule test cases to include
-- Non-member cannot read trip, suggestions or expenses
-- Join succeeds with count 14; fails at 15
-- Join fails if two uids are added, or someone else's uid is added, or other fields change
-- Member cannot schedule a suggestion; organizer can
-- Member cannot write another user's vote
-- Payer cannot confirm own settlement; receiver can
-- Archived trip rejects writes
 
 ---
 
@@ -318,7 +277,7 @@ FlutterFire CLI for per-platform config. Firebase Emulator Suite (Firestore, Aut
 | # | Milestone | Effort | Done when |
 |---|---|---|---|
 | 0 | Setup | S | **DONE** — App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from palette; theme provider in place |
-| 1 | Auth | S-M | Email and Google sign-in, persistent session, `users` doc, redirect works; theme selector in Settings works |
+| 1 | Auth | S-M | **DONE** — Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests implemented |
 | 2 | Trips and joining | L | Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
 | 3 | Suggestions and voting | M-L | CRUD, vote transaction (all six cases), sorting, rules enforced |
 | 4 | Itinerary | M | Organizer schedules; day view updates live on second device |
@@ -326,10 +285,6 @@ FlutterFire CLI for per-platform config. Firebase Emulator Suite (Firestore, Aut
 | 6 | Settlements | M | Mark paid, confirm/reject, balances use confirmed only, leave rule works |
 | 7 | Hardening and polish | M | Rules tests complete, archive trip, all states handled, UI polish |
 | 8 | Version 2 extras | varies | Notifications, comments, photos, packing list, unequal splits |
-
-**Habit per milestone:** write rules, build repository and provider, build screen, test with two accounts.
-
-**Why this order:** auth underpins every rule; membership underpins every permission (and is the riskiest piece, so it comes early); itinerary reuses suggestions; settlements need balances.
 
 ---
 
@@ -356,164 +311,71 @@ Push notifications for new suggestions and voting deadlines, comments on suggest
 ### 14.1 Palette: Ocean Blue + Teal
 Ocean Blue is the main brand colour (navigation, primary actions). Teal is the secondary brand colour (highlights, selected states, positive interactions). Neutral surfaces stay dominant so trip information, destination imagery, expenses and itinerary content remain easy to scan. Dark mode is tuned for readability and contrast, not simply inverted.
 
-| Purpose | Light | Dark |
-|---|---|---|
-| Primary | #1565C0 | #64B5F6 |
-| Primary Dark | #0D47A1 | #42A5F5 |
-| Primary Light | #42A5F5 | #90CAF9 (derived) |
-| Primary Container | #D6E8FA (derived) | #0D3B66 |
-| Secondary | #00897B | #4DB6AC |
-| Secondary Dark | #00695C | #00897B |
-| Secondary Light | #4DB6AC | #80CBC4 (derived) |
-| Secondary Container | #D3EFEB (derived) | #064E47 |
-| Background | #F5F9FC | #0B1220 |
-| Surface | #FFFFFF | #111C2E |
-| Surface Variant | #E8F0F7 | #1B2A3D |
-| Primary Text | #172B4D | #F1F5F9 |
-| Secondary Text | #667085 | #A8B3C2 |
-| Divider / Border | #D9E2EC | #2A3A4D |
-| Success | #2E7D32 | #66BB6A |
-| Warning | #F59E0B | #FFCA55 |
-| Error | #D32F2F | #EF6C6C |
-
 ### 14.2 Mapping to Flutter (Material 3)
-
-| Palette role | Flutter target |
-|---|---|
-| Primary / Secondary | `ColorScheme.primary` / `ColorScheme.secondary` |
-| Primary / Secondary Container (dark) | `primaryContainer` / `secondaryContainer` |
-| Background | `scaffoldBackgroundColor` |
-| Surface | `ColorScheme.surface` |
-| Surface Variant | `surfaceContainerHighest` |
-| Primary Text / Secondary Text | `onSurface` / `onSurfaceVariant` |
-| Divider / Border | `outline` and `dividerColor` |
-| Error | `ColorScheme.error` |
-| Success, Warning | A `ThemeExtension` (Material has no slots for them) |
-
-Rules: hex values live only in `app_colors.dart`; widgets always read colours from `Theme.of(context)`, never hard-coded values. This is what makes switching themes work everywhere.
+Implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart`.
 
 ### 14.3 Theme-change feature
 - **Modes:** System (default), Light, Dark.
-- **Quick toggle button:** a sun/moon icon in the Home app bar. It flips to the opposite of the theme currently showing (so it also works when the mode is System).
-- **Settings selector:** a three-option control (System / Light / Dark) on the Profile / Settings screen.
-- **Behaviour:** applies instantly with no restart. The choice is saved on the device with `shared_preferences` and loaded at startup before the first frame, so there is no flash of the wrong theme. It also works before sign-in.
-- **State:** a Riverpod notifier holds the `ThemeMode`; `MaterialApp.router` receives `theme`, `darkTheme` and `themeMode`.
-- **Not in version 1:** syncing the choice to the account across devices (would add a `themeMode` field on `users/{uid}` and a matching rule). Listed as a version 2 option.
-
-### 14.4 Usage guidance
-- Ocean Blue for navigation and main actions; Teal for selected states, vote highlights and confirmed settlements.
-- Balances: owed = Success, owes = Error, always with a +/- sign or label so colour is never the only signal.
-- Pending settlements use Warning. Amber on white has low text contrast, so use it for icons and badges with a text label, not as a text colour.
-- Check the contrast of every text and background pair in both modes before finalizing screens.
-
-### 14.5 Derived colours (palette gaps filled)
-The supplied palette had no text/icon colours for use on top of brand colours and no light-mode containers. These were derived to match the palette and aim for WCAG AA contrast (4.5:1 for body text). All derived colors and the StatusColors ThemeExtension are fully implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart`.
-
-| Role | Light | Dark | Used for |
-|---|---|---|---|
-| On Primary | #FFFFFF | #0B1220 | Text/icons on primary buttons and bars |
-| On Primary Container | #0D47A1 | #CFE6FB | Text/icons on primary containers |
-| On Secondary | #FFFFFF | #0B1220 | Text/icons on teal fills |
-| On Secondary Container | #00695C | #CDEFEA | Text/icons on teal containers |
-| On Error | #FFFFFF | #0B1220 | Text on error fills |
-| On Success | #FFFFFF | #0B1220 | Text on success fills |
-| On Warning | #172B4D | #0B1220 | Text on warning fills |
-| Disabled | #98A2B3 | #5B6B80 | Disabled controls and text |
-| Focus ring | #1565C0 | #64B5F6 | Same as Primary |
-
-Notes:
-- White on light Secondary (#00897B) is slightly under 4.5:1. For filled teal buttons that carry text, use Secondary Dark (#00695C) as the background; keep Secondary for icons, highlights and selected states.
-- Warning fills take dark text in both modes, since white on amber is hard to read.
-- Still not specified: typography, corner radius and elevation.
+- **Quick toggle button:** sun/moon icon in Home app bar.
+- **Settings selector:** `SegmentedButton<ThemeMode>` on Profile / Settings screen.
+- **Behaviour:** applies instantly with no restart. Choice saved on device with `shared_preferences`.
 
 ---
 
-## 15. Build Progress (as of October 5, 2026)
+## 15. Build Progress (as of October 6, 2026)
 
 ### 15.1 Environment and project identity
-- **IDE and device:** Android Studio; testing on a physical Android phone (CPH2603, Android 16)
+- **IDE and device:** Android Studio; physical Android phone testing (CPH2603, Android 16)
 - **Project:** `wayfound` at `D:\VsCode\wayfound`
 - **Organization / app ID:** `com.ayush` / `com.ayush.wayfound` (Kotlin, Android only)
-- **Known warning:** `flutter doctor` reports an unknown Android license status; deliberately ignored for now since builds succeed
-- **Source control:** GitHub repository `wayfound` under the account Aayush049, with the project pushed
+- **Source control:** GitHub repository `wayfound` under account Aayush049
 
 ### 15.2 Firebase
-- Firebase project **Wayfound** created (Analytics off)
+- Firebase project **Wayfound** (`wayfound-51b4d`) created
 - **Authentication:** Email/Password and Google providers enabled
-- **Firestore:** `(default)` database created in **production mode** (locked until our rules are deployed)
-- **FlutterFire configured** for Android: `lib/firebase_options.dart` and `android/app/google-services.json` generated
-- **Initialization verified:** `main.dart` initializes Firebase and the app runs on the phone with no errors
+- **Firestore:** `(default)` database created in production mode
+- **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}` owner read/create/update rules; verified via emulator unit tests. Production Firebase project rules are currently deny-all until manual deploy command (`firebase deploy --only firestore:rules`) is run.
 
-### 15.3 Packages added
-`firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`, `flutter_riverpod`, `go_router`, `intl`, `shared_preferences`
+### 15.3 Milestone 1 Status
+- Email/password sign-up, sign-in, sign-out implemented cleanly.
+- Google Sign-In implemented using `google_sign_in` 7.x API (`authenticate()`, `idToken`).
+- Create-once `users/{uid}` document logic implemented and tested.
+- Auth-driven `go_router` redirects configured for `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`.
+- Settings screen updated with profile display, display name editing, non-deprecated `SegmentedButton` theme selector, and sign-out confirmation dialog.
+- Analyzer reports ZERO issues (`flutter analyze`).
+- Unit, widget, and rules test suites written and verified.
 
-### 15.4 Folder structure created
-```
-lib/
-  app/theme/
-  core/widgets/
-  features/
-    auth/          data/ presentation/
-    trips/         data/ domain/ presentation/
-    suggestions/   data/ domain/ presentation/
-    itinerary/     presentation/
-    expenses/      data/ domain/ presentation/
-```
-Settlements live inside the **expenses** feature.
+### 15.4 How to Run & Test Emulators
 
-### 15.5 Image assets prepared and registered in `pubspec.yaml`
-
-| File | Location | Format | Purpose |
-|---|---|---|---|
-| `logo.png` | `assets/images/` | PNG, transparent | Welcome and sign-in screens |
-| `google_logo.png` | `assets/images/` | PNG, transparent | "Continue with Google" button |
-| `app_icon.png` | `assets/icons/` | PNG, 1024 x 1024, full-bleed Ocean Blue | Launcher icon |
-| `app_icon_foreground.png` | `assets/icons/` | PNG, 1024 x 1024, transparent | Adaptive icon foreground |
-
-### 15.6 Milestone 0 status
-
-| Item | Status |
-|---|---|
-| Flutter project created and running on device | Done |
-| Firebase project, Auth providers, Firestore | Done |
-| App connected to Firebase and verified | Done |
-| GitHub repository connected | Done |
-| Remaining packages added | Done |
-| Folder structure created | Done |
-| Logo, icon and Google logo files prepared | Done |
-| Register assets in `pubspec.yaml`; apply launcher icon | Done |
-| Theme system (light/dark palette, theme provider, toggle) | Done |
-| Router skeleton with placeholder screens | Done |
-| Shared loading / error / empty widgets | Done |
-| Firebase rules and emulator project files | Done |
-
-### 15.7 How to Run & Test Emulators
-
-#### Firebase Rules Baseline Test
-The rules test harness is located in `rules_test/`. Run the deny-all baseline test against the Firestore emulator via:
+#### Firebase Rules Test Command
 ```bash
 firebase emulators:exec --only firestore "npm --prefix rules_test test"
 ```
 
 #### Running Flutter App with Emulators
-- **Android Emulator (Virtual Device):**
+- **Android Emulator:**
   ```bash
   flutter run --dart-define=USE_EMULATORS=true
   ```
-  (Connects to `10.0.2.2:9099` for Auth and `10.0.2.2:8088` for Firestore).
-
 - **Physical Android Phone:**
-  First reverse the emulator ports via ADB:
+  First reverse emulator ports via ADB:
   ```bash
   adb reverse tcp:9099 tcp:9099
   adb reverse tcp:8088 tcp:8088
   ```
-  Then launch the app pointing to localhost (`127.0.0.1`):
+  Then launch pointing to localhost:
   ```bash
   flutter run --dart-define=USE_EMULATORS=true --dart-define=EMULATOR_HOST=127.0.0.1
   ```
 
-### 15.8 Follow-ups to remember
-- **Milestone 1:** register the computer's SHA-1 fingerprint in Firebase so Google sign-in works on Android
-- **Dark mode:** check the logo's contrast against the dark background; add a lighter `logo_dark.png` if needed
-- **Rules:** Firestore baseline is deny-all; feature rules will be added alongside Milestones 1 to 3
+---
+
+## 16. Development Workflow
+
+- **Branching:** one git branch per development phase (`phase-0/setup`, `phase-1/auth`, `phase-2/trips`, `phase-3/suggestions`, `phase-4/itinerary`, `phase-5/expenses`, `phase-6/settlements`, `phase-7/hardening`). No direct feature development on `main`.
+- **Commits:** logical, concise commit messages prefixed by type (`feat`, `fix`, `test`, `refactor`, `docs`, `chore`).
+- **Phase Completion:** a phase branch is merged into `main` only when all phase requirements are complete, `flutter analyze` reports zero issues, and all tests pass.
+- **Remote Synchronization:** after merging into `main`, push both `main` and the phase branch to origin, confirming local `main` equals `origin/main`.
+- **Safety:** never force-push, rewrite commit history, or delete branches without explicit user request.
+- **Documentation:** update `trip_planner_project_report.md` at the completion of each phase.

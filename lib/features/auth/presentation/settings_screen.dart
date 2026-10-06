@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/theme_provider.dart';
 import '../data/auth_provider.dart';
+import '../domain/auth_validators.dart';
 
 /// Settings/Profile screen - accessible from Home screen.
-/// Shows user info and theme selector (Section 14.3).
+/// Shows user info, allows editing display name, theme selector (Section 14.3),
+/// and sign out.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -30,35 +32,68 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           // User profile section
           authUser.when(
-            data: (user) => _buildProfileSection(context, user, colorScheme),
+            data: (user) =>
+                _buildProfileSection(context, ref, user, colorScheme),
             loading: () => const ListTile(
               leading: CircularProgressIndicator(),
-              title: Text('Loading...'),
+              title: Text('Loading profile...'),
             ),
             error: (e, _) => ListTile(
               leading: const Icon(Icons.error),
-              title: Text('Error: $e'),
+              title: Text('Error loading profile: $e'),
             ),
           ),
           const Divider(),
 
-          // Theme section (Section 14.3)
+          // Appearance section
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
-              'Appearance',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Appearance',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: SegmentedButton<ThemeMode>(
+                    segments: const [
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.system,
+                        label: Text('System'),
+                        icon: Icon(Icons.brightness_auto),
+                      ),
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.light,
+                        label: Text('Light'),
+                        icon: Icon(Icons.light_mode),
+                      ),
+                      ButtonSegment<ThemeMode>(
+                        value: ThemeMode.dark,
+                        label: Text('Dark'),
+                        icon: Icon(Icons.dark_mode),
+                      ),
+                    ],
+                    selected: {themeMode},
+                    onSelectionChanged: (newSelection) {
+                      ref
+                          .read(themeProvider.notifier)
+                          .setThemeMode(newSelection.first);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          _buildThemeSelector(context, ref, themeMode, colorScheme),
 
           const Divider(),
 
           // Account actions
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               'Account',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -71,22 +106,14 @@ class SettingsScreen extends ConsumerWidget {
             title: Text('Sign Out', style: TextStyle(color: colorScheme.error)),
             onTap: () => _signOut(context, ref),
           ),
-          ListTile(
-            leading: Icon(Icons.delete_forever, color: colorScheme.error),
-            title: Text(
-              'Delete Account',
-              style: TextStyle(color: colorScheme.error),
-            ),
-            onTap: () => _showDeleteAccountDialog(context, ref),
-          ),
 
           const Divider(),
 
           // App info
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Wayfound'),
-            subtitle: const Text('Version 1.0.0'),
+          const ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Wayfound'),
+            subtitle: Text('Version 1.0.0'),
           ),
         ],
       ),
@@ -95,6 +122,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildProfileSection(
     BuildContext context,
+    WidgetRef ref,
     User? user,
     ColorScheme colorScheme,
   ) {
@@ -103,11 +131,15 @@ class SettingsScreen extends ConsumerWidget {
         leading: Icon(Icons.person_off, color: colorScheme.onSurfaceVariant),
         title: const Text('Not signed in'),
         trailing: TextButton(
-          onPressed: () => context.go('/signin'),
+          onPressed: () => context.go('/sign-in'),
           child: const Text('Sign In'),
         ),
       );
     }
+
+    final displayName =
+        user.displayName ?? user.email?.split('@').first ?? 'User';
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -121,9 +153,10 @@ class SettingsScreen extends ConsumerWidget {
                 : null,
             child: user.photoURL == null
                 ? Text(
-                    (user.displayName ?? user.email ?? '?')[0].toUpperCase(),
+                    initial,
                     style: TextStyle(
                       fontSize: 24,
+                      fontWeight: FontWeight.bold,
                       color: colorScheme.onPrimaryContainer,
                     ),
                   )
@@ -134,10 +167,23 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  user.displayName ?? 'User',
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        displayName,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      tooltip: 'Edit display name',
+                      onPressed: () =>
+                          _showEditNameDialog(context, ref, displayName),
+                    ),
+                  ],
                 ),
                 Text(
                   user.email ?? '',
@@ -152,50 +198,60 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildThemeSelector(
+  Future<void> _showEditNameDialog(
     BuildContext context,
     WidgetRef ref,
-    ThemeMode themeMode,
-    ColorScheme colorScheme,
-  ) {
-    return Column(
-      children: [
-        RadioListTile<ThemeMode>(
-          title: const Text('System'),
-          subtitle: const Text('Follow device settings'),
-          value: ThemeMode.system,
-          groupValue: themeMode,
-          onChanged: (value) {
-            if (value != null) {
-              ref.read(themeProvider.notifier).setThemeMode(value);
-            }
-          },
-          secondary: const Icon(Icons.brightness_auto),
+    String currentName,
+  ) async {
+    final controller = TextEditingController(text: currentName);
+    final formKey = GlobalKey<FormState>();
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Display Name'),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Display Name',
+              border: OutlineInputBorder(),
+            ),
+            validator: AuthValidators.validateDisplayName,
+          ),
         ),
-        RadioListTile<ThemeMode>(
-          title: const Text('Light'),
-          value: ThemeMode.light,
-          groupValue: themeMode,
-          onChanged: (value) {
-            if (value != null) {
-              ref.read(themeProvider.notifier).setThemeMode(value);
-            }
-          },
-          secondary: const Icon(Icons.light_mode),
-        ),
-        RadioListTile<ThemeMode>(
-          title: const Text('Dark'),
-          value: ThemeMode.dark,
-          groupValue: themeMode,
-          onChanged: (value) {
-            if (value != null) {
-              ref.read(themeProvider.notifier).setThemeMode(value);
-            }
-          },
-          secondary: const Icon(Icons.dark_mode),
-        ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(context, controller.text.trim());
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
+
+    if (newName != null && newName != currentName && context.mounted) {
+      await ref.read(authNotifierProvider.notifier).updateDisplayName(newName);
+      final state = ref.read(authNotifierProvider);
+      if (state.hasError && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AuthValidators.formatAuthError(state.error)),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        ref.read(authNotifierProvider.notifier).clearError();
+      }
+    }
   }
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
@@ -221,56 +277,6 @@ class SettingsScreen extends ConsumerWidget {
       await ref.read(authNotifierProvider.notifier).signOut();
       if (context.mounted) {
         context.go('/welcome');
-      }
-    }
-  }
-
-  Future<void> _showDeleteAccountDialog(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'This will permanently delete your account and all your data. '
-          'This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      try {
-        final repository = ref.read(authRepositoryProvider);
-        await repository.deleteAccount();
-        if (context.mounted) {
-          context.go('/welcome');
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Account deleted')));
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to delete account: $e'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
       }
     }
   }

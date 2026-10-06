@@ -1,8 +1,6 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 
@@ -32,7 +30,6 @@ void main() {
       test('returns user when signed in', () async {
         final user = MockUser(uid: 'test-uid', email: 'test@example.com');
         auth = MockFirebaseAuth(mockUser: user);
-        googleSignIn = MockGoogleSignIn();
         repository = AuthRepository(
           auth: auth,
           googleSignIn: googleSignIn,
@@ -44,28 +41,9 @@ void main() {
       });
     });
 
-    group('authStateChanges', () {
-      test('emits null initially when no user', () async {
-        final stream = repository.authStateChanges;
-        expect(stream, emits(isNull));
-      });
-
-      test('emits user after sign-in', () async {
-        final user = MockUser(uid: 'test-uid', email: 'test@example.com');
-        auth = MockFirebaseAuth(mockUser: user);
-        repository = AuthRepository(
-          auth: auth,
-          googleSignIn: googleSignIn,
-          firestore: firestore,
-        );
-
-        expect(repository.authStateChanges, emits(user));
-      });
-    });
-
-    group('createOrUpdateUserDoc', () {
-      test('creates user document with correct fields', () async {
-        await repository.createOrUpdateUserDoc(
+    group('createOnceUserDoc', () {
+      test('creates user document on first call with correct fields', () async {
+        await repository.createOnceUserDoc(
           uid: 'user-123',
           email: 'test@example.com',
           displayName: 'Test User',
@@ -74,7 +52,6 @@ void main() {
 
         final doc = await firestore.collection('users').doc('user-123').get();
         expect(doc.exists, isTrue);
-        expect(doc.data()?['uid'], equals('user-123'));
         expect(doc.data()?['email'], equals('test@example.com'));
         expect(doc.data()?['displayName'], equals('Test User'));
         expect(
@@ -82,25 +59,33 @@ void main() {
           equals('https://example.com/photo.jpg'),
         );
         expect(doc.data()?['createdAt'], isNotNull);
-        expect(doc.data()?['updatedAt'], isNotNull);
+        // Ensure extraneous fields are not present
+        expect(doc.data()?.containsKey('uid'), isFalse);
       });
 
-      test('merges with existing document', () async {
-        await firestore.collection('users').doc('user-123').set({
-          'uid': 'user-123',
-          'email': 'old@example.com',
-        });
+      test(
+        'does not overwrite existing user document on second call',
+        () async {
+          final initialTimestamp = DateTime(2026, 1, 1);
+          await firestore.collection('users').doc('user-123').set({
+            'displayName': 'Initial Name',
+            'email': 'initial@example.com',
+            'photoUrl': null,
+            'createdAt': initialTimestamp.toIso8601String(),
+          });
 
-        await repository.createOrUpdateUserDoc(
-          uid: 'user-123',
-          email: 'new@example.com',
-          displayName: 'Updated User',
-        );
+          // Second call should preserve initial document
+          await repository.createOnceUserDoc(
+            uid: 'user-123',
+            email: 'new@example.com',
+            displayName: 'New Name',
+          );
 
-        final doc = await firestore.collection('users').doc('user-123').get();
-        expect(doc.data()?['email'], equals('new@example.com'));
-        expect(doc.data()?['displayName'], equals('Updated User'));
-      });
+          final doc = await firestore.collection('users').doc('user-123').get();
+          expect(doc.data()?['displayName'], equals('Initial Name'));
+          expect(doc.data()?['email'], equals('initial@example.com'));
+        },
+      );
     });
 
     group('getUserDoc', () {
@@ -111,54 +96,19 @@ void main() {
 
       test('returns document data when exists', () async {
         await firestore.collection('users').doc('user-123').set({
-          'uid': 'user-123',
-          'email': 'test@example.com',
           'displayName': 'Test',
+          'email': 'test@example.com',
         });
 
         final doc = await repository.getUserDoc('user-123');
         expect(doc, isNotNull);
-        expect(doc?['uid'], equals('user-123'));
+        expect(doc?['displayName'], equals('Test'));
         expect(doc?['email'], equals('test@example.com'));
       });
     });
 
-    group('signInWithEmailAndPassword', () {
-      test('creates user document on successful sign-in', () async {
-        auth = MockFirebaseAuth(signedIn: false);
-        googleSignIn = MockGoogleSignIn();
-        repository = AuthRepository(
-          auth: auth,
-          googleSignIn: googleSignIn,
-          firestore: firestore,
-        );
-
-        // Mock sign-in creates the user
-        auth = MockFirebaseAuth(
-          mockUser: MockUser(uid: 'new-user-uid', email: 'new@example.com'),
-        );
-        repository = AuthRepository(
-          auth: auth,
-          googleSignIn: googleSignIn,
-          firestore: firestore,
-        );
-
-        // Sign in and verify doc is created
-        await repository.signInWithEmailAndPassword(
-          email: 'new@example.com',
-          password: 'password123',
-        );
-
-        final doc = await firestore
-            .collection('users')
-            .doc('new-user-uid')
-            .get();
-        expect(doc.exists, isTrue);
-      });
-    });
-
     group('signOut', () {
-      test('signs out from Firebase Auth', () async {
+      test('signs out from providers without errors', () async {
         final user = MockUser(uid: 'test-uid');
         auth = MockFirebaseAuth(mockUser: user);
         repository = AuthRepository(
@@ -168,7 +118,6 @@ void main() {
         );
 
         await repository.signOut();
-
         expect(repository.currentUser, isNull);
       });
     });

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/widgets/async_value_widget.dart';
 import '../data/auth_provider.dart';
+import '../domain/auth_validators.dart';
 
 /// Sign-in screen with email/password and Google sign-in options.
 class SignInScreen extends ConsumerStatefulWidget {
@@ -18,7 +18,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isSignUp = false;
 
   @override
   void dispose() {
@@ -31,25 +30,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final notifier = ref.read(authNotifierProvider.notifier);
-    if (_isSignUp) {
-      await notifier.signUpWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-    } else {
-      await notifier.signInWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-    }
+    await notifier.signInWithEmail(
+      email: _emailController.text.trim().toLowerCase(),
+      password: _passwordController.text,
+    );
 
     // Check result
     final state = ref.read(authNotifierProvider);
     if (state.hasError) {
-      if (mounted) {
+      final errorMsg = AuthValidators.formatAuthError(state.error);
+      if (errorMsg.isNotEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_formatError(state.error)),
+            content: Text(errorMsg),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -58,45 +51,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
-  String _formatError(Object? error) {
-    final errorStr = error?.toString() ?? '';
-    if (errorStr.contains('user-not-found')) {
-      return 'No account found with this email.';
-    }
-    if (errorStr.contains('wrong-password')) {
-      return 'Incorrect password.';
-    }
-    if (errorStr.contains('email-already-in-use')) {
-      return 'An account already exists with this email.';
-    }
-    if (errorStr.contains('invalid-email')) {
-      return 'Please enter a valid email address.';
-    }
-    if (errorStr.contains('weak-password')) {
-      return 'Password must be at least 8 characters.';
-    }
-    if (errorStr.contains('network-request-failed')) {
-      return 'Network error. Please check your connection.';
-    }
-    if (errorStr.contains('cancelled')) {
-      return 'Sign-in was cancelled.';
-    }
-    if (errorStr.contains('DEVELOPER_ERROR')) {
-      return 'Google Sign-In not configured. Register SHA-1 in Firebase Console.';
-    }
-    return 'An error occurred. Please try again.';
-  }
-
   Future<void> _signInWithGoogle() async {
     final notifier = ref.read(authNotifierProvider.notifier);
     await notifier.signInWithGoogle();
 
     final state = ref.read(authNotifierProvider);
     if (state.hasError) {
-      if (mounted) {
+      final errorMsg = AuthValidators.formatAuthError(state.error);
+      if (errorMsg.isNotEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_formatError(state.error)),
+            content: Text(errorMsg),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -145,7 +110,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isSignUp ? 'Create an account' : 'Welcome back',
+                  'Welcome back',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
@@ -163,15 +128,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
+                  validator: AuthValidators.validateEmail,
                 ),
                 const SizedBox(height: 16),
 
@@ -198,15 +155,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       },
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
+                  validator: AuthValidators.validatePassword,
                 ),
                 const SizedBox(height: 24),
 
@@ -227,27 +176,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             color: colorScheme.onPrimary,
                           ),
                         )
-                      : Text(_isSignUp ? 'Create Account' : 'Sign In'),
+                      : const Text('Sign In'),
                 ),
                 const SizedBox(height: 16),
 
-                // Toggle sign-in / sign-up
+                // Navigation to sign up
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _isSignUp
-                          ? 'Already have an account?'
-                          : "Don't have an account?",
+                      "Don't have an account?",
                       style: theme.textTheme.bodyMedium,
                     ),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignUp = !_isSignUp;
-                        });
-                      },
-                      child: Text(_isSignUp ? 'Sign In' : 'Sign Up'),
+                      onPressed: () => context.go('/sign-up'),
+                      child: const Text('Sign Up'),
                     ),
                   ],
                 ),
