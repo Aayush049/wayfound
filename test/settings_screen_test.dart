@@ -1,13 +1,26 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wayfound/app/theme/app_theme.dart';
 import 'package:wayfound/app/theme/theme_provider.dart';
+import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/features/auth/presentation/settings_screen.dart';
+import 'package:wayfound/features/trips/presentation/home_screen.dart';
 
 import 'helpers/pump_app.dart';
+
+class FailingAuthRepository extends AuthRepository {
+  FailingAuthRepository({required super.auth, required super.firestore});
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    throw Exception('Failed to update display name');
+  }
+}
 
 void main() {
   late FakeFirebaseFirestore firestore;
@@ -112,5 +125,117 @@ void main() {
       // Verify state changed in shared prefs
       expect(prefs.getString(kThemeModeKey), equals('light'));
     });
+
+    testWidgets(
+      'editing display name updates SettingsScreen and HomeScreen immediately without restart',
+      (tester) async {
+        await firestore.collection('users').doc('user-123').set({
+          'displayName': 'Test User',
+          'email': 'test@example.com',
+        });
+
+        final container = ProviderContainer(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            authRepositoryProvider.overrideWithValue(repository),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const SettingsScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test User'), findsOneWidget);
+
+        // Tap edit icon
+        await tester.tap(find.byIcon(Icons.edit_outlined));
+        await tester.pumpAndSettle();
+
+        // Type new name
+        final textField = find.byType(TextField);
+        await tester.enterText(textField, 'Updated Name');
+        await tester.pumpAndSettle();
+
+        // Tap Save
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        // Verify SettingsScreen immediately shows updated name
+        expect(find.text('Updated Name'), findsOneWidget);
+        expect(find.text('Display name updated successfully'), findsOneWidget);
+
+        // Pump HomeScreen under same container to verify Home screen shows updated name immediately
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const HomeScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Welcome, Updated Name!'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'failed display name edit shows error snackbar and retains old name',
+      (tester) async {
+        final failingRepository = FailingAuthRepository(
+          auth: auth,
+          firestore: firestore,
+        );
+
+        await firestore.collection('users').doc('user-123').set({
+          'displayName': 'Test User',
+          'email': 'test@example.com',
+        });
+
+        await tester.pumpApp(
+          const SettingsScreen(),
+          authRepository: failingRepository,
+          sharedPreferences: prefs,
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test User'), findsOneWidget);
+
+        // Tap edit icon
+        await tester.tap(find.byIcon(Icons.edit_outlined));
+        await tester.pumpAndSettle();
+
+        // Enter new name
+        await tester.enterText(find.byType(TextField), 'Failed Name');
+        await tester.pumpAndSettle();
+
+        // Tap Save
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        // Verify error SnackBar is shown
+        expect(
+          find.textContaining('Failed to update display name'),
+          findsOneWidget,
+        );
+
+        // Cancel the dialog
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Verify old name is retained on SettingsScreen
+        expect(find.text('Test User'), findsOneWidget);
+        expect(find.text('Failed Name'), findsNothing);
+      },
+    );
   });
 }

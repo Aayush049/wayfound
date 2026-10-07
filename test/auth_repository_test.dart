@@ -3,6 +3,7 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
+import 'package:wayfound/features/auth/domain/app_user.dart';
 
 void main() {
   group('AuthRepository', () {
@@ -104,6 +105,89 @@ void main() {
         expect(doc, isNotNull);
         expect(doc?['displayName'], equals('Test'));
         expect(doc?['email'], equals('test@example.com'));
+      });
+    });
+
+    group('userStream', () {
+      test('emits AppUser when user document exists in Firestore', () async {
+        final user = MockUser(uid: 'test-uid', email: 'test@example.com');
+        auth = MockFirebaseAuth(signedIn: true, mockUser: user);
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
+
+        await firestore.collection('users').doc('test-uid').set({
+          'displayName': 'Firestore Name',
+          'email': 'test@example.com',
+          'photoUrl': null,
+          'createdAt': DateTime(2026, 1, 1).toIso8601String(),
+        });
+
+        final stream = repository.userStream('test-uid');
+        expect(
+          stream,
+          emits(
+            predicate<AppUser>(
+              (u) => u.uid == 'test-uid' && u.displayName == 'Firestore Name',
+            ),
+          ),
+        );
+      });
+
+      test(
+        'falls back to auth user when user document does not exist',
+        () async {
+          final user = MockUser(
+            uid: 'test-uid',
+            email: 'test@example.com',
+            displayName: 'Auth Name',
+          );
+          auth = MockFirebaseAuth(signedIn: true, mockUser: user);
+          repository = AuthRepository(
+            auth: auth,
+            googleSignIn: googleSignIn,
+            firestore: firestore,
+          );
+
+          final stream = repository.userStream('test-uid');
+          expect(
+            stream,
+            emits(
+              predicate<AppUser>(
+                (u) => u.uid == 'test-uid' && u.displayName == 'Auth Name',
+              ),
+            ),
+          );
+        },
+      );
+    });
+
+    group('updateDisplayName', () {
+      test('updates display name in both FirebaseAuth and Firestore', () async {
+        final user = MockUser(
+          uid: 'user-123',
+          email: 'test@example.com',
+          displayName: 'Old Name',
+        );
+        auth = MockFirebaseAuth(signedIn: true, mockUser: user);
+        repository = AuthRepository(
+          auth: auth,
+          googleSignIn: googleSignIn,
+          firestore: firestore,
+        );
+
+        await firestore.collection('users').doc('user-123').set({
+          'displayName': 'Old Name',
+          'email': 'test@example.com',
+        });
+
+        await repository.updateDisplayName('New Name');
+
+        expect(auth.currentUser?.displayName, equals('New Name'));
+        final doc = await firestore.collection('users').doc('user-123').get();
+        expect(doc.data()?['displayName'], equals('New Name'));
       });
     });
 

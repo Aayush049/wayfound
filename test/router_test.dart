@@ -71,44 +71,46 @@ void main() {
       expect(find.text('Your trips will appear here'), findsOneWidget);
     });
 
-    testWidgets('Stream auth state change dynamically triggers redirect to Home', (
-      tester,
-    ) async {
-      final firestore = FakeFirebaseFirestore();
-      final mockUser = MockUser(
-        uid: 'user-456',
-        email: 'google@example.com',
-        displayName: 'Google User',
-        photoURL: '',
-      );
-      final auth = MockFirebaseAuth(signedIn: false, mockUser: mockUser);
-      final repository = AuthRepository(auth: auth, firestore: firestore);
+    testWidgets(
+      'Stream auth state change dynamically triggers redirect to Home',
+      (tester) async {
+        final firestore = FakeFirebaseFirestore();
+        final mockUser = MockUser(
+          uid: 'user-456',
+          email: 'google@example.com',
+          displayName: 'Google User',
+          photoURL: '',
+        );
+        final auth = MockFirebaseAuth(signedIn: false, mockUser: mockUser);
+        final repository = AuthRepository(auth: auth, firestore: firestore);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(repository),
-          ],
-          child: Consumer(
-            builder: (context, ref, _) {
-              final router = ref.watch(routerProvider);
-              return MaterialApp.router(routerConfig: router);
-            },
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [authRepositoryProvider.overrideWithValue(repository)],
+            child: Consumer(
+              builder: (context, ref, _) {
+                final router = ref.watch(routerProvider);
+                return MaterialApp.router(routerConfig: router);
+              },
+            ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Wayfound'), findsOneWidget);
+        expect(find.text('Wayfound'), findsOneWidget);
 
-      // Sign in dynamically via FirebaseAuth mock
-      await auth.signInWithCredential(
-        GoogleAuthProvider.credential(idToken: 'token', accessToken: 'access'),
-      );
+        // Sign in dynamically via FirebaseAuth mock
+        await auth.signInWithCredential(
+          GoogleAuthProvider.credential(
+            idToken: 'token',
+            accessToken: 'access',
+          ),
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      expect(find.text('My Trips'), findsOneWidget);
-    });
+        expect(find.text('My Trips'), findsOneWidget);
+      },
+    );
   });
 }
