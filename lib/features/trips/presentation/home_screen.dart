@@ -45,11 +45,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final authUser = ref.watch(authUserProvider);
+    final appUserAsync = ref.watch(appUserProvider);
 
-    final user = authUser.asData?.value;
+    final user = appUserAsync.asData?.value;
     final displayName =
-        user?.displayName ?? user?.email?.split('@').first ?? '';
+        user?.displayName ??
+        (user?.email.isNotEmpty == true ? user!.email.split('@').first : '');
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
     return Scaffold(
@@ -75,10 +76,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   radius: 16,
                   backgroundColor: theme.colorScheme.primaryContainer,
                   backgroundImage:
-                      user?.photoURL != null && user!.photoURL!.isNotEmpty
-                      ? NetworkImage(user.photoURL!)
+                      user?.photoUrl != null && user!.photoUrl!.isNotEmpty
+                      ? NetworkImage(user.photoUrl!)
                       : null,
-                  child: (user?.photoURL == null || user!.photoURL!.isEmpty)
+                  child: (user?.photoUrl == null || user!.photoUrl!.isEmpty)
                       ? Text(
                           initial,
                           style: TextStyle(
@@ -96,15 +97,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: IndexedStack(
         index: _selectedIndex,
-        children: const [
+        children: [
           // Tab 0: Home (current trips overview)
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.luggage, size: 64),
-                SizedBox(height: 16),
-                Text('Your trips will appear here'),
+                if (displayName.isNotEmpty) ...[
+                  Text(
+                    'Welcome, $displayName!',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                const Icon(Icons.luggage, size: 64),
+                const SizedBox(height: 16),
+                const Text('Your trips will appear here'),
               ],
             ),
           ),

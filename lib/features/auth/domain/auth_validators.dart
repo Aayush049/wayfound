@@ -83,6 +83,9 @@ class AuthValidators {
     if (errorStr.contains('user-doc-creation-failed')) {
       return 'Failed to create user profile. Security rules may not be deployed.';
     }
+    if (errorStr.contains('Failed to update display name')) {
+      return 'Failed to update display name. Please try again.';
+    }
     return 'An error occurred. Please try again.';
   }
 }

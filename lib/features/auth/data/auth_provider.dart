@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../domain/app_user.dart';
 import 'auth_repository.dart';
 
 /// Provider for [AuthRepository] instance.
@@ -12,6 +13,18 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final authUserProvider = StreamProvider<User?>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return repository.authStateChanges;
+});
+
+/// Stream provider for the current user's profile document from Firestore (`users/{uid}`).
+/// Single source of truth for displayed profile data across the app.
+final appUserProvider = StreamProvider<AppUser?>((ref) {
+  final authUserAsync = ref.watch(authUserProvider);
+  final authUser = authUserAsync.asData?.value;
+  if (authUser == null) {
+    return Stream.value(null);
+  }
+  final repository = ref.watch(authRepositoryProvider);
+  return repository.userStream(authUser.uid);
 });
 
 /// Provider for auth state: true if user is signed in.

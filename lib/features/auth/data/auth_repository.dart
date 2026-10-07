@@ -75,7 +75,27 @@ class AuthRepository {
     return doc.data();
   }
 
+  /// Stream of user profile document from Firestore `users/{uid}`.
+  Stream<AppUser?> userStream(String uid) {
+    return _firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return AppUser.fromFirestore(snapshot);
+      }
+      final user = _auth.currentUser;
+      if (user != null && user.uid == uid) {
+        return AppUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? user.email?.split('@').first ?? '',
+          photoUrl: user.photoURL,
+        );
+      }
+      return null;
+    });
+  }
+
   /// Updates the user's display name in both FirebaseAuth and Firestore users/{uid}.
+  /// If Firestore update fails, rolls back Auth profile to avoid silent divergence.
   Future<void> updateDisplayName(String displayName) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -87,13 +107,23 @@ class AuthRepository {
       throw Exception('Display name must be between 1 and 50 characters');
     }
 
+    final oldAuthDisplayName = user.displayName;
+
     // Update Firebase Auth profile
     await user.updateDisplayName(trimmedName);
 
-    // Update Firestore users/{uid} document
-    await _firestore.collection('users').doc(user.uid).update({
-      'displayName': trimmedName,
-    });
+    try {
+      // Update Firestore users/{uid} document
+      await _firestore.collection('users').doc(user.uid).update({
+        'displayName': trimmedName,
+      });
+    } catch (e) {
+      // Revert Auth display name if Firestore update fails to prevent silent divergence
+      if (oldAuthDisplayName != null) {
+        await user.updateDisplayName(oldAuthDisplayName);
+      }
+      rethrow;
+    }
   }
 
   /// Signs in with email and password.

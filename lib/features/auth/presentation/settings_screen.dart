@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/theme_provider.dart';
 import '../data/auth_provider.dart';
+import '../domain/app_user.dart';
 import '../domain/auth_validators.dart';
 
 /// Settings/Profile screen - accessible from Home screen.
@@ -17,7 +17,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final authUser = ref.watch(authUserProvider);
+    final appUserAsync = ref.watch(appUserProvider);
     final themeMode = ref.watch(themeProvider);
 
     return Scaffold(
@@ -31,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           // User profile section
-          authUser.when(
+          appUserAsync.when(
             data: (user) =>
                 _buildProfileSection(context, ref, user, colorScheme),
             loading: () => const ListTile(
@@ -123,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildProfileSection(
     BuildContext context,
     WidgetRef ref,
-    User? user,
+    AppUser? user,
     ColorScheme colorScheme,
   ) {
     if (user == null) {
@@ -137,8 +137,9 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
 
-    final displayName =
-        user.displayName ?? user.email?.split('@').first ?? 'User';
+    final displayName = user.displayName.isNotEmpty
+        ? user.displayName
+        : (user.email.isNotEmpty ? user.email.split('@').first : 'User');
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
 
     return Padding(
@@ -148,10 +149,10 @@ class SettingsScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 32,
             backgroundColor: colorScheme.primaryContainer,
-            backgroundImage: user.photoURL != null && user.photoURL!.isNotEmpty
-                ? NetworkImage(user.photoURL!)
+            backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
+                ? NetworkImage(user.photoUrl!)
                 : null,
-            child: (user.photoURL == null || user.photoURL!.isEmpty)
+            child: (user.photoUrl == null || user.photoUrl!.isEmpty)
                 ? Text(
                     initial,
                     style: TextStyle(
@@ -186,7 +187,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
                 Text(
-                  user.email ?? '',
+                  user.email,
                   style: Theme.of(context).textTheme.bodyMedium
                       ?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
@@ -206,52 +207,94 @@ class SettingsScreen extends ConsumerWidget {
     final controller = TextEditingController(text: currentName);
     final formKey = GlobalKey<FormState>();
 
-    final newName = await showDialog<String>(
+    await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Display Name'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Display Name',
-              border: OutlineInputBorder(),
-            ),
-            validator: AuthValidators.validateDisplayName,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(context, controller.text.trim());
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-
-    if (newName != null && newName != currentName && context.mounted) {
-      await ref.read(authNotifierProvider.notifier).updateDisplayName(newName);
-      final state = ref.read(authNotifierProvider);
-      if (state.hasError && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AuthValidators.formatAuthError(state.error)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+      builder: (dialogContext) {
+        bool isSaving = false;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Edit Display Name'),
+              content: Form(
+                key: formKey,
+                child: TextFormField(
+                  controller: controller,
+                  autofocus: true,
+                  enabled: !isSaving,
+                  decoration: const InputDecoration(
+                    labelText: 'Display Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: AuthValidators.validateDisplayName,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          if (formKey.currentState!.validate()) {
+                            final newName = controller.text.trim();
+                            if (newName == currentName) {
+                              Navigator.pop(context);
+                              return;
+                            }
+                            setDialogState(() {
+                              isSaving = true;
+                            });
+                            await ref
+                                .read(authNotifierProvider.notifier)
+                                .updateDisplayName(newName);
+                            if (!context.mounted) return;
+                            final state = ref.read(authNotifierProvider);
+                            if (state.hasError) {
+                              setDialogState(() {
+                                isSaving = false;
+                              });
+                              final errorMsg = AuthValidators.formatAuthError(
+                                state.error,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(errorMsg),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .error,
+                                ),
+                              );
+                              ref
+                                  .read(authNotifierProvider.notifier)
+                                  .clearError();
+                            } else {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Display name updated successfully',
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Save'),
+                ),
+              ],
+            );
+          },
         );
-        ref.read(authNotifierProvider.notifier).clearError();
-      }
-    }
+      },
+    );
   }
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {

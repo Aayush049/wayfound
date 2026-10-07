@@ -13,15 +13,13 @@ import '../features/trips/presentation/home_screen.dart';
 
 /// Provider for the app's [GoRouter] configuration with auth redirect.
 final routerProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = ValueNotifier<AsyncValue<User?>>(const AsyncLoading());
-
-  ref.listen<AsyncValue<User?>>(
-    authUserProvider,
-    (previous, next) {
-      refreshNotifier.value = next;
-    },
-    fireImmediately: true,
+  final refreshNotifier = ValueNotifier<AsyncValue<User?>>(
+    const AsyncLoading(),
   );
+
+  ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
+    refreshNotifier.value = next;
+  }, fireImmediately: true);
 
   ref.onDispose(refreshNotifier.dispose);
 
