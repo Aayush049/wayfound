@@ -224,6 +224,7 @@ Repeat: take the largest debtor and largest creditor; the debtor pays the smalle
 
 ### 9.1 Layers
 **Repositories** are the only code that touches Firebase. **Providers** (Riverpod) expose streams and actions. **Screens** only watch providers. Firestore streams map to `StreamProvider`; loading/error/data handled with `AsyncValue`.
+All user profile data shown in the UI (display name, avatar initials, photo URL) comes from the live `users/{uid}` document stream provider (`appUserProvider`), not directly from `FirebaseAuth.currentUser`, ensuring instant UI updates across screens when profile details change.
 
 ### 9.2 Folder layout
 ```
@@ -265,7 +266,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings (SegmentedButton theme change, edit display name dialog, sign-out confirmation dialog). All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
+1. **Unit & Widget tests** (Flutter): theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings (SegmentedButton theme change, edit display name dialog with instant update across Settings and Home without restart, failed edit error handling and rollback, sign-out confirmation dialog), unit tests for `userStream` and `updateDisplayName`. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
 2. **Rules tests** (Firebase Emulator): unit test suite in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
@@ -343,6 +344,9 @@ Implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart
 - Create-once `users/{uid}` document logic implemented and tested.
 - Auth-driven `go_router` redirects configured for `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`.
 - Settings screen updated with profile display, display name editing, non-deprecated `SegmentedButton` theme selector, and sign-out confirmation dialog.
+- Physical phone testing of Phase 1 identified and resolved two issues:
+  1. Router refresh race on sign-in: fixed by binding `routerProvider` refreshNotifier to `authUserProvider` via `ref.listen`.
+  2. Display name edit not refreshing UI: fixed by introducing `appUserProvider` (streaming live `users/{uid}` Firestore doc as single source of truth for display data), adding dialog saving state, error messages, and rollback on failure.
 - Analyzer reports ZERO issues (`flutter analyze`).
 - Unit, widget, and rules test suites written and verified. All widget tests pass after consolidating provider overrides.
 
