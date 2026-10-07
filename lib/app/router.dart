@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,29 +11,23 @@ import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
 import '../features/trips/presentation/home_screen.dart';
 
-/// Helper to bridge Stream to [ChangeNotifier] for GoRouter refresh.
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
-}
-
 /// Provider for the app's [GoRouter] configuration with auth redirect.
 final routerProvider = Provider<GoRouter>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
+  final refreshNotifier = ValueNotifier<AsyncValue<User?>>(const AsyncLoading());
+
+  ref.listen<AsyncValue<User?>>(
+    authUserProvider,
+    (previous, next) {
+      refreshNotifier.value = next;
+    },
+    fireImmediately: true,
+  );
+
+  ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
     initialLocation: '/welcome',
-    refreshListenable: GoRouterRefreshStream(authRepository.authStateChanges),
+    refreshListenable: refreshNotifier,
     redirect: (BuildContext context, GoRouterState state) {
       final authState = ref.read(authUserProvider);
 
