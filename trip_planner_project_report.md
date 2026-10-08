@@ -172,7 +172,7 @@ joinCodes/{code}
 ### 7.2 Users collection rules
 - `get`: allowed only by owner (`request.auth.uid == userId`).
 - `list` and `delete`: denied for everyone.
-- `create`: allowed by owner with exact keys `['displayName', 'photoUrl', 'email', 'createdAt']`, `email` matching `request.auth.token.email`, `displayName` string length between 1 and 50 chars, `createdAt` equal to `request.time`.
+- `create`: allowed by owner with exact keys `['displayName', 'photoUrl', 'email', 'createdAt']`, `email` matching `request.auth.token.email`, `displayName` string length between 1 and 50 chars, `createdAt` equal to `request.time` (strictly enforced; client timestamp alternative removed).
 - `update`: allowed by owner changing ONLY `displayName` or `photoUrl`, with same name length validation.
 
 ### 7.3 Join rule
@@ -180,6 +180,7 @@ Flow: the user reads `joinCodes/{code}` (single get allowed for signed-in users;
 
 A non-member may update a trip only if:
 - only `memberIds` and `memberCount` change
+- `memberIds` retains all existing members (`request.resource.data.memberIds.hasAll(resource.data.memberIds)`)
 - exactly one uid is added, and it is the caller's own
 - `memberCount` is currently below 15
 - `memberCount` increases by exactly 1
@@ -390,7 +391,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 38 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; production rules for `trips`, `members`, and `joinCodes` deployed on October 8, 2026.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 46 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; production rules for `trips`, `members`, and `joinCodes` deployed on October 8, 2026.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -414,7 +415,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Members Tab:** Prominent invite code box with clipboard copy button, live active members list with organizer badge and join date formatting.
 - **Routing:** Deep linking configured in `GoRouter` with `/trip/create` and `/trip/join` registered before `/trip/:id` to prevent route param collision, and subroutes for tab navigation (`/trip/:id/members`, etc.).
 - **Security Rules:** Strict atomic batched write rules for `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` enforcing required keys, server timestamps, 15-member limit, and member-only read access.
-- **Verification:** All 38 Firestore Security Rules Jest unit tests passed, all 115 Flutter unit and widget tests passed, and `flutter analyze` reported 0 static issues.
+- **Verification:** All 46 Firestore Security Rules Jest unit tests passed, all 115 Flutter unit and widget tests passed, and `flutter analyze` reported 0 static issues.
 
 ---
 
