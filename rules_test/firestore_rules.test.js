@@ -1538,4 +1538,401 @@ describe('Trips & Join Security Rules', () => {
       await assertFails(memberRef.delete());
     });
   });
+
+  describe('Phase 3: Suggestions & Votes Security Rules', () => {
+    const organizerUid = 'organizer_1';
+    const memberUid = 'member_1';
+    const nonMemberUid = 'non_member_1';
+    const tripId = 'trip_suggestions_test';
+    const suggestionId = 'sugg_1';
+
+    function getValidSuggestionPayload(overrides = {}) {
+      return {
+        title: 'Visit Fort Aguada',
+        note: 'Go in the evening for sunset',
+        estimatedCost: 500,
+        category: 'sightseeing',
+        authorId: memberUid,
+        upCount: 0,
+        downCount: 0,
+        status: 'pending',
+        dayIndex: null,
+        order: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        ...overrides,
+      };
+    }
+
+    beforeEach(async () => {
+      await seedUser(organizerUid, 'Organizer');
+      await seedUser(memberUid, 'Member');
+      await seedUser(nonMemberUid, 'Non Member');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).set({
+          name: 'Suggestions Test Trip',
+          destination: 'Goa',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'INR',
+          organizerId: organizerUid,
+          joinCode: 'SUGG01',
+          memberIds: [organizerUid, memberUid],
+          memberCount: 2,
+          archived: false,
+          createdAt: new Date(),
+        });
+      });
+    });
+
+    test('Signed-out and non-member are denied reading or writing suggestions and votes', async () => {
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+
+      const suggRefUnauth = unauthedDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const suggRefNonMember = nonMemberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      await assertFails(suggRefUnauth.get());
+      await assertFails(suggRefNonMember.get());
+      await assertFails(suggRefUnauth.set(getValidSuggestionPayload()));
+      await assertFails(suggRefNonMember.set(getValidSuggestionPayload()));
+
+      // Negative control: Trip member can read suggestions
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const suggRefMember = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      await assertSucceeds(suggRefMember.get());
+    });
+
+    test('Valid member suggestion create succeeds', async () => {
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const suggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      await assertSucceeds(suggRef.set(getValidSuggestionPayload()));
+
+      // Negative control: Denied when missing required key (e.g. category)
+      const invalidRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc('sugg_bad');
+      const badPayload = getValidSuggestionPayload();
+      delete badPayload.category;
+      await assertFails(invalidRef.set(badPayload));
+    });
+
+    test('Denied suggestion create for invalid fields, authorId, counters, status, dayIndex, client date, cost', async () => {
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const suggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      // Extra key
+      await assertFails(suggRef.set(getValidSuggestionPayload({ extra: 123 })));
+
+      // authorId not caller
+      await assertFails(suggRef.set(getValidSuggestionPayload({ authorId: organizerUid })));
+
+      // upCount not 0
+      await assertFails(suggRef.set(getValidSuggestionPayload({ upCount: 1 })));
+
+      // downCount not 0
+      await assertFails(suggRef.set(getValidSuggestionPayload({ downCount: 1 })));
+
+      // status not pending
+      await assertFails(suggRef.set(getValidSuggestionPayload({ status: 'scheduled' })));
+
+      // dayIndex not null
+      await assertFails(suggRef.set(getValidSuggestionPayload({ dayIndex: 0 })));
+
+      // order not null
+      await assertFails(suggRef.set(getValidSuggestionPayload({ order: 1 })));
+
+      // client-date createdAt
+      await assertFails(suggRef.set(getValidSuggestionPayload({ createdAt: new Date() })));
+
+      // empty title
+      await assertFails(suggRef.set(getValidSuggestionPayload({ title: '' })));
+
+      // title > 80 chars
+      await assertFails(suggRef.set(getValidSuggestionPayload({ title: 'A'.repeat(81) })));
+
+      // note > 500 chars
+      await assertFails(suggRef.set(getValidSuggestionPayload({ note: 'A'.repeat(501) })));
+
+      // bad category
+      await assertFails(suggRef.set(getValidSuggestionPayload({ category: 'party' })));
+
+      // negative cost
+      await assertFails(suggRef.set(getValidSuggestionPayload({ estimatedCost: -10 })));
+
+      // non-integer cost
+      await assertFails(suggRef.set(getValidSuggestionPayload({ estimatedCost: 10.5 })));
+
+      // cost > 100,000,000,000
+      await assertFails(suggRef.set(getValidSuggestionPayload({ estimatedCost: 100000000001 })));
+
+      // Archived trip
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      await assertFails(suggRef.set(getValidSuggestionPayload()));
+    });
+
+    test('Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied', async () => {
+      // Seed a suggestion
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).set({
+          title: 'Initial Title',
+          note: 'Initial Note',
+          estimatedCost: 100,
+          category: 'food',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRefMember = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const suggRefOrganizer = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      // Author edit succeeds
+      await assertSucceeds(suggRefMember.update({ title: 'Author Updated Title' }));
+
+      // Organizer edit succeeds
+      await assertSucceeds(suggRefOrganizer.update({ note: 'Organizer Updated Note', category: 'other' }));
+
+      // Other member edit denied
+      const otherMemberUid = 'other_member_2';
+      await seedUser(otherMemberUid, 'Other Member');
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ memberIds: [organizerUid, memberUid, otherMemberUid] });
+      });
+      const otherMemberDb = testEnv.authenticatedContext(otherMemberUid).firestore();
+      await assertFails(otherMemberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).update({ title: 'Hacked Title' }));
+
+      // Cannot change status, dayIndex, order, authorId, createdAt or counters through content path
+      await assertFails(suggRefMember.update({ status: 'scheduled' }));
+      await assertFails(suggRefMember.update({ dayIndex: 1 }));
+      await assertFails(suggRefMember.update({ order: 1 }));
+      await assertFails(suggRefMember.update({ authorId: organizerUid }));
+      await assertFails(suggRefMember.update({ upCount: 1 }));
+    });
+
+    test('Vote transactions & counter coupling: all 6 vote transitions succeed with matching counters', async () => {
+      // Seed initial suggestion
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).set({
+          title: 'Vote Test Suggestion',
+          note: 'Note',
+          estimatedCost: null,
+          category: 'sightseeing',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const suggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const voteRef = suggRef.collection('votes').doc(memberUid);
+
+      // 1. No vote -> Up (+1 upCount)
+      let batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertSucceeds(batch.commit());
+
+      // 2. Up -> Down (flip: upCount 1 -> 0, downCount 0 -> 1)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 1 });
+      batch.set(voteRef, { value: -1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertSucceeds(batch.commit());
+
+      // 3. Down -> Up (flip back: upCount 0 -> 1, downCount 1 -> 0)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertSucceeds(batch.commit());
+
+      // 4. Up -> Up again (remove up vote: upCount 1 -> 0, delete vote doc)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 0 });
+      batch.delete(voteRef);
+      await assertSucceeds(batch.commit());
+
+      // 5. No vote -> Down (+1 downCount)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 1 });
+      batch.set(voteRef, { value: -1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertSucceeds(batch.commit());
+
+      // 6. Down -> Down again (remove down vote: downCount 1 -> 0, delete vote doc)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 0 });
+      batch.delete(voteRef);
+      await assertSucceeds(batch.commit());
+    });
+
+    test('Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys', async () => {
+      // Seed initial suggestion
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).set({
+          title: 'Bad Vote Test',
+          note: 'Note',
+          estimatedCost: null,
+          category: 'stay',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const suggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const voteRef = suggRef.collection('votes').doc(memberUid);
+
+      // UpCount +2 (changed by 2)
+      let batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 2, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // UpCount -1 on new up vote (wrong direction)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: -1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Counter changed alone without vote write
+      await assertFails(suggRef.update({ upCount: 1, downCount: 0 }));
+
+      // Vote written alone without counter change
+      await assertFails(voteRef.set({ value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }));
+
+      // Vote value 1, but downCount updated instead of upCount
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 1 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Both upCount and downCount changed on plain up vote (+1 upCount, +1 downCount)
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 1 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Invalid vote value 0 or 2
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 0, downCount: 0 });
+      batch.set(voteRef, { value: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Extra key in vote document
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), extra: true });
+      await assertFails(batch.commit());
+
+      // Client date updatedAt
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: new Date() });
+      await assertFails(batch.commit());
+
+      // Vote written to another user's uid doc path
+      const otherVoteRef = suggRef.collection('votes').doc(organizerUid);
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(otherVoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+    });
+
+    test('Votes read permissions: owner can read own vote, other member cannot read owner vote', async () => {
+      // Seed a vote
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).collection('votes').doc(memberUid).set({
+          value: 1,
+          updatedAt: new Date(),
+        });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+
+      const voteRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).collection('votes').doc(memberUid);
+      const otherVoteRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).collection('votes').doc(memberUid);
+
+      // Owner can read own vote
+      await assertSucceeds(voteRef.get());
+
+      // Other member (organizer) cannot read member's vote
+      await assertFails(otherVoteRef.get());
+    });
+
+    test('Suggestion delete: author and organizer succeed, other member denied', async () => {
+      // Seed suggestion
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).set({
+          title: 'To Be Deleted',
+          note: 'Note',
+          estimatedCost: null,
+          category: 'transport',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+
+      const otherMemberUid = 'other_member_delete';
+      await seedUser(otherMemberUid, 'Other Member Delete');
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ memberIds: [organizerUid, memberUid, otherMemberUid] });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const otherDb = testEnv.authenticatedContext(otherMemberUid).firestore();
+
+      const suggRefOther = otherDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const suggRefMember = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const suggRefOrganizer = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      // Other member delete denied
+      await assertFails(suggRefOther.delete());
+
+      // Author delete succeeds
+      await assertSucceeds(suggRefMember.delete());
+
+      // Re-seed and test organizer delete succeeds
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).set({
+          title: 'To Be Deleted 2',
+          note: 'Note',
+          estimatedCost: null,
+          category: 'transport',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+      await assertSucceeds(suggRefOrganizer.delete());
+    });
+  });
 });

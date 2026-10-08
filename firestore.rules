@@ -10,6 +10,38 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isTripMember(tripId) {
+      return isSignedIn() && (request.auth.uid in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds);
+    }
+
+    function isTripOrganizer(tripId) {
+      return isSignedIn() && (request.auth.uid == get(/databases/$(database)/documents/trips/$(tripId)).data.organizerId);
+    }
+
+    function isTripNotArchived(tripId) {
+      return get(/databases/$(database)/documents/trips/$(tripId)).data.archived == false;
+    }
+
+    function getVoteBeforeVal(database, tripId, sid, uid) {
+      return exists(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)/votes/$(uid))
+        ? get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)/votes/$(uid)).data.value
+        : 0;
+    }
+
+    function getVoteAfterVal(database, tripId, sid, uid) {
+      return existsAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)/votes/$(uid))
+        ? getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)/votes/$(uid)).data.value
+        : 0;
+    }
+
+    function getUpDelta(beforeVal, afterVal) {
+      return (afterVal == 1 ? 1 : 0) - (beforeVal == 1 ? 1 : 0);
+    }
+
+    function getDownDelta(beforeVal, afterVal) {
+      return (afterVal == -1 ? 1 : 0) - (beforeVal == -1 ? 1 : 0);
+    }
+
     // Users collection: users/{userId}
     match /users/{userId} {
       allow get: if isOwner(userId);
@@ -93,6 +125,78 @@ service cloud.firestore {
           );
 
         allow update, delete: if false;
+      }
+
+      // Subcollection: trips/{tripId}/suggestions/{sid}
+      match /suggestions/{sid} {
+        allow get, list: if isSignedIn() && isTripMember(tripId);
+
+        allow create: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && request.resource.data.keys().hasAll(['title', 'note', 'estimatedCost', 'category', 'authorId', 'upCount', 'downCount', 'status', 'dayIndex', 'order', 'createdAt'])
+          && request.resource.data.keys().hasOnly(['title', 'note', 'estimatedCost', 'category', 'authorId', 'upCount', 'downCount', 'status', 'dayIndex', 'order', 'createdAt'])
+          && request.resource.data.authorId == request.auth.uid
+          && request.resource.data.upCount == 0
+          && request.resource.data.downCount == 0
+          && request.resource.data.status == 'pending'
+          && request.resource.data.dayIndex == null
+          && request.resource.data.order == null
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.title is string && request.resource.data.title.size() >= 1 && request.resource.data.title.size() <= 80
+          && request.resource.data.note is string && request.resource.data.note.size() >= 0 && request.resource.data.note.size() <= 500
+          && request.resource.data.category in ['food', 'sightseeing', 'stay', 'transport', 'other']
+          && (request.resource.data.estimatedCost == null || (request.resource.data.estimatedCost is int && request.resource.data.estimatedCost >= 0 && request.resource.data.estimatedCost <= 100000000000));
+
+        allow update: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'note', 'estimatedCost', 'category'])
+          && request.resource.data.title is string && request.resource.data.title.size() >= 1 && request.resource.data.title.size() <= 80
+          && request.resource.data.note is string && request.resource.data.note.size() >= 0 && request.resource.data.note.size() <= 500
+          && request.resource.data.category in ['food', 'sightseeing', 'stay', 'transport', 'other']
+          && (request.resource.data.estimatedCost == null || (request.resource.data.estimatedCost is int && request.resource.data.estimatedCost >= 0 && request.resource.data.estimatedCost <= 100000000000));
+
+        allow update: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])
+          && request.resource.data.upCount is int && request.resource.data.upCount >= 0
+          && request.resource.data.downCount is int && request.resource.data.downCount >= 0
+          && getVoteBeforeVal(database, tripId, sid, request.auth.uid) != getVoteAfterVal(database, tripId, sid, request.auth.uid)
+          && request.resource.data.upCount == resource.data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid))
+          && request.resource.data.downCount == resource.data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid));
+
+        allow delete: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));
+
+        match /votes/{uid} {
+          allow get, list: if isSignedIn() && uid == request.auth.uid && isTripMember(tripId);
+
+          allow create, update: if isSignedIn()
+            && uid == request.auth.uid
+            && isTripMember(tripId)
+            && isTripNotArchived(tripId)
+            && request.resource.data.keys().hasAll(['value', 'updatedAt'])
+            && request.resource.data.keys().hasOnly(['value', 'updatedAt'])
+            && (request.resource.data.value == 1 || request.resource.data.value == -1)
+            && request.resource.data.updatedAt == request.time
+            && (request.method == 'create' || request.resource.data.value != resource.data.value)
+            && existsAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid))
+            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value)
+            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value);
+
+          allow delete: if isSignedIn()
+            && uid == request.auth.uid
+            && isTripMember(tripId)
+            && isTripNotArchived(tripId)
+            && existsAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid))
+            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount + getUpDelta(resource.data.value, 0)
+            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount + getDownDelta(resource.data.value, 0);
+        }
       }
     }
 
