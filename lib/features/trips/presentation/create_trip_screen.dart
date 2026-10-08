@@ -162,7 +162,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                   color: Theme.of(ctx).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Theme.of(ctx).colorScheme.primary.withValues(alpha: 0.5),
+                    color: Theme.of(ctx).colorScheme.primary
+                        .withValues(alpha: 0.5),
                   ),
                 ),
                 child: SelectableText(

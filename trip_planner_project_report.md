@@ -94,7 +94,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 ## 5. User Flows and Screens
 
 ### 5.1 Flows
-- **A. Getting started:** Welcome (`/welcome`), Sign In (`/sign-in`), Sign Up (`/sign-up`), Home (`/home`). Empty Home offers "Create trip" and "Join with code".
+- **A. Getting started:** Welcome (`/welcome`), Sign In (`/sign-in`), Sign Up (`/sign-up`), Home (`/home`). Empty Home offers stacked centered actions ("Create a Trip" primary filled and "Join with Code" secondary outlined), plus expandable FAB menu ("Create Trip" and "Join Trip").
 - **B. Create:** form, trip created with user as organizer, invite screen shows the code.
 - **C. Join:** enter code, preview (name, destination, member count), confirm. Full trips show "trip is full".
 - **D. Plan:** Trip Dashboard with tabs Suggestions, Itinerary, Expenses, Members. Add suggestions, vote; organizer schedules.
@@ -107,7 +107,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 | 1 | Welcome | `/welcome` | Entry point for unauthenticated users |
 | 2 | Sign In | `/sign-in` | Email/password and Google login |
 | 3 | Sign Up | `/sign-up` | Create account with display name, email, password, confirm |
-| 4 | Home (My Trips) | `/home` | Trip list, create/join entry, theme toggle, avatar button to Settings |
+| 4 | Home (My Trips) | `/home` | Trip list, expandable FAB menu (Create/Join), empty state dual actions, theme toggle, avatar button to Settings |
 | 5 | Create Trip | `/trip/create` | Name, destination, dates, currency |
 | 6 | Join Trip | `/trip/join` | Code entry, preview, confirm |
 | 7 | Trip Dashboard | `/trip/:id` | Container with four tabs |
@@ -415,7 +415,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Members Tab:** Prominent invite code box with clipboard copy button, live active members list with organizer badge and join date formatting.
 - **Routing:** Deep linking configured in `GoRouter` with `/trip/create` and `/trip/join` registered before `/trip/:id` to prevent route param collision, and subroutes for tab navigation (`/trip/:id/members`, etc.).
 - **Security Rules:** Strict atomic batched write rules for `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` enforcing required keys, server timestamps, 15-member limit, and member-only read access.
-- **Verification:** All 46 Firestore Security Rules Jest unit tests passed, all 115 Flutter unit and widget tests passed, and `flutter analyze` reported 0 static issues.
+- **Verification:** All 46 Firestore Security Rules Jest unit tests passed, all 122 Flutter unit and widget tests passed (including Home expandable FAB menu and dual empty-state action widget tests), and `flutter analyze` reported 0 static issues.
 
 ---
 
