@@ -32,6 +32,92 @@ service cloud.firestore {
         && (request.resource.data.photoUrl == null || request.resource.data.photoUrl is string);
     }
 
+    // Trips collection: trips/{tripId}
+    match /trips/{tripId} {
+      // Read: signed in and caller is in memberIds
+      allow get, list: if isSignedIn() && (request.auth.uid in resource.data.memberIds);
+
+      // Create: exact keys, creator is organizer, memberIds == [auth.uid], memberCount == 1, archived == false, etc.
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll(['name', 'destination', 'startDate', 'endDate', 'currency', 'organizerId', 'joinCode', 'memberIds', 'memberCount', 'archived', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['name', 'destination', 'startDate', 'endDate', 'currency', 'organizerId', 'joinCode', 'memberIds', 'memberCount', 'archived', 'createdAt'])
+        && request.resource.data.organizerId == request.auth.uid
+        && request.resource.data.memberIds == [request.auth.uid]
+        && request.resource.data.memberCount == 1
+        && request.resource.data.archived == false
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 60
+        && request.resource.data.destination is string && request.resource.data.destination.size() >= 1 && request.resource.data.destination.size() <= 80
+        && request.resource.data.startDate is timestamp && request.resource.data.endDate is timestamp && request.resource.data.endDate >= request.resource.data.startDate
+        && request.resource.data.currency in ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY', 'CHF']
+        && request.resource.data.joinCode is string && request.resource.data.joinCode.matches('^[A-HJKMNP-Z2-9]{6}$')
+        && getAfter(/databases/$(database)/documents/joinCodes/$(request.resource.data.joinCode)).data.tripId == tripId
+        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid));
+
+      // Join update (the high-risk rule)
+      // Important: guard against missing resource fields during create writes.
+      // Without these guards, the emulator can throw an evaluation error when it
+      // attempts to evaluate the update rule against a non-existent document.
+      allow update: if isSignedIn()
+        && resource.data.memberIds is list
+        && resource.data.memberCount is number
+        && !(request.auth.uid in resource.data.memberIds)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount'])
+        && request.resource.data.memberIds.removeAll(resource.data.memberIds) == [request.auth.uid]
+        && resource.data.memberIds.size() == resource.data.memberCount
+        && request.resource.data.memberIds.size() == request.resource.data.memberCount
+        && resource.data.memberCount < 15
+        && request.resource.data.memberCount == resource.data.memberCount + 1
+        && resource.data.archived == false
+        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid));
+
+      allow delete: if false;
+
+      // Subcollection: trips/{tripId}/members/{uid}
+      match /members/{uid} {
+        allow get, list: if isSignedIn() && (request.auth.uid in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds);
+
+        allow create: if isSignedIn()
+          && uid == request.auth.uid
+          && request.resource.data.keys().hasAll(['displayName', 'photoUrl', 'role', 'status', 'joinedAt'])
+          && request.resource.data.keys().hasOnly(['displayName', 'photoUrl', 'role', 'status', 'joinedAt'])
+          && request.resource.data.status == 'active'
+          && request.resource.data.joinedAt == request.time
+          && request.resource.data.displayName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName
+          && request.resource.data.photoUrl == (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAll(['photoUrl']) ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.photoUrl : null)
+          && (
+            (request.resource.data.role == 'organizer' && getAfter(/databases/$(database)/documents/trips/$(tripId)).data.organizerId == request.auth.uid)
+            ||
+            (request.resource.data.role == 'member' && !(request.auth.uid in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds) && (request.auth.uid in getAfter(/databases/$(database)/documents/trips/$(tripId)).data.memberIds))
+          );
+
+        allow update, delete: if false;
+      }
+    }
+
+    // Collection: joinCodes/{code}
+    match /joinCodes/{code} {
+      allow get: if isSignedIn();
+      allow list: if false;
+
+      allow create: if isSignedIn()
+        && code.matches('^[A-HJKMNP-Z2-9]{6}$')
+        && request.resource.data.keys().hasAll(['tripId', 'tripName', 'destination', 'startDate', 'endDate', 'memberCount'])
+        && request.resource.data.keys().hasOnly(['tripId', 'tripName', 'destination', 'startDate', 'endDate', 'memberCount'])
+        && request.resource.data.memberCount == 1
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.organizerId == request.auth.uid
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.name == request.resource.data.tripName
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.destination == request.resource.data.destination
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.startDate == request.resource.data.startDate
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.endDate == request.resource.data.endDate;
+
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCount'])
+        && request.resource.data.memberCount == getAfter(/databases/$(database)/documents/trips/$(resource.data.tripId)).data.memberCount;
+
+      allow delete: if false;
+    }
+
     // Baseline deny-all for all other collections
     match /{path=**}/** {
       allow read, write: if false;
