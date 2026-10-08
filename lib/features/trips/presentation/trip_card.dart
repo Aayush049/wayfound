@@ -29,11 +29,13 @@ class TripCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: isPast ? 0 : 2,
       color: isPast
-          ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.5)
+          ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
           : theme.colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
+        side: BorderSide(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -101,7 +103,7 @@ class TripCard extends StatelessWidget {
               const SizedBox(height: 12),
               Divider(
                 height: 1,
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
               ),
               const SizedBox(height: 12),
               Row(
