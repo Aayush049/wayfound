@@ -50,7 +50,7 @@ describe('Users Collection Security Rules', () => {
       docRef.set({
         displayName: 'Alice',
         email: userEmail,
-        createdAt: new Date(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
     );
   });
@@ -66,7 +66,7 @@ describe('Users Collection Security Rules', () => {
         displayName: 'Alice',
         email: userEmail,
         photoUrl: 'https://example.com/photo.jpg',
-        createdAt: new Date(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
     );
   });
@@ -82,7 +82,7 @@ describe('Users Collection Security Rules', () => {
         displayName: 'Alice',
         email: userEmail,
         photoUrl: null,
-        createdAt: new Date(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         isAdmin: true,
       })
     );
@@ -112,7 +112,7 @@ describe('Users Collection Security Rules', () => {
         displayName: 'Alice',
         email: 'attacker@example.com',
         photoUrl: null,
-        createdAt: new Date(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
     );
   });
@@ -128,7 +128,7 @@ describe('Users Collection Security Rules', () => {
         displayName: 'Alice',
         email: userEmail,
         photoUrl: null,
-        createdAt: new Date(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
     );
   });
@@ -240,6 +240,102 @@ describe('Users Collection Security Rules', () => {
     await assertFails(
       docRef.update({
         displayName: 'Hacked Name',
+      })
+    );
+  });
+
+  // --- Part B(c): New users create & update tests ---
+
+  test('users create SUCCEEDS with serverTimestamp', async () => {
+    const authedDb = testEnv
+      .authenticatedContext(userId, { email: userEmail })
+      .firestore();
+    const docRef = authedDb.collection('users').doc(userId);
+
+    // Valid create with serverTimestamp succeeds
+    await assertSucceeds(
+      docRef.set({
+        displayName: 'Alice',
+        email: userEmail,
+        photoUrl: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+    );
+
+    // Negative control: Invalid create with missing required key 'email' fails
+    const invalidDocRef = authedDb.collection('users').doc('user_invalid');
+    await assertFails(
+      invalidDocRef.set({
+        displayName: 'Alice',
+        photoUrl: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+    );
+  });
+
+  test('users create DENIED when createdAt is a client Date (not request.time)', async () => {
+    const authedDb = testEnv
+      .authenticatedContext(userId, { email: userEmail })
+      .firestore();
+    const docRef = authedDb.collection('users').doc(userId);
+
+    // Negative control: Valid create with serverTimestamp succeeds
+    await assertSucceeds(
+      docRef.set({
+        displayName: 'Alice Valid',
+        email: userEmail,
+        photoUrl: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+    );
+
+    // Invalid create with client Date (new Date()) must be denied when createdAt == request.time is enforced
+    const clientDateUserUid = 'user_client_date';
+    const clientDateAuthedDb = testEnv
+      .authenticatedContext(clientDateUserUid, { email: 'clientdate@example.com' })
+      .firestore();
+    const clientDateDocRef = clientDateAuthedDb.collection('users').doc(clientDateUserUid);
+
+    await assertFails(
+      clientDateDocRef.set({
+        displayName: 'Client Date User',
+        email: 'clientdate@example.com',
+        photoUrl: null,
+        createdAt: new Date(),
+      })
+    );
+  });
+
+  test('users update DENIED when createdAt is changed', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context
+        .firestore()
+        .collection('users')
+        .doc(userId)
+        .set({
+          displayName: 'Alice',
+          email: userEmail,
+          photoUrl: null,
+          createdAt: new Date(),
+        });
+    });
+
+    const authedDb = testEnv
+      .authenticatedContext(userId, { email: userEmail })
+      .firestore();
+    const docRef = authedDb.collection('users').doc(userId);
+
+    // Negative control: Valid update modifying only displayName succeeds
+    await assertSucceeds(
+      docRef.update({
+        displayName: 'Alice Updated',
+      })
+    );
+
+    // Invalid update attempting to modify createdAt fails
+    await assertFails(
+      docRef.update({
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
     );
   });
@@ -913,6 +1009,362 @@ describe('Trips & Join Security Rules', () => {
       });
 
       await assertFails(batch.commit());
+    });
+
+    // --- Part B(a): Join DENIED when memberIds drops an existing member ---
+
+    test('Join DENIED when new memberIds drops an existing member while adding caller (count +1)', async () => {
+      const authedDb = testEnv.authenticatedContext(member2Uid).firestore();
+
+      // Invalid: drops existing organizer userId, puts only member2Uid, but memberCount is 2
+      const batch1 = authedDb.batch();
+      batch1.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [member2Uid],
+        memberCount: 2,
+      });
+      batch1.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+      await assertFails(batch1.commit());
+
+      // Negative control: Normal valid join preserving existing userId succeeds
+      const batchValid = authedDb.batch();
+      batchValid.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 2,
+      });
+      batchValid.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batchValid.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Join DENIED when one old member is replaced by caller and memberCount is unchanged', async () => {
+      const authedDb = testEnv.authenticatedContext(member2Uid).firestore();
+
+      // Invalid: replaces userId with member2Uid, memberCount remains 1
+      const batch1 = authedDb.batch();
+      batch1.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [member2Uid],
+        memberCount: 1,
+      });
+      batch1.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 1,
+      });
+      await assertFails(batch1.commit());
+
+      // Negative control: Normal valid join adding member2Uid with memberCount +1 succeeds
+      const batchValid = authedDb.batch();
+      batchValid.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 2,
+      });
+      batchValid.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batchValid.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Join DENIED when removing one member and adding caller plus another uid (memberCount +1)', async () => {
+      const member3Uid = 'member_3';
+      const member3Name = 'Carol Member';
+      const extraUid = 'extra_uid';
+      await seedUser(member3Uid, member3Name);
+      await seedUser(extraUid, 'Extra User');
+
+      // Seed trip to have 2 members (userId and member2Uid)
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).update({
+          memberIds: [userId, member2Uid],
+          memberCount: 2,
+        });
+        await db
+          .collection('trips')
+          .doc(tripId)
+          .collection('members')
+          .doc(member2Uid)
+          .set({
+            displayName: member2Name,
+            photoUrl: null,
+            role: 'member',
+            status: 'active',
+            joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        await db.collection('joinCodes').doc(joinCode).update({
+          memberCount: 2,
+        });
+      });
+
+      const authedDb = testEnv.authenticatedContext(member3Uid).firestore();
+
+      // Invalid: drops userId, adds member3Uid AND extraUid, memberCount 3
+      const batch1 = authedDb.batch();
+      batch1.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [member2Uid, member3Uid, extraUid],
+        memberCount: 3,
+      });
+      batch1.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member3Uid),
+        {
+          displayName: member3Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 3,
+      });
+      await assertFails(batch1.commit());
+
+      // Negative control: Normal valid join retaining both existing members (userId, member2Uid) succeeds
+      const batchValid = authedDb.batch();
+      batchValid.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid, member3Uid],
+        memberCount: 3,
+      });
+      batchValid.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member3Uid),
+        {
+          displayName: member3Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batchValid.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 3,
+      });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C])', async () => {
+      const member3Uid = 'member_3';
+      const member3Name = 'Carol Member';
+      await seedUser(member3Uid, member3Name);
+
+      // Seed trip to have 2 members (userId and member2Uid)
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).update({
+          memberIds: [userId, member2Uid],
+          memberCount: 2,
+        });
+        await db
+          .collection('trips')
+          .doc(tripId)
+          .collection('members')
+          .doc(member2Uid)
+          .set({
+            displayName: member2Name,
+            photoUrl: null,
+            role: 'member',
+            status: 'active',
+            joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        await db.collection('joinCodes').doc(joinCode).update({
+          memberCount: 2,
+        });
+      });
+
+      const authedDb = testEnv.authenticatedContext(member3Uid).firestore();
+
+      // Duplicate variant 1: [member2Uid, member2Uid, member3Uid] (drops userId)
+      const batch1 = authedDb.batch();
+      batch1.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [member2Uid, member2Uid, member3Uid],
+        memberCount: 3,
+      });
+      batch1.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member3Uid),
+        {
+          displayName: member3Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 3,
+      });
+      await assertFails(batch1.commit());
+
+      // Duplicate variant 2: [userId, userId, member3Uid] (drops member2Uid)
+      const batch2 = authedDb.batch();
+      batch2.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, userId, member3Uid],
+        memberCount: 3,
+      });
+      batch2.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member3Uid),
+        {
+          displayName: member3Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch2.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 3,
+      });
+      await assertFails(batch2.commit());
+    });
+
+    // --- Part B(b): Join SUCCEEDS for normal case at counts 1 and 14 ---
+
+    test('Join SUCCEEDS for normal case at count 1 (1 to 2) and count 14 (14 to 15)', async () => {
+      // 1. Count 1 to 2
+      const authedDb2 = testEnv.authenticatedContext(member2Uid).firestore();
+      const batch1to2 = authedDb2.batch();
+      batch1to2.update(authedDb2.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 2,
+      });
+      batch1to2.set(
+        authedDb2.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1to2.update(authedDb2.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+      await assertSucceeds(batch1to2.commit());
+
+      // Negative control for 1 to 2: Invalid join dropping existing member fails
+      const batch1to2Invalid = authedDb2.batch();
+      batch1to2Invalid.update(authedDb2.collection('trips').doc(tripId), {
+        memberIds: [member2Uid],
+        memberCount: 2,
+      });
+      batch1to2Invalid.set(
+        authedDb2.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch1to2Invalid.update(authedDb2.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+      await assertFails(batch1to2Invalid.commit());
+
+      // 2. Count 14 to 15
+      const existingMembers = [];
+      for (let i = 1; i <= 14; i++) {
+        existingMembers.push(`user_${i}`);
+      }
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).update({
+          memberIds: existingMembers,
+          memberCount: 14,
+        });
+        await db.collection('joinCodes').doc(joinCode).update({
+          memberCount: 14,
+        });
+      });
+
+      const user15Uid = 'user_15';
+      await seedUser(user15Uid, 'User 15');
+
+      const authedDb15 = testEnv.authenticatedContext(user15Uid).firestore();
+      const batch14to15 = authedDb15.batch();
+      batch14to15.update(authedDb15.collection('trips').doc(tripId), {
+        memberIds: [...existingMembers, user15Uid],
+        memberCount: 15,
+      });
+      batch14to15.set(
+        authedDb15.collection('trips').doc(tripId).collection('members').doc(user15Uid),
+        {
+          displayName: 'User 15',
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch14to15.update(authedDb15.collection('joinCodes').doc(joinCode), {
+        memberCount: 15,
+      });
+      await assertSucceeds(batch14to15.commit());
+
+      // Negative control for 14 to 15: Invalid join dropping an existing member fails
+      const user16Uid = 'user_16';
+      await seedUser(user16Uid, 'User 16');
+      const authedDb16 = testEnv.authenticatedContext(user16Uid).firestore();
+      const batch14to15Invalid = authedDb16.batch();
+      // Drop user_1, keep 13 existing members + user16Uid (total size 14, memberCount 15)
+      batch14to15Invalid.update(authedDb16.collection('trips').doc(tripId), {
+        memberIds: [...existingMembers.slice(1), user15Uid, user16Uid],
+        memberCount: 15,
+      });
+      batch14to15Invalid.set(
+        authedDb16.collection('trips').doc(tripId).collection('members').doc(user16Uid),
+        {
+          displayName: 'User 16',
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch14to15Invalid.update(authedDb16.collection('joinCodes').doc(joinCode), {
+        memberCount: 15,
+      });
+      await assertFails(batch14to15Invalid.commit());
     });
 
     test('Sequential boundary test: succeeds at 14 to 15, fails at 15 to 16', async () => {
