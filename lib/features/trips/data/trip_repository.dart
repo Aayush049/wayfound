@@ -1,0 +1,228 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../domain/join_code.dart';
+import '../domain/join_preview.dart';
+import '../domain/member.dart';
+import '../domain/trip.dart';
+import '../domain/trip_payload_builders.dart';
+
+class TripRepository {
+  final FirebaseFirestore _firestore;
+  final Random? _random;
+
+  TripRepository({FirebaseFirestore? firestore, this._random})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  /// Creates a new trip atomically with [createTrip] batch.
+  /// Retries code generation up to 5 times if a collision occurs.
+  Future<({String tripId, String joinCode})> createTrip({
+    required String name,
+    required String destination,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String currency,
+    required String userUid,
+    required String displayName,
+    String? photoUrl,
+  }) async {
+    int attempts = 0;
+
+    while (attempts < 5) {
+      attempts++;
+      final code = generateJoinCode(_random);
+      final tripDocRef = _firestore.collection('trips').doc();
+      final tripId = tripDocRef.id;
+
+      final memberDocRef = tripDocRef.collection('members').doc(userUid);
+      final joinCodeDocRef = _firestore.collection('joinCodes').doc(code);
+
+      final batch = _firestore.batch();
+
+      final tripData = buildTripCreatePayload(
+        name: name,
+        destination: destination,
+        startDate: startDate,
+        endDate: endDate,
+        currency: currency,
+        organizerId: userUid,
+        joinCode: code,
+      );
+
+      final memberData = buildMemberCreatePayload(
+        displayName: displayName,
+        photoUrl: photoUrl,
+        role: 'organizer',
+      );
+
+      final joinCodeData = buildJoinCodeCreatePayload(
+        tripId: tripId,
+        tripName: name,
+        destination: destination,
+        startDate: startDate,
+        endDate: endDate,
+        memberCount: 1,
+      );
+
+      batch.set(tripDocRef, tripData);
+      batch.set(memberDocRef, memberData);
+      batch.set(joinCodeDocRef, joinCodeData);
+
+      try {
+        await batch.commit();
+        return (tripId: tripId, joinCode: code);
+      } catch (e) {
+        if (attempts >= 5) {
+          throw Exception(
+            'Failed to generate a unique join code after 5 attempts. Please try again.',
+          );
+        }
+        // Retry loop for collision
+      }
+    }
+
+    throw Exception('Could not create trip');
+  }
+
+  /// Streams trips where [uid] is in [memberIds].
+  /// Sorts client-side without composite index:
+  /// - Excludes archived trips
+  /// - Upcoming/ongoing (endDate >= midnight today) by startDate ASC
+  /// - Past trips by startDate DESC
+  Stream<List<Trip>> watchMyTrips(String uid) {
+    return _firestore
+        .collection('trips')
+        .where('memberIds', arrayContains: uid)
+        .snapshots()
+        .map((snapshot) {
+          final trips = snapshot.docs
+              .map((doc) => Trip.fromFirestore(doc))
+              .where((t) => !t.archived)
+              .toList();
+
+          return sortTripsClientSide(trips);
+        });
+  }
+
+  /// Client-side sorting helper for trips list.
+  static List<Trip> sortTripsClientSide(List<Trip> trips) {
+    final today = DateTime.now();
+    final midnightToday = DateTime(today.year, today.month, today.day);
+
+    final activeTrips = <Trip>[];
+    final pastTrips = <Trip>[];
+
+    for (final trip in trips) {
+      final endDay = DateTime(
+        trip.endDate.year,
+        trip.endDate.month,
+        trip.endDate.day,
+      );
+      if (endDay.isBefore(midnightToday)) {
+        pastTrips.add(trip);
+      } else {
+        activeTrips.add(trip);
+      }
+    }
+
+    // Active trips by startDate ascending
+    activeTrips.sort((a, b) => a.startDate.compareTo(b.startDate));
+
+    // Past trips by startDate descending
+    pastTrips.sort((a, b) => b.startDate.compareTo(a.startDate));
+
+    return [...activeTrips, ...pastTrips];
+  }
+
+  /// Streams a single [Trip] document.
+  Stream<Trip?> watchTrip(String tripId) {
+    return _firestore.collection('trips').doc(tripId).snapshots().map((doc) {
+      if (!doc.exists) return null;
+      return Trip.fromFirestore(doc);
+    });
+  }
+
+  /// Streams members of a trip (`trips/{tripId}/members`).
+  /// Active members sorted: organizer first, then by joinedAt ASC.
+  Stream<List<Member>> watchMembers(String tripId) {
+    return _firestore
+        .collection('trips')
+        .doc(tripId)
+        .collection('members')
+        .snapshots()
+        .map((snapshot) {
+          final members = snapshot.docs
+              .map((doc) => Member.fromFirestore(doc))
+              .where((m) => m.isActive)
+              .toList();
+
+          members.sort((a, b) {
+            if (a.isOrganizer && !b.isOrganizer) return -1;
+            if (!a.isOrganizer && b.isOrganizer) return 1;
+            if (a.joinedAt != null && b.joinedAt != null) {
+              return a.joinedAt!.compareTo(b.joinedAt!);
+            }
+            return 0;
+          });
+
+          return members;
+        });
+  }
+
+  /// Looks up a join preview document `joinCodes/{code}`.
+  Future<JoinPreview?> getJoinPreview(String code) async {
+    final doc = await _firestore.collection('joinCodes').doc(code).get();
+    if (!doc.exists) return null;
+    return JoinPreview.fromFirestore(doc);
+  }
+
+  /// Joins a trip via one atomic batched write.
+  Future<void> joinTrip({
+    required String code,
+    required String tripId,
+    required String userUid,
+    required String displayName,
+    String? photoUrl,
+    required int currentMemberCount,
+  }) async {
+    if (currentMemberCount >= 15) {
+      throw Exception('Trip is full');
+    }
+
+    final tripDocRef = _firestore.collection('trips').doc(tripId);
+    final memberDocRef = tripDocRef.collection('members').doc(userUid);
+    final joinCodeDocRef = _firestore.collection('joinCodes').doc(code);
+
+    final batch = _firestore.batch();
+
+    batch.update(tripDocRef, buildJoinTripUpdatePayload(callerUid: userUid));
+
+    batch.set(
+      memberDocRef,
+      buildMemberCreatePayload(
+        displayName: displayName,
+        photoUrl: photoUrl,
+        role: 'member',
+      ),
+    );
+
+    batch.update(
+      joinCodeDocRef,
+      buildJoinCodeUpdatePayload(newMemberCount: currentMemberCount + 1),
+    );
+
+    try {
+      await batch.commit();
+    } catch (e) {
+      // Re-read join code to present friendly message
+      final freshCodeDoc = await getJoinPreview(code);
+      if (freshCodeDoc != null && freshCodeDoc.isFull) {
+        throw Exception('Could not join, the trip may be full');
+      }
+      throw Exception(
+        'Could not join trip. Please verify the code and try again.',
+      );
+    }
+  }
+}
