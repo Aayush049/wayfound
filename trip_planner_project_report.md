@@ -390,7 +390,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 38 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; trip rules ready for deployment.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 38 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; production rules for `trips`, `members`, and `joinCodes` deployed on October 8, 2026.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
