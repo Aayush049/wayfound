@@ -1716,6 +1716,7 @@ describe('Trips & Join Security Rules', () => {
       await assertFails(suggRefMember.update({ dayIndex: 1 }));
       await assertFails(suggRefMember.update({ order: 1 }));
       await assertFails(suggRefMember.update({ authorId: organizerUid }));
+      await assertFails(suggRefMember.update({ createdAt: new Date() }));
       await assertFails(suggRefMember.update({ upCount: 1 }));
     });
 
@@ -1836,6 +1837,36 @@ describe('Trips & Join Security Rules', () => {
       batch.set(voteRef, { value: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       await assertFails(batch.commit());
 
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 2, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Same-value vote update denied (re-voting +1 when already +1)
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const adminSuggRef = context.firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+        await adminSuggRef.collection('votes').doc(memberUid).set({ value: 1, updatedAt: new Date() });
+        await adminSuggRef.update({ upCount: 1, downCount: 0 });
+      });
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 1, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Vote transaction on archived trip denied
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      batch = memberDb.batch();
+      batch.update(suggRef, { upCount: 2, downCount: 0 });
+      batch.set(voteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await assertFails(batch.commit());
+
+      // Restore trip archived status for subsequent tests
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: false });
+      });
+
       // Extra key in vote document
       batch = memberDb.batch();
       batch.update(suggRef, { upCount: 1, downCount: 0 });
@@ -1876,6 +1907,12 @@ describe('Trips & Join Security Rules', () => {
 
       // Other member (organizer) cannot read member's vote
       await assertFails(otherVoteRef.get());
+
+      // Signed-out and non-member cannot read vote
+      const unauthVoteRef = testEnv.unauthenticatedContext().firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).collection('votes').doc(memberUid);
+      await assertFails(unauthVoteRef.get());
+      const nonMemberVoteRef = testEnv.authenticatedContext(nonMemberUid).firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId).collection('votes').doc(memberUid);
+      await assertFails(nonMemberVoteRef.get());
     });
 
     test('Suggestion delete: author and organizer succeed, other member denied', async () => {
@@ -1909,6 +1946,10 @@ describe('Trips & Join Security Rules', () => {
       const suggRefOther = otherDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
       const suggRefMember = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
       const suggRefOrganizer = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+      const suggRefNonMember = testEnv.authenticatedContext(nonMemberUid).firestore().collection('trips').doc(tripId).collection('suggestions').doc(suggestionId);
+
+      // Non-member delete denied
+      await assertFails(suggRefNonMember.delete());
 
       // Other member delete denied
       await assertFails(suggRefOther.delete());
