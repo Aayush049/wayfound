@@ -390,7 +390,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}` owner read/create/update rules; verified via emulator unit tests. Production Firebase project users rules deployed on October 7, 2026; trips rules from Phase 2 NOT yet deployed.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 33 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; trip rules ready for deployment.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -406,7 +406,19 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 
 ---
 
-### 15.4 How to Run & Test Emulators
+### 15.5 Milestone 2 Status (Phase 2: Trips and Joining Completed)
+- **Create Trip:** Form with name, destination, date range picker, required currency dropdown (`kSupportedCurrencies`), atomic Firestore batch create across `trips`, `trips/members`, and `joinCodes`, 5-attempt collision retry, and post-creation invite code dialog.
+- **Join Trip:** 6-character code input with normalization, lookup preview card, member count and 15-member cap enforcement, already-member detection, and atomic batch join.
+- **My Trips List & Sorting:** Client-side sorting without compound indexes: upcoming/ongoing trips (`endDate >= today`) sorted by `startDate` ascending; past trips sorted by `startDate` descending.
+- **Trip Dashboard Shell:** AppBar displaying trip name & destination, back button to `/home`, TabBar with 4 tabs (`suggestions`, `itinerary`, `expenses`, `members`), and placeholder screens for future phases (`TEMP(phase-3/4/5)`).
+- **Members Tab:** Prominent invite code box with clipboard copy button, live active members list with organizer badge and join date formatting.
+- **Routing:** Deep linking configured in `GoRouter` with `/trip/create` and `/trip/join` registered before `/trip/:id` to prevent route param collision, and subroutes for tab navigation (`/trip/:id/members`, etc.).
+- **Security Rules:** Strict atomic batched write rules for `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` enforcing required keys, server timestamps, 15-member limit, and member-only read access.
+- **Verification:** All 33 Firestore Security Rules Jest unit tests passed, all 115 Flutter unit and widget tests passed, and `flutter analyze` reported 0 static issues.
+
+---
+
+### 15.6 How to Run & Test Emulators
 
 #### Firebase Rules Test Command
 ```bash
