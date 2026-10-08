@@ -192,6 +192,11 @@ A non-member may update a trip only if:
 - **Settlements:** create only as payer (`fromUid` equals caller, status `pending`); only the receiver (or organizer) may set `confirmed` or `rejected`; amount and parties are immutable after creation.
 - **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
 
+### 7.5 Known limitations
+- Stored vote counters can be tampered with by a determined member, since rules cannot fully verify the arithmetic without server code. Accepted for a friend-group app.
+- Short join codes could in theory be brute-forced; plan Firebase App Check as a later hardening step.
+- Subcollections are not removed when a trip document is deleted, which is why trips are archived rather than deleted.
+
 ---
 
 ## 8. Key Logic
@@ -217,6 +222,23 @@ Start all at zero. For each expense: payer gets **+amount**, each participant ge
 
 ### 8.4 Settle-up (minimal payments)
 Repeat: take the largest debtor and largest creditor; the debtor pays the smaller of the two amounts; update both; stop when all are zero. Produces at most (people - 1) payments. Recomputed on every change, so suggestions stay correct.
+
+### 8.5 Worked example
+Asha pays 900 for dinner (split 3 ways); Ravi pays 300 for a cab (split 3 ways).
+- Dinner: Asha +600, Ravi -300, Sam -300
+- Cab: Ravi +200, Asha -100, Sam -100
+- **Net: Asha +500, Ravi -100, Sam -400**
+- **Settle-up: Sam pays Asha 400; Ravi pays Asha 100**
+
+### 8.6 Knowing someone has paid
+The app cannot see real money moving. It uses a two-step record:
+1. Payer pays outside the app (cash, transfer, any payment app).
+2. Payer taps **Mark as paid**, creating a `pending` settlement.
+3. Receiver taps **Confirm received** (`confirmed`) or **Not received** (`rejected`).
+4. Only `confirmed` settlements change balances. Pending ones display as "awaiting confirmation". Partial payments are allowed. A rejected settlement leaves the debt unchanged.
+
+### 8.7 Leaving a trip
+Allowed only when the member's balance is zero. The organizer can remove anyone regardless; their historical expenses and votes remain.
 
 ---
 
@@ -315,11 +337,43 @@ Ocean Blue is the main brand colour (navigation, primary actions). Teal is the s
 ### 14.2 Mapping to Flutter (Material 3)
 Implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart`.
 
+| Palette role | Flutter target |
+|---|---|
+| Primary / Secondary | `ColorScheme.primary` / `ColorScheme.secondary` |
+| Primary / Secondary Container (dark) | `primaryContainer` / `secondaryContainer` |
+| Background | `scaffoldBackgroundColor` |
+| Surface | `ColorScheme.surface` |
+| Surface Variant | `surfaceContainerHighest` |
+| Primary Text / Secondary Text | `onSurface` / `onSurfaceVariant` |
+| Divider / Border | `outline` and `dividerColor` |
+| Error | `ColorScheme.error` |
+| Success, Warning | A `ThemeExtension` (Material has no slots for them) |
+
+Rules: hex values live only in `app_colors.dart`; widgets always read colours from `Theme.of(context)`, never hard-coded values. This is what makes switching themes work everywhere.
+
 ### 14.3 Theme-change feature
 - **Modes:** System (default), Light, Dark.
 - **Quick toggle button:** sun/moon icon in Home app bar.
 - **Settings selector:** `SegmentedButton<ThemeMode>` on Profile / Settings screen.
 - **Behaviour:** applies instantly with no restart. Choice saved on device with `shared_preferences`.
+
+### 14.4 Usage guidance
+- Ocean Blue for navigation and main actions; Teal for selected states, vote highlights and confirmed settlements.
+- Balances: owed = Success, owes = Error, always with a +/- sign or label so colour is never the only signal.
+- Pending settlements use Warning. Amber on white has low text contrast, so use it for icons and badges with a text label, not as a text colour.
+- Check the contrast of every text and background pair in both modes before finalizing screens.
+
+### 14.5 Derived colours (palette gaps filled)
+The supplied palette had no text/icon colours for use on top of brand colours and no light-mode containers. These were derived to match the palette and aim for WCAG AA contrast (4.5:1 for body text). Verify each pair with a contrast checker during Milestone 0.
+
+| Role | Light | Dark | Used for |
+|---|---|---|---|
+| On Primary | #FFFFFF | #0B1220 | Text/icons on primary buttons and bars |
+| On Primary Container | #0D47A1 | #CFE6FB | Text/icons on primary containers |
+| On Secondary | #FFFFFF | #0B1220 | Text/icons on teal fills |
+| On Secondary Container | #00695C | #CDEFEA | Text/icons on teal containers |
+| On Error | #FFFFFF | #0B1220 | Text on error fills |
+| On Success | #FFFFFF | #0B1220 | Text on success fills |
 
 ---
 
@@ -336,7 +390,7 @@ Implemented in `lib/app/theme/app_colors.dart` and `lib/app/theme/app_theme.dart
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}` owner read/create/update rules; verified via emulator unit tests. Production Firebase project rules are currently deny-all until manual deploy command (`firebase deploy --only firestore:rules`) is run.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}` owner read/create/update rules; verified via emulator unit tests. Production Firebase project users rules deployed on October 7, 2026; trips rules from Phase 2 NOT yet deployed.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -368,7 +422,7 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
   First reverse emulator ports via ADB:
   ```bash
   adb reverse tcp:9099 tcp:9099
-  adb reverse tcp:8088 tcp:8088
+  adb reverse tcp:8092 tcp:8092
   ```
   Then launch pointing to localhost:
   ```bash
