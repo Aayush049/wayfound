@@ -1,6 +1,6 @@
 import 'dart:math';
 
-/// 32-character unambiguous alphabet (excludes I, L, O, 0, 1).
+/// 31-character unambiguous alphabet (excludes I, L, O, 0, 1).
 const String kJoinCodeAlphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 /// Regex for validating normalized 6-character join code format.

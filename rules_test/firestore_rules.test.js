@@ -582,6 +582,48 @@ describe('Trips & Join Security Rules', () => {
     await assertFails(batch2.commit());
   });
 
+  test('Denied trip create when createdAt is not request.time', async () => {
+    await seedUser(userId, displayName);
+    const authedDb = testEnv.authenticatedContext(userId).firestore();
+    const batch = authedDb.batch();
+
+    batch.set(
+      authedDb.collection('trips').doc(tripId),
+      getValidTripCreatePayload({ createdAt: new Date('2025-01-01T00:00:00Z') })
+    );
+    batch.set(
+      authedDb.collection('trips').doc(tripId).collection('members').doc(userId),
+      getValidMemberPayload()
+    );
+    batch.set(
+      authedDb.collection('joinCodes').doc(joinCode),
+      getValidJoinCodePayload()
+    );
+
+    await assertFails(batch.commit());
+  });
+
+  test('Denied trip create when joinCode does not match joinCodes document tripId', async () => {
+    await seedUser(userId, displayName);
+    const authedDb = testEnv.authenticatedContext(userId).firestore();
+    const batch = authedDb.batch();
+
+    batch.set(
+      authedDb.collection('trips').doc(tripId),
+      getValidTripCreatePayload({ joinCode })
+    );
+    batch.set(
+      authedDb.collection('trips').doc(tripId).collection('members').doc(userId),
+      getValidMemberPayload()
+    );
+    batch.set(
+      authedDb.collection('joinCodes').doc(joinCode),
+      getValidJoinCodePayload({ tripId: 'other_trip_id' })
+    );
+
+    await assertFails(batch.commit());
+  });
+
   describe('Trip Join Boundary & Security Tests', () => {
     const member2Uid = 'member_2';
     const member2Name = 'Bob Member';
@@ -788,6 +830,89 @@ describe('Trips & Join Security Rules', () => {
         memberCount: 2,
       });
       await assertFails(batch2.commit());
+    });
+
+    test('Join fails when memberCount increases by +2', async () => {
+      const authedDb = testEnv.authenticatedContext(member2Uid).firestore();
+      const batch = authedDb.batch();
+
+      batch.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 3,
+      });
+      batch.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 3,
+      });
+
+      await assertFails(batch.commit());
+    });
+
+    test('Join fails when memberIds.length and memberCount are inconsistent', async () => {
+      const authedDb = testEnv.authenticatedContext(member2Uid).firestore();
+      const batch = authedDb.batch();
+
+      batch.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 5,
+      });
+      batch.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 5,
+      });
+
+      await assertFails(batch.commit());
+    });
+
+    test('Join fails when trip is archived', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context
+          .firestore()
+          .collection('trips')
+          .doc(tripId)
+          .update({ archived: true });
+      });
+
+      const authedDb = testEnv.authenticatedContext(member2Uid).firestore();
+      const batch = authedDb.batch();
+
+      batch.update(authedDb.collection('trips').doc(tripId), {
+        memberIds: [userId, member2Uid],
+        memberCount: 2,
+      });
+      batch.set(
+        authedDb.collection('trips').doc(tripId).collection('members').doc(member2Uid),
+        {
+          displayName: member2Name,
+          photoUrl: null,
+          role: 'member',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.update(authedDb.collection('joinCodes').doc(joinCode), {
+        memberCount: 2,
+      });
+
+      await assertFails(batch.commit());
     });
 
     test('Sequential boundary test: succeeds at 14 to 15, fails at 15 to 16', async () => {
