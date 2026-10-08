@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wayfound/app/theme/theme_provider.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
+import 'package:wayfound/features/trips/data/trips_providers.dart';
 import 'package:wayfound/main.dart';
 
 void main() {
@@ -30,6 +31,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           authRepositoryProvider.overrideWithValue(repository),
+          myTripsProvider.overrideWithValue(const AsyncData([])),
           if (authUserValue != null)
             authUserProvider.overrideWithValue(authUserValue),
         ],

@@ -8,6 +8,7 @@ import 'package:wayfound/app/theme/theme_provider.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/features/auth/domain/app_user.dart';
+import 'package:wayfound/features/trips/data/trips_providers.dart';
 
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(
@@ -50,6 +51,7 @@ extension PumpApp on WidgetTester {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
+          myTripsProvider.overrideWithValue(const AsyncData([])),
           if (authRepository != null)
             authRepositoryProvider.overrideWithValue(authRepository),
           if (authUserValue != null)

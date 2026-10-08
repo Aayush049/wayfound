@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wayfound/app/router.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
+import 'package:wayfound/features/trips/data/trips_providers.dart';
 
 void main() {
   group('App Router Redirects', () {
@@ -56,6 +57,7 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(repository),
             authUserProvider.overrideWithValue(AsyncData(user)),
+            myTripsProvider.overrideWithValue(const AsyncData([])),
           ],
           child: Consumer(
             builder: (context, ref, _) {
@@ -68,7 +70,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('My Trips'), findsOneWidget);
-      expect(find.text('Your trips will appear here'), findsOneWidget);
+      expect(find.text('No trips yet'), findsOneWidget);
     });
 
     testWidgets(
@@ -86,7 +88,10 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [authRepositoryProvider.overrideWithValue(repository)],
+            overrides: [
+              authRepositoryProvider.overrideWithValue(repository),
+              myTripsProvider.overrideWithValue(const AsyncData([])),
+            ],
             child: Consumer(
               builder: (context, ref, _) {
                 final router = ref.watch(routerProvider);

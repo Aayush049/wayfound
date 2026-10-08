@@ -3,49 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/theme_provider.dart';
+import '../../../core/widgets/app_empty.dart';
+import '../../../core/widgets/app_error.dart';
+import '../../../core/widgets/app_loading.dart';
 import '../../auth/data/auth_provider.dart';
+import '../data/trips_providers.dart';
+import 'trip_card.dart';
 
-// Tab destinations for the main navigation (Section 5.1)
-final List<NavigationDestination> kTabDestinations = [
-  const NavigationDestination(
-    icon: Icon(Icons.home_outlined),
-    selectedIcon: Icon(Icons.home),
-    label: 'Home',
-  ),
-  const NavigationDestination(
-    icon: Icon(Icons.explore_outlined),
-    selectedIcon: Icon(Icons.explore),
-    label: 'Trips',
-  ),
-  const NavigationDestination(
-    icon: Icon(Icons.lightbulb_outline),
-    selectedIcon: Icon(Icons.lightbulb),
-    label: 'Ideas',
-  ),
-  const NavigationDestination(
-    icon: Icon(Icons.account_balance_wallet_outlined),
-    selectedIcon: Icon(Icons.account_balance_wallet),
-    label: 'Expenses',
-  ),
-];
-
-/// Home screen with tab-based navigation shell.
-/// Uses bottom navigation bar with 4 tabs as per the app design.
-class HomeScreen extends ConsumerStatefulWidget {
+/// Home screen showing "My Trips" list and actions to create or join trips.
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
     final appUserAsync = ref.watch(appUserProvider);
+    final myTripsAsync = ref.watch(myTripsProvider);
+    final authUser = ref.watch(authUserProvider).asData?.value;
 
     final user = appUserAsync.asData?.value;
     final displayName =
@@ -59,11 +35,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           // Quick theme toggle button (Section 14.3)
           IconButton(
+            key: const Key('home_theme_toggle_button'),
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
             tooltip: 'Toggle Theme',
             onPressed: () {
               ref.read(themeProvider.notifier).toggleTheme(theme.brightness);
             },
+          ),
+          // Action button to Join with code
+          IconButton(
+            icon: const Icon(Icons.qr_code),
+            tooltip: 'Join with code',
+            onPressed: () => context.push('/trip/join'),
           ),
           // User Avatar button reaching Settings screen
           Padding(
@@ -95,45 +78,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          // Tab 0: Home (current trips overview)
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (displayName.isNotEmpty) ...[
-                  Text(
-                    'Welcome, $displayName!',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                const Icon(Icons.luggage, size: 64),
-                const SizedBox(height: 16),
-                const Text('Your trips will appear here'),
-              ],
-            ),
-          ),
-          // Tab 1: Trips (browse/join trips)
-          Center(child: Text('Trips Tab')),
-          // Tab 2: Ideas (suggestions for active trip)
-          Center(child: Text('Ideas Tab')),
-          // Tab 3: Expenses (expenses and settlements)
-          Center(child: Text('Expenses Tab')),
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+      body: myTripsAsync.when(
+        loading: () => const AppLoading(message: 'Loading your trips...'),
+        error: (err, stack) => AppError(
+          message: 'Failed to load trips: ${err.toString()}',
+          onRetry: () => ref.invalidate(myTripsProvider),
+        ),
+        data: (trips) {
+          if (trips.isEmpty) {
+            return AppEmpty(
+              title: 'No trips yet',
+              message: 'Create a new trip to invite your friends or join an existing trip with a 6-character code.',
+              icon: Icons.luggage_outlined,
+              actionLabel: 'Create a Trip',
+              onAction: () => context.push('/trip/create'),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.only(top: 8, bottom: 88),
+            itemCount: trips.length,
+            itemBuilder: (context, index) {
+              final trip = trips[index];
+              return TripCard(
+                trip: trip,
+                currentUid: authUser?.uid ?? '',
+                onTap: () => context.push('/trip/${trip.id}/members'),
+              );
+            },
+          );
         },
-        destinations: kTabDestinations,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/trip/create'),
+        icon: const Icon(Icons.add),
+        label: const Text('Create Trip'),
       ),
     );
   }

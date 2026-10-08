@@ -9,7 +9,10 @@ import '../features/auth/presentation/settings_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/trips/presentation/create_trip_screen.dart';
 import '../features/trips/presentation/home_screen.dart';
+import '../features/trips/presentation/join_trip_screen.dart';
+import '../features/trips/presentation/trip_dashboard_screen.dart';
 
 /// Provider for the app's [GoRouter] configuration with auth redirect.
 final routerProvider = Provider<GoRouter>((ref) {
@@ -76,6 +79,58 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      // Trip create & join routes (MUST be defined before /trip/:id so they aren't captured as an id!)
+      GoRoute(
+        path: '/trip/create',
+        builder: (context, state) => const CreateTripScreen(),
+      ),
+      GoRoute(
+        path: '/trip/join',
+        builder: (context, state) => const JoinTripScreen(),
+      ),
+
+      // Trip dashboard routes (/trip/:id and sub-tabs)
+      GoRoute(
+        path: '/trip/:id',
+        redirect: (context, state) {
+          final id = state.pathParameters['id'];
+          if (state.matchedLocation == '/trip/$id') {
+            return '/trip/$id/members';
+          }
+          return null;
+        },
+        routes: [
+          GoRoute(
+            path: 'suggestions',
+            builder: (context, state) => TripDashboardScreen(
+              tripId: state.pathParameters['id']!,
+              activeTab: 'suggestions',
+            ),
+          ),
+          GoRoute(
+            path: 'itinerary',
+            builder: (context, state) => TripDashboardScreen(
+              tripId: state.pathParameters['id']!,
+              activeTab: 'itinerary',
+            ),
+          ),
+          GoRoute(
+            path: 'expenses',
+            builder: (context, state) => TripDashboardScreen(
+              tripId: state.pathParameters['id']!,
+              activeTab: 'expenses',
+            ),
+          ),
+          GoRoute(
+            path: 'members',
+            builder: (context, state) => TripDashboardScreen(
+              tripId: state.pathParameters['id']!,
+              activeTab: 'members',
+            ),
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) => const Scaffold(

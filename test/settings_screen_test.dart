@@ -9,6 +9,7 @@ import 'package:wayfound/app/theme/theme_provider.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
 import 'package:wayfound/features/auth/data/auth_repository.dart';
 import 'package:wayfound/features/auth/presentation/settings_screen.dart';
+import 'package:wayfound/features/trips/data/trips_providers.dart';
 import 'package:wayfound/features/trips/presentation/home_screen.dart';
 
 import 'helpers/pump_app.dart';
@@ -138,6 +139,7 @@ void main() {
           overrides: [
             sharedPreferencesProvider.overrideWithValue(prefs),
             authRepositoryProvider.overrideWithValue(repository),
+            myTripsProvider.overrideWithValue(const AsyncData([])),
           ],
         );
         addTearDown(container.dispose);
@@ -184,7 +186,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Welcome, Updated Name!'), findsOneWidget);
+        expect(find.text('My Trips'), findsOneWidget);
       },
     );
 
