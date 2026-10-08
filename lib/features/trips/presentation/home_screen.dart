@@ -170,18 +170,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Material(
-                      elevation: 2,
+                      elevation: 3,
                       borderRadius: BorderRadius.circular(8),
-                      color: theme.colorScheme.surfaceContainerHighest,
+                      color: theme.colorScheme.surface,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                          horizontal: 14,
+                          vertical: 8,
                         ),
                         child: Text(
                           'Create Trip',
                           style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -195,6 +195,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         key: const Key('fab_action_create_trip'),
                         heroTag: 'fab_action_create_trip',
                         tooltip: 'Create Trip',
+                        backgroundColor: theme.colorScheme.secondaryContainer,
+                        foregroundColor: theme.colorScheme.onSecondaryContainer,
                         onPressed: _navigateToCreate,
                         child: const Icon(Icons.add),
                       ),
@@ -210,18 +212,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Material(
-                      elevation: 2,
+                      elevation: 3,
                       borderRadius: BorderRadius.circular(8),
-                      color: theme.colorScheme.surfaceContainerHighest,
+                      color: theme.colorScheme.surface,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                          horizontal: 14,
+                          vertical: 8,
                         ),
                         child: Text(
                           'Join Trip',
                           style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -235,6 +237,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         key: const Key('fab_action_join_trip'),
                         heroTag: 'fab_action_join_trip',
                         tooltip: 'Join Trip',
+                        backgroundColor: theme.colorScheme.secondaryContainer,
+                        foregroundColor: theme.colorScheme.onSecondaryContainer,
                         onPressed: _navigateToJoin,
                         child: const Icon(Icons.group_add_outlined),
                       ),
