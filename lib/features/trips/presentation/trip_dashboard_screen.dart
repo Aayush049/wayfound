@@ -6,6 +6,7 @@ import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
 import '../../auth/data/auth_provider.dart';
+import '../../suggestions/presentation/suggestions_tab.dart';
 import '../data/trips_providers.dart';
 import 'members_tab.dart';
 
@@ -151,12 +152,8 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
           body: TabBarView(
             controller: _tabController,
             children: [
-              // Tab 0: Suggestions Placeholder TEMP(phase-3)
-              const AppEmpty(
-                title: 'Suggestions Coming Soon',
-                message: 'TEMP(phase-3): Suggest activities, places, and ideas for this trip in Phase 3.',
-                icon: Icons.lightbulb_outline,
-              ),
+              // Tab 0: Suggestions Tab (Phase 3)
+              SuggestionsTab(trip: trip),
 
               // Tab 1: Itinerary Placeholder TEMP(phase-4)
               const AppEmpty(

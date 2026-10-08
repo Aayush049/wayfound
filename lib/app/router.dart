@@ -9,6 +9,7 @@ import '../features/auth/presentation/settings_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/suggestions/presentation/add_edit_suggestion_screen.dart';
 import '../features/trips/presentation/create_trip_screen.dart';
 import '../features/trips/presentation/home_screen.dart';
 import '../features/trips/presentation/join_trip_screen.dart';
@@ -102,6 +103,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           return null;
         },
         routes: [
+          GoRoute(
+            path: 'suggestions/add',
+            builder: (context, state) =>
+                AddEditSuggestionScreen(tripId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: 'suggestions/:sid/edit',
+            builder: (context, state) => AddEditSuggestionScreen(
+              tripId: state.pathParameters['id']!,
+              suggestionId: state.pathParameters['sid'],
+            ),
+          ),
           GoRoute(
             path: 'suggestions',
             builder: (context, state) => TripDashboardScreen(

@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wayfound/features/suggestions/domain/suggestion.dart';
 import 'package:wayfound/features/suggestions/domain/suggestion_category.dart';
 import 'package:wayfound/features/suggestions/domain/suggestion_payload_builders.dart';
 import 'package:wayfound/features/suggestions/domain/suggestion_validators.dart';
-import 'package:wayfound/features/suggestions/domain/vote.dart';
 import 'package:wayfound/features/suggestions/domain/vote_logic.dart';
 
 void main() {

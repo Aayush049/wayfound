@@ -3,7 +3,7 @@
 *Wayfound is a collaborative trip planner for groups.*
 
 **Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026 (Updated: October 6, 2026)
-**Status:** Milestone 0 & Milestone 1 complete (Phase 0 setup and Phase 1 auth finished)
+**Status:** Milestone 0, Milestone 1, Milestone 2 & Milestone 3 complete (Phase 0 setup, Phase 1 auth, Phase 2 trips, Phase 3 suggestions & voting finished)
 
 ---
 
@@ -303,7 +303,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | 0 | Setup | S | **DONE** — App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from palette; theme provider in place |
 | 1 | Auth | S-M | **DONE** — Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests implemented |
 | 2 | Trips and joining | L | Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
-| 3 | Suggestions and voting | M-L | CRUD, vote transaction (all six cases), sorting, rules enforced |
+| 3 | Suggestions and voting | M-L | **DONE** — CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
 | 4 | Itinerary | M | Organizer schedules; day view updates live on second device |
 | 5 | Expenses and balances | L | Expense CRUD, calculator unit-tested, Balances view with suggested payments |
 | 6 | Settlements | M | Mark paid, confirm/reject, balances use confirmed only, leave rule works |
@@ -416,6 +416,27 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Routing:** Deep linking configured in `GoRouter` with `/trip/create` and `/trip/join` registered before `/trip/:id` to prevent route param collision, and subroutes for tab navigation (`/trip/:id/members`, etc.).
 - **Security Rules:** Strict atomic batched write rules for `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` enforcing required keys, server timestamps, 15-member limit, and member-only read access.
 - **Verification:** All 46 Firestore Security Rules Jest unit tests passed, all 122 Flutter unit and widget tests passed (including Home expandable FAB menu and dual empty-state action widget tests), and `flutter analyze` reported 0 static issues.
+
+---
+
+### 15.7 Milestone 3 Status (Phase 3: Suggestions and Voting Completed)
+- **Suggestion Models & Validation:** `Suggestion` domain model, `Vote` domain model, `SuggestionCategory` definitions with material icons and labels, strict field validators (`SuggestionValidators`), and exact key set payload builders (`SuggestionPayloadBuilders`).
+- **Integer Money Utility:** Pure Dart helper (`lib/core/money.dart`) for parsing and formatting monetary amounts as minor unit integers (e.g. 12550 minor units = ₹125.50 / $125.50; 500 minor units = ¥500) supporting zero-decimal currencies (JPY) and 2-decimal currencies (INR, USD, EUR).
+- **Atomic Vote Logic:** Pure function `computeVoteTransition` covering all 6 vote states (No Vote + Up, No Vote + Down, Up + Down, Down + Up, Up + Up again (delete), Down + Down again (delete)), preventing negative counts.
+- **Firestore Repository & Transactions:** `SuggestionRepository` performing atomic `runTransaction` for vote casting (updating vote document and suggestion counters simultaneously), `watchSuggestions` stream, `watchMyVote` stream, `createSuggestion`, `updateSuggestion`, and `deleteSuggestion`.
+- **Client-Side Sorting:** Suggestions list reactively sorted by `score` (`upCount - downCount`) descending, with ties broken by oldest `createdAt` timestamp first.
+- **Presentation Components:**
+  - `VoteButtons`: Upvote/downvote buttons meeting 48dp minimum touch targets, semantics, tooltips, and active highlight states.
+  - `SuggestionCard`: Category chip, formatted cost, author display name, score badge, vote controls, and overflow edit/delete menu for author/organizer.
+  - `SuggestionsTab`: Reactive stream view with loading, error retry, empty state ("No suggestions yet"), and floating action button.
+  - `AddEditSuggestionScreen`: Form with category dropdown, title, optional note, optional cost input, prefilled initial data on edit, and back navigation to suggestions tab.
+- **GoRouter Integration:** Registered subroutes `/trip/:id/suggestions/add` and `/trip/:id/suggestions/:sid/edit` under the `/trip/:id` route branch, cleanly navigating to add/edit forms and back to the suggestions tab.
+- **Firestore Security Rules:** CEL security rules for `suggestions/{sid}` and `votes/{uid}` enforcing trip membership, caller ownership for updates, strict document structure, and atomic counter coupling where suggestion `upCount`/`downCount` updates must exactly match the vote document transition delta.
+- **Comprehensive Verification:**
+  - **Firestore Security Rules Tests:** 54 passed (8 dedicated suggestion & vote security rules tests verifying signed-out denials, valid create, payload tampering, author edits, vote transitions, and counter-mismatch protection).
+  - **Flutter Tests:** 145 passed (covering unit tests for money parsing/formatting, vote logic, category resolution, payload builders, fake Firestore repository operations, and full widget tests for cards, forms, and tabs).
+  - **Static Analysis:** `flutter analyze` reported 0 static issues across the entire project.
+  - **Code Formatting:** `dart format --set-exit-if-changed .` verified 100% compliant formatting.
 
 ---
 
