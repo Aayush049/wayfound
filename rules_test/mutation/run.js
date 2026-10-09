@@ -16,44 +16,75 @@ const originalRules = fs.readFileSync(originalRulesPath, 'utf8').replace(/\r\n/g
 
 const mutations = [
   {
+    name: 'm0',
+    description: 'BASELINE CONTROL (unchanged firestore.rules)',
+    isBaseline: true,
+    relevantTarget: 'Yes (0 failures expected)',
+    custom: (rules) => rules,
+  },
+  {
     name: 'm1',
     description: 'member/signed-in checks on vote writes',
+    relevantTarget: 'No (Overlaps with suggestion member check; proven by m1all)',
     find: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
     replace: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid`,
   },
   {
+    name: 'm1all',
+    description: 'member checks on vote writes AND suggestion updates together',
+    relevantTarget: 'Yes (Proof 1: Signed-out and non-member vote write denied)',
+    custom: (rules) => {
+      let r = rules;
+      const t1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`;
+      const r1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid`;
+      const t2 = `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
+      const r2 = `        allow update: if isSignedIn()\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
+
+      if (r.split(t1).length - 1 !== 1) throw new Error('m1all t1 not found exactly once');
+      if (r.split(t2).length - 1 !== 1) throw new Error('m1all t2 not found exactly once');
+
+      return r.replace(t1, r1).replace(t2, r2);
+    }
+  },
+  {
     name: 'm2',
     description: 'value in {1,-1}',
+    relevantTarget: 'Yes (Proof 2 & Denied vote transactions)',
     find: `\n            && (request.resource.data.value == 1 || request.resource.data.value == -1)`,
     replace: ``,
   },
   {
     name: 'm3',
     description: 'value != previous value',
+    relevantTarget: 'Yes (Proof 3 & Denied vote transactions)',
     find: `\n            && (request.method == 'create' || request.resource.data.value != resource.data.value)`,
     replace: ``,
   },
   {
     name: 'm4a',
     description: 'archived check on vote create/update',
+    relevantTarget: 'No (Overlaps with suggestion archived check; proven by m4all)',
     find: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`,
     replace: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
   },
   {
     name: 'm4b',
     description: 'archived check on vote delete',
+    relevantTarget: 'No (Overlaps with suggestion archived check; proven by m4all)',
     find: `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`,
     replace: `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
   },
   {
     name: 'm4c',
     description: 'archived check on suggestion counter update',
+    relevantTarget: 'No (Overlaps with vote archived check; proven by m4all)',
     find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`,
     replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`,
   },
   {
     name: 'm4all',
     description: 'all three archived checks together',
+    relevantTarget: 'Yes (Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied)',
     custom: (rules) => {
       let r = rules;
       const t1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`;
@@ -73,54 +104,63 @@ const mutations = [
   {
     name: 'm5',
     description: 'vote read owner check (uid == auth uid)',
+    relevantTarget: 'Yes (Votes read permissions & Proof 5)',
     find: `allow get, list: if isSignedIn() && uid == request.auth.uid && isTripMember(tripId);`,
     replace: `allow get, list: if isSignedIn() && isTripMember(tripId);`,
   },
   {
     name: 'm5b',
     description: 'vote read member check',
+    relevantTarget: 'Yes (Proof 5: Signed-out, non-member and other-member reads of vote document denied)',
     find: `allow get, list: if isSignedIn() && uid == request.auth.uid && isTripMember(tripId);`,
     replace: `allow get, list: if isSignedIn() && uid == request.auth.uid;`,
   },
   {
     name: 'm6',
     description: 'content-update hasOnly key restriction',
+    relevantTarget: 'Yes (Proof 6a-6e & Content edit)',
     find: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'note', 'estimatedCost', 'category'])`,
     replace: ``,
   },
   {
     name: 'm7a',
     description: 'delete author-or-organizer check',
+    relevantTarget: 'Yes (Suggestion delete: author and organizer succeed, other member denied)',
     find: `\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `;`,
   },
   {
     name: 'm7b',
     description: 'delete member check',
+    relevantTarget: 'Yes (Proof 7: Suggestion delete denied for non-member and signed-out user)',
     find: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `        allow delete: if isSignedIn()\n          && isTripNotArchived(tripId)\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
   },
   {
     name: 'm8a',
     description: 'suggestion-side before != after and delta lines together',
+    relevantTarget: 'Yes (Proof 8a: Plain suggestion counter update with NO vote change denied)',
     find: `\n          && getVoteBeforeVal(database, tripId, sid, request.auth.uid) != getVoteAfterVal(database, tripId, sid, request.auth.uid)\n          && request.resource.data.upCount == resource.data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid))\n          && request.resource.data.downCount == resource.data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid));`,
     replace: `;`,
   },
   {
     name: 'm8b',
     description: 'vote-side mirror delta lines together',
+    relevantTarget: 'Yes (Proof 8b: Vote write with NO matching counter change denied)',
     find: `\n            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value)\n            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value);`,
     replace: `;`,
   },
   {
     name: 'm9',
     description: 'hasAll(resource.data.memberIds) check on trip join',
+    relevantTarget: 'Yes (Join DENIED duplicate member padding)',
     find: `\n        && request.resource.data.memberIds.hasAll(resource.data.memberIds)`,
     replace: ``,
   },
   {
     name: 'm10',
     description: 'users createdAt == request.time',
+    relevantTarget: 'Yes (users create DENIED when createdAt is a client Date)',
     find: `\n        && request.resource.data.createdAt == request.time;`,
     replace: `;`,
   }
@@ -179,12 +219,12 @@ function parseFailedTests(output) {
     if (trimmed.startsWith('● ')) {
       const parts = trimmed.substring(2).split('›');
       const testName = parts[parts.length - 1].trim();
-      if (testName && !testName.includes('beforeAll hook')) {
+      if (testName && !testName.includes('beforeAll hook') && !testName.includes('afterAll hook')) {
         failed.add(testName);
       }
     } else if (trimmed.startsWith('✕ ') || trimmed.startsWith('× ')) {
       const testName = trimmed.replace(/^[✕×]\s+/, '').replace(/\s+\(\d+\s*ms\)$/, '').trim();
-      if (testName && !testName.includes('beforeAll hook')) {
+      if (testName && !testName.includes('beforeAll hook') && !testName.includes('afterAll hook')) {
         failed.add(testName);
       }
     }
@@ -194,7 +234,8 @@ function parseFailedTests(output) {
 
 async function main() {
   const results = [];
-  let anyUndetected = false;
+  let anyUnexpectedUndetected = false;
+  let baselineFailed = false;
 
   console.log('Starting Security Rules Mutation Runner...\n');
 
@@ -221,7 +262,7 @@ async function main() {
       mutantRules = originalRules.replace(mut.find, mut.replace);
     }
 
-    if (mutantRules === originalRules) {
+    if (!mut.isBaseline && mutantRules === originalRules) {
       console.error(`ERROR: Mutant ${mut.name} is identical to original rules!`);
       process.exit(1);
     }
@@ -252,33 +293,60 @@ async function main() {
     const failedTests = parseFailedTests(output);
     const detected = failedTests.length > 0;
 
-    results.push({
-      mutant: mut.name,
-      removed: mut.description,
-      failedTests: detected ? failedTests : ['NONE = UNDETECTED'],
-      detected,
-    });
-
-    if (!detected) {
-      console.log(`  -> UNDETECTED!`);
-      anyUndetected = true;
+    if (mut.isBaseline) {
+      if (detected) {
+        baselineFailed = true;
+        console.error(`  -> ERROR: BASELINE CONTROL (m0) FAILED! (${failedTests.length} failing tests: ${failedTests.join('; ')})`);
+      } else {
+        console.log(`  -> BASELINE CONTROL PASSED (0 failing tests).`);
+      }
+      results.push({
+        mutant: mut.name,
+        removed: mut.description,
+        failedTests: ['0 failing tests (PASSED)'],
+        relevant: mut.relevantTarget,
+        detected: true,
+      });
     } else {
-      console.log(`  -> Detected by ${failedTests.length} test(s): ${failedTests.join('; ')}`);
+      results.push({
+        mutant: mut.name,
+        removed: mut.description,
+        failedTests: detected ? failedTests : ['NONE = UNDETECTED (Overlapped)'],
+        relevant: mut.relevantTarget,
+        detected,
+      });
+
+      if (!detected) {
+        if (mut.relevantTarget.startsWith('No')) {
+          console.log(`  -> UNDETECTED (Expected overlap: ${mut.relevantTarget})`);
+        } else {
+          console.log(`  -> UNDETECTED! (UNEXPECTED)`);
+          anyUnexpectedUndetected = true;
+        }
+      } else {
+        console.log(`  -> Detected by ${failedTests.length} test(s): ${failedTests.join('; ')}`);
+      }
     }
   }
 
   console.log('\n================================ MUTATION RESULTS TABLE ================================');
-  console.log('| Mutant | What was removed | Failed Tests (or NONE = UNDETECTED) |');
-  console.log('|---|---|---|');
+  console.log('| Mutant | What was removed | Exact Failed Tests | Relevant? |');
+  console.log('|---|---|---|---|');
   for (const r of results) {
-    console.log(`| ${r.mutant} | ${r.removed} | ${r.failedTests.join(', ')} |`);
+    console.log(`| ${r.mutant} | ${r.removed} | ${r.failedTests.join(', ')} | ${r.relevant} |`);
   }
   console.log('=======================================================================================\n');
 
-  if (anyUndetected) {
-    console.log('WARNING: Some mutants were UNDETECTED.');
+  if (baselineFailed) {
+    console.error('FATAL: Baseline control m0 failed! Exiting non-zero.');
+    process.exit(1);
+  }
+
+  if (anyUnexpectedUndetected) {
+    console.error('WARNING: Unexpected undetected mutants found!');
+    process.exit(1);
   } else {
-    console.log('SUCCESS: All mutants detected by the security rules test suite!');
+    console.log('SUCCESS: All mutations verified! Baseline m0 passed with 0 failures, all individual/combined protections verified.');
   }
 }
 
