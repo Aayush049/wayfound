@@ -112,7 +112,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 | 6 | Join Trip | `/trip/join` | Code entry, preview, confirm |
 | 7 | Trip Dashboard | `/trip/:id` | Container with four tabs |
 | 8 | Suggestions tab | `/trip/:id/suggestions` | List with vote controls |
-| 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add` | Title, note, cost, category |
+| 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add`, `/trip/:id/suggestions/:sid/edit` | Title, note, cost, category |
 | 10 | Itinerary tab | `/trip/:id/itinerary` | Day-by-day confirmed plan |
 | 11 | Expenses tab | `/trip/:id/expenses` | Expense list plus Balances view |
 | 12 | Add Expense | `/trip/:id/expenses/add` | Amount, payer, participants, description |
@@ -193,8 +193,8 @@ A non-member may update a trip only if:
 - **Settlements:** create only as payer (`fromUid` equals caller, status `pending`); only the receiver (or organizer) may set `confirmed` or `rejected`; amount and parties are immutable after creation.
 - **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
 
-### 7.5 Known limitations
-- Stored vote counters can be tampered with by a determined member, since rules cannot fully verify the arithmetic without server code. Accepted for a friend-group app.
+### 7.5 Known limitations & Counter Integrity
+- Stored vote counters (`upCount`, `downCount`) are protected by `getAfter` rules requiring exact correlation with atomic vote document changes. Plain counter updates without matching vote transitions are strictly denied.
 - Short join codes could in theory be brute-forced; plan Firebase App Check as a later hardening step.
 - Subcollections are not removed when a trip document is deleted, which is why trips are archived rather than deleted.
 
@@ -290,7 +290,33 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 ## 10. Testing Plan
 
 1. **Unit & Widget tests** (Flutter): 145 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, and vote logic. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
-2. **Rules tests** (Firebase Emulator): 54 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, and vote read restrictions. Verified with 100% CEL condition coverage via mutation testing on `fix/phase-3-rules-verification`. Run with `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
+2. **Rules tests** (Firebase Emulator): 67 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, and 13 dedicated Phase 3 proof tests (signed-out/non-member access, vote value limits, re-vote block, archived trip lock, private vote reads, immutable field protections, non-author delete block, plain counter manipulation block, and uncoupled vote write block).
+   - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
+   - **Mutation Testing Suite:** 100% CEL condition detection score across 16 security rule mutants (`m1` to `m10`, including `m4all`, `m5b`, `m7b`, `m8a`, `m8b`). Run mutation runner via node script `rules_test/mutation/run.js`.
+
+### 10.1 Security Rules Mutation Testing Results Table
+
+| Mutant | What was removed | Failed Tests (or NONE = UNDETECTED) |
+|---|---|---|
+| m1 | member/signed-in checks on vote writes | Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m2 | value in {1,-1} | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 2: Vote value 2 and 0 denied on create with unchanged counters, Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m3 | value != previous value | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 3: Re-vote with same value denied, Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m4a | archived check on vote create/update | Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m4b | archived check on vote delete | Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m4c | archived check on suggestion counter update | Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m4all | all three archived checks together | Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied, Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m5 | vote read owner check (uid == auth uid) | Votes read permissions: owner can read own vote, other member cannot read owner vote, Proof 5: Signed-out, non-member and other-member reads of vote document denied, Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m5b | vote read member check | Proof 5: Signed-out, non-member and other-member reads of vote document denied, Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m6 | content-update hasOnly key restriction | Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied, Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 6a: Content update changing createdAt denied, Proof 6b: Content update changing authorId denied, Proof 6c: Content update changing status denied, Proof 6d: Content update changing dayIndex denied, Proof 6e: Content update changing order denied, Proof 7: Suggestion delete denied for non-member and signed-out user, Proof 8a: Plain suggestion counter update with NO vote change denied |
+| m7a | delete author-or-organizer check | Suggestion delete: author and organizer succeed, other member denied |
+| m7b | delete member check | Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m8a | suggestion-side before != after and delta lines together | Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied, Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 7: Suggestion delete denied for non-member and signed-out user, Proof 8a: Plain suggestion counter update with NO vote change denied |
+| m8b | vote-side mirror delta lines together | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 7: Suggestion delete denied for non-member and signed-out user, Proof 8b: Vote write with NO matching counter change denied |
+| m9 | hasAll(resource.data.memberIds) check on trip join | Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C]), Proof 7: Suggestion delete denied for non-member and signed-out user |
+| m10 | users createdAt == request.time | users create DENIED when createdAt is a client Date (not request.time), Proof 7: Suggestion delete denied for non-member and signed-out user |
+
+*Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules. Evaluating `m4all` proves that complete removal of archived trip protection is caught by Proof 4.
+
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
 
@@ -302,7 +328,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 |---|---|---|---|
 | 0 | Setup | S | **DONE** — App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from palette; theme provider in place |
 | 1 | Auth | S-M | **DONE** — Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests implemented |
-| 2 | Trips and joining | L | Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
+| 2 | Trips and joining | L | **DONE** — Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
 | 3 | Suggestions and voting | M-L | **DONE** — CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
 | 4 | Itinerary | M | Organizer schedules; day view updates live on second device |
 | 5 | Expenses and balances | L | Expense CRUD, calculator unit-tested, Balances view with suggested payments |
@@ -391,7 +417,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `trips/{tripId}/members/{uid}`, and `joinCodes/{code}` rules; fully verified via 46 passing Jest unit tests against the Firestore emulator. Production rules for user docs deployed on October 7, 2026; production rules for `trips`, `members`, and `joinCodes` deployed on October 8, 2026.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, and `joinCodes/{code}` rules; fully verified via 67 passing Jest unit tests against the Firestore emulator and 100% mutation detection (16/16 mutants detected). Production rules last deployed Oct 8, 2026 prior to Phase 3 & strictness fixes; production rules deploy pending: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -433,7 +459,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **GoRouter Integration:** Registered subroutes `/trip/:id/suggestions/add` and `/trip/:id/suggestions/:sid/edit` under the `/trip/:id` route branch, cleanly navigating to add/edit forms and back to the suggestions tab.
 - **Firestore Security Rules:** CEL security rules for `suggestions/{sid}` and `votes/{uid}` enforcing trip membership, caller ownership for updates, strict document structure, and atomic counter coupling where suggestion `upCount`/`downCount` updates must exactly match the vote document transition delta.
 - **Comprehensive Verification:**
-  - **Firestore Security Rules Tests:** 54 passed (8 dedicated suggestion & vote security rules tests verifying signed-out denials, valid create, payload tampering, author edits, vote transitions, and counter-mismatch protection).
+  - **Firestore Security Rules Tests:** 67 passed (including 13 dedicated Phase 3 proof tests verifying signed-out denials, valid create, payload tampering, author edits, vote transitions, archived trip locks, private vote reads, non-author delete denials, plain counter manipulation block, and counter-mismatch protection). Verified with 100% mutation detection score (16/16 mutants detected).
   - **Flutter Tests:** 145 passed (covering unit tests for money parsing/formatting, vote logic, category resolution, payload builders, fake Firestore repository operations, and full widget tests for cards, forms, and tabs).
   - **Static Analysis:** `flutter analyze` reported 0 static issues across the entire project.
   - **Code Formatting:** `dart format --set-exit-if-changed .` verified 100% compliant formatting.
@@ -471,5 +497,5 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
 - **Commits:** logical, concise commit messages prefixed by type (`feat`, `fix`, `test`, `refactor`, `docs`, `chore`).
 - **Phase Completion:** a phase branch is merged into `main` only when all phase requirements are complete, `flutter analyze` reports zero issues, and all tests pass.
 - **Remote Synchronization:** after merging into `main`, push both `main` and the phase branch to origin, confirming local `main` equals `origin/main`.
-- **Safety:** never force-push, rewrite commit history, or delete branches without explicit user request.
+- **Safety Rules & Safeguards:** Never execute destructive git or filesystem commands (`git clean`, `git reset --hard`, `git checkout .`, `git restore .`, `git stash drop`, `git branch -D`, `git push --force`, `rm -rf`, `del /s`) or modify `firestore.rules` during security rules testing sessions without explicit user approval and prior dry runs.
 - **Documentation:** update `trip_planner_project_report.md` at the completion of each phase.

@@ -50,3 +50,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Mutation testing output
+rules_test/mutation/out/

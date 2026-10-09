@@ -12,7 +12,7 @@ const PROJECT_ID = 'wayfound-51b4d';
 let testEnv;
 
 beforeAll(async () => {
-  const rulesPath = path.join(__dirname, '..', 'firestore.rules');
+  const rulesPath = process.env.RULES_PATH || path.join(__dirname, '..', 'firestore.rules');
   const rules = fs.readFileSync(rulesPath, 'utf8');
 
   testEnv = await initializeTestEnvironment({
@@ -2184,8 +2184,18 @@ describe('Trips & Join Security Rules', () => {
       // Signed-out read denied
       await assertFails(unauthedDb.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
 
-      // Non-member read denied
+      // Non-member read denied (reading someone else's vote)
       await assertFails(nonMemberDb.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
+
+      // Non-member reading their OWN vote document on a trip they do not belong to denied
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).collection('votes').doc(proofNonMemberUid).set({
+          value: 1,
+          updatedAt: new Date(),
+        });
+      });
+      await assertFails(nonMemberDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).collection('votes').doc(proofNonMemberUid).get());
 
       // Other member read denied
       await assertFails(member2Db.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
@@ -2277,6 +2287,43 @@ describe('Trips & Join Security Rules', () => {
 
       // Non-member delete denied
       await assertFails(nonMemberSuggRef.delete());
+
+      // Non-member who is suggestion author (e.g. removed member) delete denied
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).set({
+          title: 'Non-Member Author Suggestion',
+          note: 'Proof Note',
+          estimatedCost: 100,
+          category: 'food',
+          authorId: proofNonMemberUid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+      await assertFails(nonMemberSuggRef.delete());
+
+      // Re-seed for author control
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).set({
+          title: 'Member Author Suggestion',
+          note: 'Proof Note',
+          estimatedCost: 100,
+          category: 'food',
+          authorId: proofMember1Uid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
 
       // Control 1: Author delete succeeds
       await assertSucceeds(member1SuggRef.delete());
