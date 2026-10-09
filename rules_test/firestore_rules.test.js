@@ -1975,5 +1975,370 @@ describe('Trips & Join Security Rules', () => {
       });
       await assertSucceeds(suggRefOrganizer.delete());
     });
+
+  describe('Phase 3 proof tests', () => {
+    const proofOrganizerUid = 'proof_organizer';
+    const proofMember1Uid = 'proof_member_1';
+    const proofMember2Uid = 'proof_member_2';
+    const proofNonMemberUid = 'proof_non_member';
+    const proofTripId = 'trip_proof_test';
+    const proofSuggId = 'sugg_proof_1';
+
+    async function seedProofEnvironment(overrides = {}) {
+      const {
+        archived = false,
+        suggestion = null,
+        vote = null,
+      } = overrides;
+
+      await seedUser(proofOrganizerUid, 'Proof Organizer');
+      await seedUser(proofMember1Uid, 'Proof Member 1');
+      await seedUser(proofMember2Uid, 'Proof Member 2');
+      await seedUser(proofNonMemberUid, 'Proof Non Member');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).set({
+          name: 'Proof Test Trip',
+          destination: 'Goa',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'INR',
+          organizerId: proofOrganizerUid,
+          joinCode: 'PROOF1',
+          memberIds: [proofOrganizerUid, proofMember1Uid, proofMember2Uid],
+          memberCount: 3,
+          archived,
+          createdAt: new Date(),
+        });
+
+        const suggData = {
+          title: 'Proof Suggestion',
+          note: 'Proof Note',
+          estimatedCost: 100,
+          category: 'food',
+          authorId: proofMember1Uid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+          ...suggestion,
+        };
+
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).set(suggData);
+
+        if (vote) {
+          const voteUid = vote.uid || proofMember1Uid;
+          await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).collection('votes').doc(voteUid).set({
+            value: vote.value !== undefined ? vote.value : 1,
+            updatedAt: new Date(),
+          });
+        }
+      });
+    }
+
+    test('Proof 1: Signed-out and non-member vote write denied', async () => {
+      await seedProofEnvironment();
+
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+      const nonMemberDb = testEnv.authenticatedContext(proofNonMemberUid).firestore();
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+
+      const unauthSuggRef = unauthedDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const unauthVoteRef = unauthSuggRef.collection('votes').doc('unauth_uid');
+
+      const nonMemberSuggRef = nonMemberDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const nonMemberVoteRef = nonMemberSuggRef.collection('votes').doc(proofNonMemberUid);
+
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // Signed-out vote write denied
+      const batch1 = unauthedDb.batch();
+      batch1.set(unauthVoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batch1.update(unauthSuggRef, { upCount: 1, downCount: 0 });
+      await assertFails(batch1.commit());
+
+      // Non-member vote write denied
+      const batch2 = nonMemberDb.batch();
+      batch2.set(nonMemberVoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batch2.update(nonMemberSuggRef, { upCount: 1, downCount: 0 });
+      await assertFails(batch2.commit());
+
+      // Control: Valid member vote write succeeds
+      const batchValid = member1Db.batch();
+      batchValid.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchValid.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Proof 2: Vote value 2 and 0 denied on create with unchanged counters', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // Vote value 2 with unchanged counters denied
+      const batch2 = member1Db.batch();
+      batch2.set(member1VoteRef, { value: 2, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batch2.update(member1SuggRef, { upCount: 0, downCount: 0 });
+      await assertFails(batch2.commit());
+
+      // Vote value 0 with unchanged counters denied
+      const batch0 = member1Db.batch();
+      batch0.set(member1VoteRef, { value: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batch0.update(member1SuggRef, { upCount: 0, downCount: 0 });
+      await assertFails(batch0.commit());
+
+      // Control: Valid vote create (value 1, upCount 1) succeeds
+      const batchValid = member1Db.batch();
+      batchValid.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchValid.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Proof 3: Re-vote with same value denied', async () => {
+      await seedProofEnvironment({
+        suggestion: { upCount: 1, downCount: 0 },
+        vote: { uid: proofMember1Uid, value: 1 },
+      });
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // Same value re-vote (value 1 -> 1, counters unchanged upCount 1, downCount 0) denied
+      const batchSame = member1Db.batch();
+      batchSame.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchSame.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertFails(batchSame.commit());
+
+      // Control: Valid vote flip (value 1 -> -1, upCount 0, downCount 1) succeeds
+      const batchFlip = member1Db.batch();
+      batchFlip.set(member1VoteRef, { value: -1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchFlip.update(member1SuggRef, { upCount: 0, downCount: 1 });
+      await assertSucceeds(batchFlip.commit());
+    });
+
+    test('Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied', async () => {
+      await seedProofEnvironment({ archived: true });
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // 4a. Vote create on archived trip denied (matching counters upCount 1)
+      const batchCreateArchived = member1Db.batch();
+      batchCreateArchived.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchCreateArchived.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertFails(batchCreateArchived.commit());
+
+      // 4b. Vote delete on archived trip denied (matching counter decrement)
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).update({ upCount: 1, downCount: 0 });
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).collection('votes').doc(proofMember1Uid).set({
+          value: 1,
+          updatedAt: new Date(),
+        });
+      });
+
+      const batchDeleteArchived = member1Db.batch();
+      batchDeleteArchived.delete(member1VoteRef);
+      batchDeleteArchived.update(member1SuggRef, { upCount: 0, downCount: 0 });
+      await assertFails(batchDeleteArchived.commit());
+
+      // 4c. Suggestion counter update on archived trip denied
+      await assertFails(member1SuggRef.update({ upCount: 1, downCount: 0 }));
+
+      // Control: On non-archived trip, vote create succeeds
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).update({ archived: false });
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).update({ upCount: 0, downCount: 0 });
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).collection('votes').doc(proofMember1Uid).delete();
+      });
+
+      const batchControl = member1Db.batch();
+      batchControl.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchControl.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchControl.commit());
+    });
+
+    test('Proof 5: Signed-out, non-member and other-member reads of vote document denied', async () => {
+      await seedProofEnvironment({
+        suggestion: { upCount: 1, downCount: 0 },
+        vote: { uid: proofMember1Uid, value: 1 },
+      });
+
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+      const nonMemberDb = testEnv.authenticatedContext(proofNonMemberUid).firestore();
+      const member2Db = testEnv.authenticatedContext(proofMember2Uid).firestore();
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+
+      const votePath = ['trips', proofTripId, 'suggestions', proofSuggId, 'votes', proofMember1Uid];
+
+      // Signed-out read denied
+      await assertFails(unauthedDb.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
+
+      // Non-member read denied
+      await assertFails(nonMemberDb.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
+
+      // Other member read denied
+      await assertFails(member2Db.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
+
+      // Control: Owner read succeeds
+      await assertSucceeds(member1Db.collection(votePath[0]).doc(votePath[1]).collection(votePath[2]).doc(votePath[3]).collection(votePath[4]).doc(votePath[5]).get());
+    });
+
+    test('Proof 6a: Content update changing createdAt denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Changing createdAt denied
+      await assertFails(member1SuggRef.update({ createdAt: firebase.firestore.FieldValue.serverTimestamp() }));
+
+      // Control: Author valid content update succeeds
+      await assertSucceeds(member1SuggRef.update({ title: 'Valid Updated Title 6a' }));
+    });
+
+    test('Proof 6b: Content update changing authorId denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Changing authorId denied
+      await assertFails(member1SuggRef.update({ authorId: proofOrganizerUid }));
+
+      // Control: Author valid content update succeeds
+      await assertSucceeds(member1SuggRef.update({ title: 'Valid Updated Title 6b' }));
+    });
+
+    test('Proof 6c: Content update changing status denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Changing status denied
+      await assertFails(member1SuggRef.update({ status: 'scheduled' }));
+
+      // Control: Author valid content update succeeds
+      await assertSucceeds(member1SuggRef.update({ title: 'Valid Updated Title 6c' }));
+    });
+
+    test('Proof 6d: Content update changing dayIndex denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Changing dayIndex denied
+      await assertFails(member1SuggRef.update({ dayIndex: 1 }));
+
+      // Control: Author valid content update succeeds
+      await assertSucceeds(member1SuggRef.update({ title: 'Valid Updated Title 6d' }));
+    });
+
+    test('Proof 6e: Content update changing order denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Changing order denied
+      await assertFails(member1SuggRef.update({ order: 1 }));
+
+      // Control: Author valid content update succeeds
+      await assertSucceeds(member1SuggRef.update({ title: 'Valid Updated Title 6e' }));
+    });
+
+    test('Proof 7: Suggestion delete denied for non-member and signed-out user', async () => {
+      await seedProofEnvironment();
+
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+      const nonMemberDb = testEnv.authenticatedContext(proofNonMemberUid).firestore();
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const organizerDb = testEnv.authenticatedContext(proofOrganizerUid).firestore();
+
+      const unauthSuggRef = unauthedDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const nonMemberSuggRef = nonMemberDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const organizerSuggRef = organizerDb.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+
+      // Signed-out delete denied
+      await assertFails(unauthSuggRef.delete());
+
+      // Non-member delete denied
+      await assertFails(nonMemberSuggRef.delete());
+
+      // Control 1: Author delete succeeds
+      await assertSucceeds(member1SuggRef.delete());
+
+      // Re-seed for organizer control
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId).set({
+          title: 'Proof Suggestion 2',
+          note: 'Proof Note',
+          estimatedCost: 100,
+          category: 'food',
+          authorId: proofMember1Uid,
+          upCount: 0,
+          downCount: 0,
+          status: 'pending',
+          dayIndex: null,
+          order: null,
+          createdAt: new Date(),
+        });
+      });
+
+      // Control 2: Organizer delete succeeds
+      await assertSucceeds(organizerSuggRef.delete());
+    });
+
+    test('Proof 8a: Plain suggestion counter update with NO vote change denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // upCount +1 alone denied
+      await assertFails(member1SuggRef.update({ upCount: 1 }));
+
+      // downCount +1 alone denied
+      await assertFails(member1SuggRef.update({ downCount: 1 }));
+
+      // Control: Valid vote write with matching counter change succeeds
+      const batchValid = member1Db.batch();
+      batchValid.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchValid.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchValid.commit());
+    });
+
+    test('Proof 8b: Vote write with NO matching counter change denied', async () => {
+      await seedProofEnvironment();
+
+      const member1Db = testEnv.authenticatedContext(proofMember1Uid).firestore();
+      const member1SuggRef = member1Db.collection('trips').doc(proofTripId).collection('suggestions').doc(proofSuggId);
+      const member1VoteRef = member1SuggRef.collection('votes').doc(proofMember1Uid);
+
+      // Vote write with NO matching counter change denied
+      await assertFails(member1VoteRef.set({ value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }));
+
+      // Control: Valid vote write with matching counter change succeeds
+      const batchValid = member1Db.batch();
+      batchValid.set(member1VoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchValid.update(member1SuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchValid.commit());
+    });
   });
+});
 });
