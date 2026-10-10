@@ -163,6 +163,48 @@ const mutations = [
     relevantTarget: 'Yes (users create DENIED when createdAt is a client Date)',
     find: `\n        && request.resource.data.createdAt == request.time;`,
     replace: `;`,
+  },
+  {
+    name: 'm11',
+    description: 'organizer check on scheduling branch',
+    relevantTarget: 'Yes (Scheduling denied for plain member)',
+    find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+    replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+  },
+  {
+    name: 'm12',
+    description: 'archived check on scheduling',
+    relevantTarget: 'Yes (Scheduling denied for archived trip)',
+    find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+    replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+  },
+  {
+    name: 'm13',
+    description: 'dayIndex upper bound',
+    relevantTarget: 'Yes (Denied scheduling for dayIndex beyond last day)',
+    find: `\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`,
+    replace: ``,
+  },
+  {
+    name: 'm14',
+    description: 'status/dayIndex/order coherence',
+    relevantTarget: 'Yes (Denied scheduling for status pending with dayIndex or order)',
+    find: `\n          && (\n            (request.resource.data.status == 'pending' && request.resource.data.dayIndex == null && request.resource.data.order == null)\n            ||\n            (\n              request.resource.data.status == 'scheduled'\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000\n              && request.resource.data.order is int\n              && request.resource.data.order >= 0\n              && request.resource.data.order <= 10000\n            )\n          );`,
+    replace: `;`,
+  },
+  {
+    name: 'm15',
+    description: 'hasOnly key restriction on scheduling',
+    relevantTarget: 'Yes (Denied scheduling for extra/mixed keys)',
+    find: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+    replace: ``,
+  },
+  {
+    name: 'm16',
+    description: 'integer type checks',
+    relevantTarget: 'Yes (Denied scheduling for dayIndex float or order float)',
+    find: `\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000\n              && request.resource.data.order is int`,
+    replace: `\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`,
   }
 ];
 

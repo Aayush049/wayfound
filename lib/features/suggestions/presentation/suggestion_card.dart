@@ -166,6 +166,26 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                   padding: EdgeInsets.zero,
                   visualDensity: VisualDensity.compact,
                 ),
+                if (widget.suggestion.isScheduled &&
+                    widget.suggestion.dayIndex != null) ...[
+                  const SizedBox(width: 6),
+                  Chip(
+                    avatar: Icon(
+                      Icons.event,
+                      size: 14,
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
+                    label: Text('Day ${widget.suggestion.dayIndex! + 1}'),
+                    backgroundColor: theme.colorScheme.secondaryContainer,
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSecondaryContainer,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
                 const Spacer(),
                 // Score Badge
                 Container(

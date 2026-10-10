@@ -6,6 +6,7 @@ import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
 import '../../auth/data/auth_provider.dart';
+import '../../itinerary/presentation/itinerary_tab.dart';
 import '../../suggestions/presentation/suggestions_tab.dart';
 import '../data/trips_providers.dart';
 import 'members_tab.dart';
@@ -155,11 +156,14 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
               // Tab 0: Suggestions Tab (Phase 3)
               SuggestionsTab(trip: trip),
 
-              // Tab 1: Itinerary Placeholder TEMP(phase-4)
-              const AppEmpty(
-                title: 'Itinerary Coming Soon',
-                message: 'TEMP(phase-4): Schedule activities and view the day-by-day plan in Phase 4.',
-                icon: Icons.calendar_today,
+              // Tab 1: Itinerary Tab (Phase 4)
+              ItineraryTab(
+                tripId: trip.id,
+                startDate: trip.startDate,
+                endDate: trip.endDate,
+                currency: trip.currency,
+                isOrganizer: trip.isOrganizer(authUser?.uid ?? ''),
+                isArchived: trip.archived,
               ),
 
               // Tab 2: Expenses Placeholder TEMP(phase-5)

@@ -113,7 +113,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 | 7 | Trip Dashboard | `/trip/:id` | Container with four tabs |
 | 8 | Suggestions tab | `/trip/:id/suggestions` | List with vote controls |
 | 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add`, `/trip/:id/suggestions/:sid/edit` | Title, note, cost, category (pushed on top of dashboard) |
-| 10 | Itinerary tab | `/trip/:id/itinerary` | Day-by-day confirmed plan |
+| 10 | Itinerary tab | `/trip/:id/itinerary` | Day-by-day confirmed plan with organizer day assignment, drag-to-reorder, and pending suggestions sheet |
 | 11 | Expenses tab | `/trip/:id/expenses` | Expense list plus Balances view |
 | 12 | Add Expense | `/trip/:id/expenses/add` | Amount, payer, participants, description |
 | 13 | Members tab | `/trip/:id/members` | Members, invite code, remove (organizer) |
@@ -188,7 +188,7 @@ A non-member may update a trip only if:
 ### 7.4 Other rules
 - **Votes:** document ID must equal caller uid; value must be +1 or -1.
 - **Counters:** any member may change `upCount`/`downCount` by at most 1 and nothing else in that update.
-- **Suggestions:** authors change only title, note, cost, category; only the organizer changes `status`, `dayIndex`, `order`.
+- **Suggestions:** authors change only title, note, cost, category; only the organizer changes `status`, `dayIndex`, `order`. Updates are strictly validated with `diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`, integer checks, trip date range bounds `[0, (endDate - startDate)/86400000]`, order bounds `[0, 10000]`, and coherence validation (`pending` requires null `dayIndex`/`order`; `scheduled` requires non-null integer `dayIndex`/`order`).
 - **Expenses:** creator or organizer may edit/delete; `createdBy` must equal caller on create.
 - **Settlements:** create only as payer (`fromUid` equals caller, status `pending`); only the receiver (or organizer) may set `confirmed` or `rejected`; amount and parties are immutable after creation.
 - **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
@@ -261,7 +261,8 @@ lib/
                   domain/app_user.dart, auth_validators.dart
     trips/        data/ domain/ presentation/
     suggestions/  data/ domain/ presentation/
-    itinerary/    presentation/
+    itinerary/    data/ domain/ presentation/
+                  domain/itinerary_item_update.dart
     expenses/     data/ domain/ presentation/
                   domain/balance_calculator.dart  (pure Dart)
 ```
@@ -289,12 +290,12 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): 152 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, and vote logic. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
-2. **Rules tests** (Firebase Emulator): 67 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, and 13 dedicated Phase 3 proof tests (signed-out/non-member access, vote value limits, re-vote block, archived trip lock, private vote reads, immutable field protections, non-author delete block, plain counter manipulation block, and uncoupled vote write block).
+1. **Unit & Widget tests** (Flutter): 177 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models (`ItineraryItemUpdate`), itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, and ItineraryTab UI states. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
+2. **Rules tests** (Firebase Emulator): 72 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates, owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, 13 Phase 3 proof tests, and 5 dedicated Phase 4 proof tests (non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence).
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
-   - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m10`, including combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
+   - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m16`, including Phase 4 itinerary mutants `m11` through `m16` and combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
      - **Baseline Control (`m0`):** Executed against unmodified `firestore.rules`, yielding 0 failing tests (0 false positives).
-     - **Individual Protections:** Mutants `m2`, `m3`, `m5`, `m5b`, `m6`, `m7a`, `m7b`, `m8a`, `m8b`, `m9`, and `m10` are individually detected by relevant target tests.
+     - **Individual Protections:** Mutants `m2`, `m3`, `m5`, `m5b`, `m6`, `m7a`, `m7b`, `m8a`, `m8b`, `m9`, `m10`, `m11`, `m12`, `m13`, `m14`, `m15`, and `m16` are individually detected by relevant target tests.
      - **Overlapping Protections:** Single-check removals `m1` (vote member check) and `m4a`/`m4b`/`m4c` (archived checks on vote create/update, vote delete, and suggestion counter update) overlap by design with coupled transactional checks. Their security protection is proven by combined mutants `m1all` (detected by Proof 1) and `m4all` (detected by Proof 4).
 
 ### 10.1 Security Rules Mutation Testing Results Table
@@ -319,6 +320,12 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | m8b | vote-side mirror delta lines together | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 8b: Vote write with NO matching counter change denied | Yes (Proof 8b: Vote write with NO matching counter change denied) |
 | m9 | hasAll(resource.data.memberIds) check on trip join | Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C]) | Yes (Join DENIED duplicate member padding) |
 | m10 | users createdAt == request.time | users create DENIED when createdAt is a client Date (not request.time) | Yes (users create DENIED when createdAt is a client Date) |
+| m11 | isOrganizer check on itinerary scheduling update | Non-organizer scheduling update denied | Yes (Non-organizer scheduling update denied) |
+| m12 | exact key restriction affectedKeys().hasOnly(['status','dayIndex','order']) | Itinerary update with unauthorized field modification denied | Yes (Itinerary update with unauthorized field modification denied) |
+| m13 | dayIndex bounds check [0, maxDays] | Itinerary update with out-of-bounds dayIndex denied | Yes (Itinerary update with out-of-bounds dayIndex denied) |
+| m14 | dayIndex integer type check | Itinerary update with non-integer dayIndex denied | Yes (Itinerary update with non-integer dayIndex denied) |
+| m15 | order integer type check | Itinerary update with non-integer order denied | Yes (Itinerary update with non-integer order denied) |
+| m16 | status == pending null dayIndex/order check | Itinerary update setting pending with non-null dayIndex/order denied | Yes (Itinerary update setting pending with non-null dayIndex/order denied) |
 
 *Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules. Evaluating `m4all` proves that complete removal of archived trip protection is caught by Proof 4.
 
@@ -335,7 +342,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | 1 | Auth | S-M | **DONE** — Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests implemented |
 | 2 | Trips and joining | L | **DONE** — Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
 | 3 | Suggestions and voting | M-L | **DONE** — CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
-| 4 | Itinerary | M | Organizer schedules; day view updates live on second device |
+| 4 | Itinerary | M | **DONE** — Day-by-day itinerary view, pending suggestions sheet sorted by score, day picker sheet, organizer drag-to-reorder within a day, item scheduling/unscheduling/moving between days, CEL security rules for organizer updates, integer checks, date range bounds, exact key restriction, and status coherence; 100% verified across 177 Flutter tests, 72 rules unit tests, and 17/17 security rule mutants. |
 | 5 | Expenses and balances | L | Expense CRUD, calculator unit-tested, Balances view with suggested payments |
 | 6 | Settlements | M | Mark paid, confirm/reject, balances use confirmed only, leave rule works |
 | 7 | Hardening and polish | M | Rules tests complete, archive trip, all states handled, UI polish |
@@ -409,7 +416,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 
 ---
 
-## 15. Build Progress (as of October 6, 2026)
+## 15. Build Progress (as of October 10, 2026)
 
 ### 15.1 Environment and project identity
 - **IDE and device:** Android Studio; physical Android phone testing (CPH2603, Android 16)
@@ -469,6 +476,28 @@ The supplied palette had no text/icon colours for use on top of brand colours an
   - **Physical Device Navigation Fix:** Resolved Add Suggestion navigation bug on physical Android phone (CPH2603). Proven cause: parent route `/trip/:id` in `router.dart` contained `redirect` logic checking `state.matchedLocation == '/trip/$id'`, which evaluated to true on subroute matching because GoRouter's matched location prefix during parent processing is `/trip/:id`. This continuously redirected subroutes (`/trip/:id/suggestions/add`) to `/trip/:id/members`. Fixed by matching exact `state.uri.path` and opening forms with `context.push`.
   - **Static Analysis:** `flutter analyze` reported 0 static issues across the entire project.
   - **Code Formatting:** `dart format --set-exit-if-changed .` verified 100% compliant formatting.
+
+---
+
+### 15.8 Milestone 4 Status (Phase 4: Itinerary Completed)
+- **Zero Schema Additions:** Itinerary items are represented solely by `status = 'scheduled'`, `dayIndex` (0-indexed integer), and `order` (0-indexed integer) on existing `suggestions/{id}` documents. Pending items retain `status = 'pending'`, `dayIndex = null`, and `order = null`.
+- **Domain & Repository Architecture:** `ItineraryItemUpdate` domain class for client reorder item updates; single source of truth stream `suggestionsStreamProvider` driving derived reactive providers (`scheduledSuggestionsProvider`, `groupedItineraryProvider`, `pendingSuggestionsProvider`) without extra network calls or redundant Firestore listeners.
+- **Presentation Components:**
+  - `ItineraryItemTile`: Rendered with category avatar, title, optional note, formatted cost, and organizer popover menu (Move to Day, Unschedule). Non-organizer view omits action menu.
+  - `DayPickerSheet`: Modal bottom sheet allowing organizers to reassign an itinerary item to any valid day in the trip (`Day 1 · Mon 12 Oct`, `Day 2 · Tue 13 Oct`, etc.).
+  - `PendingSuggestionsSheet`: Modal bottom sheet listing unscheduled suggestions sorted by vote score descending, enabling organizers to quickly select and schedule top-voted ideas into specific days.
+  - `ItineraryDaySection`: Per-day section rendering header with calendar date, activity count, optional "+ Add Suggestion" button for organizers, and interactive `ReorderableListView.builder` supporting drag-to-reorder within that day.
+  - `ItineraryTab`: Main itinerary view organizing all trip days in sequence, showing empty state ("No itinerary items scheduled yet") when no items are scheduled, handling stream loading/error states, and reacting to realtime Firestore updates across devices.
+- **Firestore Security Rules (CEL):** Added strict organizer-only scheduling rule for `suggestions/{id}` updates, validating:
+  - Exact field diff restriction: `diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`.
+  - Date bounds: `dayIndex >= 0` and `dayIndex <= (endDate.toMillis() - startDate.toMillis()) / 86400000`.
+  - Integer type assertions: `dayIndex is int` and `order is int`.
+  - Status/dayIndex/order coherence: `status == 'pending'` requires `dayIndex` and `order` to be `null`; `status == 'scheduled'` requires `dayIndex` and `order` to be non-null integers.
+- **Comprehensive Verification:**
+  - **Firestore Security Rules Tests:** 72 passed (including 5 dedicated Phase 4 proof tests verifying non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence).
+  - **Mutation Testing Suite:** 100% detection rate across all 17 security rule mutants (`m0` baseline to `m16`), including Phase 4 mutants `m11` through `m16`.
+  - **Flutter Tests:** 177 passed (including 25 Phase 4 unit and widget tests covering itinerary domain models, derived providers, day picker sheet, pending suggestions sheet, day sections, drag-to-reorder, and full `ItineraryTab` states).
+  - **Static Analysis & Formatting:** `flutter analyze` reported 0 issues; `dart format .` verified 100% formatted.
 
 ---
 

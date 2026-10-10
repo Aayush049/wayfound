@@ -2387,5 +2387,222 @@ describe('Trips & Join Security Rules', () => {
       await assertSucceeds(batchValid.commit());
     });
   });
+
+  describe('Phase 4 itinerary rules', () => {
+    const tripId = 'trip_itinerary_1';
+    const organizerUid = 'organizer_itin';
+    const memberUid = 'member_itin';
+    const nonMemberUid = 'non_member_itin';
+    const suggId = 'sugg_itin_1';
+
+    async function seedItineraryEnv(options = {}) {
+      const { archived = false, status = 'pending', dayIndex = null, order = null } = options;
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('users').doc(organizerUid).set({
+          displayName: 'Organizer Itin',
+          email: 'org@itin.com',
+          createdAt: new Date(),
+        });
+        await db.collection('users').doc(memberUid).set({
+          displayName: 'Member Itin',
+          email: 'mem@itin.com',
+          createdAt: new Date(),
+        });
+        await db.collection('users').doc(nonMemberUid).set({
+          displayName: 'NonMember Itin',
+          email: 'nonmem@itin.com',
+          createdAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).set({
+          name: 'Itinerary Trip',
+          destination: 'Paris',
+          startDate: firebase.firestore.Timestamp.fromDate(new Date('2026-11-01T00:00:00Z')),
+          endDate: firebase.firestore.Timestamp.fromDate(new Date('2026-11-05T00:00:00Z')),
+          currency: 'EUR',
+          organizerId: organizerUid,
+          joinCode: 'ITIN01',
+          memberIds: [organizerUid, memberUid],
+          memberCount: 2,
+          archived,
+          createdAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('suggestions').doc(suggId).set({
+          title: 'Visit Louvre',
+          note: 'Buy tickets online',
+          estimatedCost: 2000,
+          category: 'sightseeing',
+          authorId: memberUid,
+          upCount: 0,
+          downCount: 0,
+          status,
+          dayIndex,
+          order,
+          createdAt: new Date(),
+        });
+      });
+    }
+
+    test('Organizer schedules pending suggestion to scheduled (day 0 and last day)', async () => {
+      await seedItineraryEnv();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      // Day 0
+      await assertSucceeds(suggRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 0,
+      }));
+
+      // Last day (Day 4)
+      await assertSucceeds(suggRef.update({
+        status: 'scheduled',
+        dayIndex: 4,
+        order: 1,
+      }));
+    });
+
+    test('Organizer reorders, moves day, and unschedules', async () => {
+      await seedItineraryEnv({ status: 'scheduled', dayIndex: 0, order: 0 });
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      // Reorder (order only)
+      await assertSucceeds(suggRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 1,
+      }));
+
+      // Move day
+      await assertSucceeds(suggRef.update({
+        status: 'scheduled',
+        dayIndex: 2,
+        order: 0,
+      }));
+
+      // Unschedule (scheduled to pending)
+      await assertSucceeds(suggRef.update({
+        status: 'pending',
+        dayIndex: null,
+        order: null,
+      }));
+    });
+
+    test('Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip', async () => {
+      await seedItineraryEnv();
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+
+      const memberRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+      const nonMemberRef = nonMemberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+      const unauthRef = unauthedDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      // Plain member (even though member is the author)
+      await assertFails(memberRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 0,
+      }));
+
+      // Non-member
+      await assertFails(nonMemberRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 0,
+      }));
+
+      // Signed out
+      await assertFails(unauthRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 0,
+      }));
+
+      // Archived trip
+      await seedItineraryEnv({ archived: true });
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const orgRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+      await assertFails(orgRef.update({
+        status: 'scheduled',
+        dayIndex: 0,
+        order: 0,
+      }));
+    });
+
+    test('Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys', async () => {
+      await seedItineraryEnv();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      // dayIndex -1
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: -1, order: 0 }));
+
+      // dayIndex beyond last day (Nov 1 to Nov 5 = 4 days; dayIndex 5 is beyond)
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 5, order: 0 }));
+
+      // dayIndex string
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: '0', order: 0 }));
+
+      // dayIndex float
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 1.5, order: 0 }));
+
+      // order -1
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: -1 }));
+
+      // order string
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: '0' }));
+
+      // order float
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 2.5 }));
+
+      // order > 10000
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 10001 }));
+
+      // status 'scheduled' with null dayIndex
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: null, order: 0 }));
+
+      // status 'scheduled' with null order
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: null }));
+
+      // status 'pending' with non-null dayIndex or order
+      await assertFails(suggRef.update({ status: 'pending', dayIndex: 0, order: null }));
+      await assertFails(suggRef.update({ status: 'pending', dayIndex: null, order: 0 }));
+
+      // invalid status value 'done'
+      await assertFails(suggRef.update({ status: 'done', dayIndex: 0, order: 0 }));
+
+      // extra keys in update
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 0, title: 'New Title' }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 0, upCount: 1 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 0, authorId: organizerUid }));
+
+      // mixed keys (content + scheduling)
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 0, note: 'New note' }));
+    });
+
+    test('Existing content-update and counter branches cannot set scheduling fields, and vote transaction works on scheduled item', async () => {
+      await seedItineraryEnv({ status: 'scheduled', dayIndex: 0, order: 0 });
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const orgSuggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+      const memSuggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      // Content branch cannot change status/dayIndex/order
+      await assertFails(memSuggRef.update({ title: 'New Title', status: 'pending' }));
+
+      // Counter branch cannot change status/dayIndex/order
+      await assertFails(memSuggRef.update({ upCount: 1, dayIndex: 1 }));
+
+      // Vote transaction still works on scheduled suggestion
+      const memberVoteRef = memSuggRef.collection('votes').doc(memberUid);
+      const batchVote = memberDb.batch();
+      batchVote.set(memberVoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      batchVote.update(memSuggRef, { upCount: 1, downCount: 0 });
+      await assertSucceeds(batchVote.commit());
+    });
+  });
 });
 });

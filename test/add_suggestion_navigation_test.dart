@@ -322,7 +322,7 @@ void main() {
       await tester.tap(itineraryTab);
       await tester.pumpAndSettle();
 
-      expect(find.text('Itinerary Coming Soon'), findsOneWidget);
+      expect(find.text('No itinerary items scheduled yet'), findsOneWidget);
       expect(
         router.routeInformationProvider.value.uri.path,
         '/trip/$tripId/itinerary',

@@ -33,6 +33,9 @@ class Suggestion {
 
   int get score => upCount - downCount;
 
+  bool get isScheduled => status == 'scheduled';
+  bool get isPending => status == 'pending';
+
   factory Suggestion.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
     String tripId,

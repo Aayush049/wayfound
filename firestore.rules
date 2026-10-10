@@ -168,6 +168,25 @@ service cloud.firestore {
           && request.resource.data.upCount == resource.data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid))
           && request.resource.data.downCount == resource.data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid));
 
+        allow update: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripOrganizer(tripId)
+          && isTripNotArchived(tripId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])
+          && (
+            (request.resource.data.status == 'pending' && request.resource.data.dayIndex == null && request.resource.data.order == null)
+            ||
+            (
+              request.resource.data.status == 'scheduled'
+              && request.resource.data.dayIndex is int
+              && request.resource.data.dayIndex >= 0
+              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000
+              && request.resource.data.order is int
+              && request.resource.data.order >= 0
+              && request.resource.data.order <= 10000
+            )
+          );
+
         allow delete: if isSignedIn()
           && isTripMember(tripId)
           && isTripNotArchived(tripId)
