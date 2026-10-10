@@ -180,7 +180,7 @@ service cloud.firestore {
               request.resource.data.status == 'scheduled'
               && request.resource.data.dayIndex is int
               && request.resource.data.dayIndex >= 0
-              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000
+              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000
               && request.resource.data.order is int
               && request.resource.data.order >= 0
               && request.resource.data.order <= 10000

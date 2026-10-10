@@ -1,4 +1,89 @@
-const {
+test('Day bound tolerance: diff 0 (1-day trip) allows dayIndex 0, denies 1', async () => {
+      // Trip Oct 10 to Oct 10 = 0 millisecond diff, 1 day
+      await testEnv.authenticatedContext(organizerUid).firestore().doc(`trips/${tripId}`).update({
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 9, 10, 12, 0, 0))),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 9, 10, 12, 0, 0))),
+      });
+
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      await assertSucceeds(suggRef.update({ status: 'scheduled', dayIndex: 0, order: 0 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 1, order: 0 }));
+    });
+
+    test('Day bound tolerance: diff exactly 2 days allows 2, denies 3', async () => {
+      // Trip Oct 10 12:00 to Oct 12 12:00 = 48 hours = 172800000 ms
+      await testEnv.authenticatedContext(organizerUid).firestore().doc(`trips/${tripId}`).update({
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 9, 10, 12, 0, 0))),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 9, 12, 12, 0, 0))),
+      });
+
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      await assertSucceeds(suggRef.update({ status: 'scheduled', dayIndex: 2, order: 0 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 3, order: 0 }));
+    });
+
+    test('Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3', async () => {
+      // Mar 9 2024 12:00 to Mar 10 2024 11:00 = 47 hours due to DST spring-forward
+      // 47 hours = 169200000 ms, / 86400000 = 1.9583, +43200000 = 212400000, / 86400000 = 2.4583
+      await testEnv.authenticatedContext(organizerUid).firestore().doc(`trips/${tripId}`).update({
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 2, 9, 12, 0, 0))),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 2, 10, 11, 0, 0))),
+      });
+
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      await assertSucceeds(suggRef.update({ status: 'scheduled', dayIndex: 2, order: 0 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 3, order: 0 }));
+    });
+
+    test('Day bound tolerance: diff 49 hours (fall-back) allows 2, denies 3', async () => {
+      // Nov 2 2024 12:00 to Nov 3 2024 13:00 = 49 hours due to DST fall-back
+      // 49 hours = 176400000 ms, / 86400000 = 2.0417, +43200000 = 219600000, / 86400000 = 2.5417
+      await testEnv.authenticatedContext(organizerUid).firestore().doc(`trips/${tripId}`).update({
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 10, 2, 12, 0, 0))),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 10, 3, 13, 0, 0))),
+      });
+
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      await assertSucceeds(suggRef.update({ status: 'scheduled', dayIndex: 2, order: 0 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 3, order: 0 }));
+    });
+
+    test('Day bound tolerance: diff 30 days allows 30, denies 31', async () => {
+      // Oct 10 to Nov 9 = 30 days exactly (86400000 * 30 = 2592000000 ms)
+      await testEnv.authenticatedContext(organizerUid).firestore().doc(`trips/${tripId}`).update({
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 9, 10, 12, 0, 0))),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.UTC(2024, 10, 9, 12, 0, 0))),
+      });
+
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const suggRef = organizerDb.collection('trips').doc(tripId).collection('suggestions').doc(suggId);
+
+      await assertSucceeds(suggRef.update({ status: 'scheduled', dayIndex: 30, order: 0 }));
+      await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 31, order: 0 }));
+    });
+  });
+});
+});
+
+process.on('SIGINT', async () => {
+  console.log('\nReceived SIGINT. Cleaning up...');
+  await testEnv.cleanup();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\nReceived SIGTERM. Cleaning up...');
+  await testEnv.cleanup();
+  process.exit(0);
+});const {
   initializeTestEnvironment,
   assertFails,
   assertSucceeds,
@@ -2602,7 +2687,3 @@ describe('Trips & Join Security Rules', () => {
       batchVote.set(memberVoteRef, { value: 1, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       batchVote.update(memSuggRef, { upCount: 1, downCount: 0 });
       await assertSucceeds(batchVote.commit());
-    });
-  });
-});
-});

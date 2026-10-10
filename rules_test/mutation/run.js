@@ -205,6 +205,23 @@ const mutations = [
     relevantTarget: 'Yes (Denied scheduling for dayIndex float or order float)',
     find: `\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000\n              && request.resource.data.order is int`,
     replace: `\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`,
+  },
+  {
+    name: 'm17',
+    description: 'day bound without tolerance (+43200000)',
+    relevantTarget: 'Yes (Day bound tolerance tests would fail without tolerance)',
+    custom: (rules) => {
+      // Restore the old expression without tolerance for the dayIndex upper bound
+      // The new expression is: (end - start + 43200000) / 86400000
+      // The old expression is: (end - start) / 86400000
+      const newExpr = `(get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`;
+      const oldExpr = `(get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`;
+
+      if (rules.split(newExpr).length - 1 !== 1) {
+        throw new Error('m17: new expression (with tolerance) not found exactly once');
+      }
+      return rules.replace(newExpr, oldExpr);
+    },
   }
 ];
 

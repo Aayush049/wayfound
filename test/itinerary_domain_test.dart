@@ -32,9 +32,9 @@ void main() {
     });
 
     test('dayDate calculates date for given index', () {
-      final start = DateTime(2026, 10, 12);
-      expect(dayDate(start, 0), equals(DateTime(2026, 10, 12)));
-      expect(dayDate(start, 2), equals(DateTime(2026, 10, 14)));
+      final start = DateTime.utc(2026, 10, 12);
+      expect(dayDate(start, 0), equals(DateTime.utc(2026, 10, 12)));
+      expect(dayDate(start, 2), equals(DateTime.utc(2026, 10, 14)));
     });
 
     test('formatDayHeader produces formatted string', () {
