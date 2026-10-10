@@ -112,7 +112,7 @@ Push notifications, comments on suggestions, photos, shared packing checklist, u
 | 6 | Join Trip | `/trip/join` | Code entry, preview, confirm |
 | 7 | Trip Dashboard | `/trip/:id` | Container with four tabs |
 | 8 | Suggestions tab | `/trip/:id/suggestions` | List with vote controls |
-| 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add`, `/trip/:id/suggestions/:sid/edit` | Title, note, cost, category |
+| 9 | Add/Edit Suggestion | `/trip/:id/suggestions/add`, `/trip/:id/suggestions/:sid/edit` | Title, note, cost, category (pushed on top of dashboard) |
 | 10 | Itinerary tab | `/trip/:id/itinerary` | Day-by-day confirmed plan |
 | 11 | Expenses tab | `/trip/:id/expenses` | Expense list plus Balances view |
 | 12 | Add Expense | `/trip/:id/expenses/add` | Amount, payer, participants, description |
@@ -270,7 +270,7 @@ lib/
 Plain Dart classes with `fromFirestore` / `toFirestore`: AppUser, Trip, Member, Suggestion, Vote, Expense, Settlement.
 
 ### 9.4 Navigation
-go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. Auth redirect sends signed-out users to welcome and signed-in users away from auth screens.
+go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. Auth redirect sends signed-out users to welcome and signed-in users away from auth screens. Navigation rule: Tab switching uses `context.go('/trip/:id/$tab')`. Form and detail screens (Add/Edit Suggestion, Create Trip, Join Trip) are pushed on top of the current screen using `context.push(...)` so saving or popping returns directly to the active tab. Parent `/trip/:id` redirect checks `state.uri.path` for exact matches (`/trip/$id` or `/trip/$id/`) to prevent subroute redirect collisions.
 
 ### 9.5 Packages
 
@@ -289,7 +289,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): 145 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, and vote logic. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
+1. **Unit & Widget tests** (Flutter): 152 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, and vote logic. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
 2. **Rules tests** (Firebase Emulator): 67 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates (extra/missing keys, wrong email, wrong uid, bad timestamp), owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, and 13 dedicated Phase 3 proof tests (signed-out/non-member access, vote value limits, re-vote block, archived trip lock, private vote reads, immutable field protections, non-author delete block, plain counter manipulation block, and uncoupled vote write block).
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
    - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m10`, including combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
@@ -465,7 +465,8 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Firestore Security Rules:** CEL security rules for `suggestions/{sid}` and `votes/{uid}` enforcing trip membership, caller ownership for updates, strict document structure, and atomic counter coupling where suggestion `upCount`/`downCount` updates must exactly match the vote document transition delta.
 - **Comprehensive Verification:**
   - **Firestore Security Rules Tests:** 67 passed (including 13 dedicated Phase 3 proof tests verifying signed-out denials, valid create, payload tampering, author edits, vote transitions, archived trip locks, private vote reads, non-author delete denials, plain counter manipulation block, and counter-mismatch protection). Verified with 100% mutation detection score (16/16 mutants detected).
-  - **Flutter Tests:** 145 passed (covering unit tests for money parsing/formatting, vote logic, category resolution, payload builders, fake Firestore repository operations, and full widget tests for cards, forms, and tabs).
+  - **Flutter Tests:** 152 passed (covering unit tests for money parsing/formatting, vote logic, category resolution, payload builders, fake Firestore repository operations, full widget tests for cards, forms, and tabs, plus 7 real-router navigation widget tests).
+  - **Physical Device Navigation Fix:** Resolved Add Suggestion navigation bug on physical Android phone (CPH2603). Proven cause: parent route `/trip/:id` in `router.dart` contained `redirect` logic checking `state.matchedLocation == '/trip/$id'`, which evaluated to true on subroute matching because GoRouter's matched location prefix during parent processing is `/trip/:id`. This continuously redirected subroutes (`/trip/:id/suggestions/add`) to `/trip/:id/members`. Fixed by matching exact `state.uri.path` and opening forms with `context.push`.
   - **Static Analysis:** `flutter analyze` reported 0 static issues across the entire project.
   - **Code Formatting:** `dart format --set-exit-if-changed .` verified 100% compliant formatting.
 
