@@ -188,7 +188,8 @@ A non-member may update a trip only if:
 ### 7.4 Other rules
 - **Votes:** document ID must equal caller uid; value must be +1 or -1.
 - **Counters:** any member may change `upCount`/`downCount` by at most 1 and nothing else in that update.
-- **Suggestions:** authors change only title, note, cost, category; only the organizer changes `status`, `dayIndex`, `order`. Updates are strictly validated with `diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`, integer checks, trip date range bounds `[0, (endDate - startDate)/86400000]`, order bounds `[0, 10000]`, and coherence validation (`pending` requires null `dayIndex`/`order`; `scheduled` requires non-null integer `dayIndex`/`order`).
+- **Suggestions:** authors change only title, note, cost, category; only the organizer changes `status`, `dayIndex`, `order`. Updates are strictly validated with `diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`, integer checks, trip date range bounds `dayIndex <= (endDate.toMillis() - startDate.toMillis() + 43200000) / 86400000` (rounding form tolerating 23h or 25h DST days), order bounds `[0, 10000]`, and coherence validation (`pending` requires null `dayIndex`/`order`; `scheduled` requires non-null integer `dayIndex`/`order`).
+- **Document Access Margin (Scheduling Path):** The scheduling security rule executes 4 `get()` calls on the parent trip document (`isTripMember`, `isTripOrganizer`, `isTripNotArchived`, and date range bound). Margin under 20 limit is 16 document access calls.
 - **Expenses:** creator or organizer may edit/delete; `createdBy` must equal caller on create.
 - **Settlements:** create only as payer (`fromUid` equals caller, status `pending`); only the receiver (or organizer) may set `confirmed` or `rejected`; amount and parties are immutable after creation.
 - **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
@@ -241,6 +242,9 @@ The app cannot see real money moving. It uses a two-step record:
 ### 8.7 Leaving a trip
 Allowed only when the member's balance is zero. The organizer can remove anyone regardless; their historical expenses and votes remain.
 
+### 8.8 Calendar Day Computation
+Trip days and itinerary dates are calculated strictly using UTC calendar arithmetic (`DateTime.utc(year, month, day)`). `tripDays(startDate, endDate)` computes total inclusive days from UTC midnight timestamps, completely avoiding daylight savings (23-hour or 25-hour days) and local time-zone shifts. `dayDate(startDate, dayIndex)` derives the exact calendar date for a given index by adding days in UTC space. All calculations depend solely on year, month, and day calendar fields regardless of local time of day.
+
 ---
 
 ## 9. Flutter Architecture
@@ -290,12 +294,12 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): 177 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models (`ItineraryItemUpdate`), itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, and ItineraryTab UI states. All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
-2. **Rules tests** (Firebase Emulator): 72 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates, owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, 13 Phase 3 proof tests, and 5 dedicated Phase 4 proof tests (non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence).
+1. **Unit & Widget tests** (Flutter): 197 passing tests across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models (`ItineraryItemUpdate`), itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, ItineraryTab UI states, and 20 dedicated UTC trip days calendar arithmetic unit tests (`test/trip_days_test.dart`). All widget tests use `test/helpers/pump_app.dart` to streamline provider overrides.
+2. **Rules tests** (Firebase Emulator): 77 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates, owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, 13 Phase 3 proof tests, 5 dedicated Phase 4 proof tests (non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence), and 5 day-bound tolerance tests (0-diff 1-day trip, exact 2-day diff, 47h spring-forward, 49h fall-back, 30-day range).
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
-   - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m16`, including Phase 4 itinerary mutants `m11` through `m16` and combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
+   - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m17`, including Phase 4 itinerary mutants `m11` through `m16`, new tolerance mutant `m17`, and combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
      - **Baseline Control (`m0`):** Executed against unmodified `firestore.rules`, yielding 0 failing tests (0 false positives).
-     - **Individual Protections:** Mutants `m2`, `m3`, `m5`, `m5b`, `m6`, `m7a`, `m7b`, `m8a`, `m8b`, `m9`, `m10`, `m11`, `m12`, `m13`, `m14`, `m15`, and `m16` are individually detected by relevant target tests.
+     - **Individual Protections:** Mutants `m2`, `m3`, `m5`, `m5b`, `m6`, `m7a`, `m7b`, `m8a`, `m8b`, `m9`, `m10`, `m11`, `m12`, `m13`, `m14`, `m15`, `m16`, and `m17` are individually detected by relevant target tests.
      - **Overlapping Protections:** Single-check removals `m1` (vote member check) and `m4a`/`m4b`/`m4c` (archived checks on vote create/update, vote delete, and suggestion counter update) overlap by design with coupled transactional checks. Their security protection is proven by combined mutants `m1all` (detected by Proof 1) and `m4all` (detected by Proof 4).
 
 ### 10.1 Security Rules Mutation Testing Results Table
@@ -320,12 +324,13 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | m8b | vote-side mirror delta lines together | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys, Proof 8b: Vote write with NO matching counter change denied | Yes (Proof 8b: Vote write with NO matching counter change denied) |
 | m9 | hasAll(resource.data.memberIds) check on trip join | Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C]) | Yes (Join DENIED duplicate member padding) |
 | m10 | users createdAt == request.time | users create DENIED when createdAt is a client Date (not request.time) | Yes (users create DENIED when createdAt is a client Date) |
-| m11 | isOrganizer check on itinerary scheduling update | Non-organizer scheduling update denied | Yes (Non-organizer scheduling update denied) |
-| m12 | exact key restriction affectedKeys().hasOnly(['status','dayIndex','order']) | Itinerary update with unauthorized field modification denied | Yes (Itinerary update with unauthorized field modification denied) |
-| m13 | dayIndex bounds check [0, maxDays] | Itinerary update with out-of-bounds dayIndex denied | Yes (Itinerary update with out-of-bounds dayIndex denied) |
-| m14 | dayIndex integer type check | Itinerary update with non-integer dayIndex denied | Yes (Itinerary update with non-integer dayIndex denied) |
-| m15 | order integer type check | Itinerary update with non-integer order denied | Yes (Itinerary update with non-integer order denied) |
-| m16 | status == pending null dayIndex/order check | Itinerary update setting pending with non-null dayIndex/order denied | Yes (Itinerary update setting pending with non-null dayIndex/order denied) |
+| m11 | isOrganizer check on itinerary scheduling update | Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip | Yes (Scheduling denied for plain member) |
+| m12 | exact key restriction affectedKeys().hasOnly(['status','dayIndex','order']) | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update with unauthorized field modification denied) |
+| m13 | dayIndex bounds check [0, maxDays] | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update with out-of-bounds dayIndex denied) |
+| m14 | dayIndex integer type check | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update with non-integer dayIndex denied) |
+| m15 | order integer type check | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update with non-integer order denied) |
+| m16 | status == pending null dayIndex/order check | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update setting pending with non-null dayIndex/order denied) |
+| m17 | day bound without tolerance (+43200000) | Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3 | Yes (Day bound tolerance tests) |
 
 *Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules. Evaluating `m4all` proves that complete removal of archived trip protection is caught by Proof 4.
 
@@ -429,7 +434,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, and `joinCodes/{code}` rules; fully verified via 67 passing Jest unit tests against the Firestore emulator and 100% mutation detection (16/16 mutants detected). Production rules last deployed Oct 8, 2026 prior to Phase 3 & strictness fixes; production rules deploy pending: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`.
+- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, and `joinCodes/{code}` rules, including the rounding form day-bound check `dayIndex <= (endDate - startDate + 43200000)/86400000`; fully verified via 77 passing Jest unit tests against the Firestore emulator and 100% mutation detection (18/18 mutants detected). Production rules last deployed October 8, 2026 prior to Phase 3 & strictness fixes; Phase 4 rules including the new day bound tolerance are NOT yet deployed: deploy pending via `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
