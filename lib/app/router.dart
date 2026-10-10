@@ -97,7 +97,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/trip/:id',
         redirect: (context, state) {
           final id = state.pathParameters['id'];
-          if (state.matchedLocation == '/trip/$id') {
+          final path = state.uri.path;
+          if (path == '/trip/$id' || path == '/trip/$id/') {
             return '/trip/$id/members';
           }
           return null;

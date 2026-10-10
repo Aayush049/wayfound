@@ -190,7 +190,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                     icon: const Icon(Icons.more_vert),
                     onSelected: (value) {
                       if (value == 'edit') {
-                        context.go(
+                        context.push(
                           '/trip/${widget.suggestion.tripId}/suggestions/${widget.suggestion.id}/edit',
                         );
                       } else if (value == 'delete') {

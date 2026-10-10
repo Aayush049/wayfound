@@ -41,7 +41,7 @@ class SuggestionsTab extends ConsumerWidget {
               message: 'Add the first idea for this trip!',
               icon: Icons.lightbulb_outline,
               actionLabel: 'Add Suggestion',
-              onAction: () => context.go('/trip/${trip.id}/suggestions/add'),
+              onAction: () => context.push('/trip/${trip.id}/suggestions/add'),
             );
           }
 
@@ -63,7 +63,7 @@ class SuggestionsTab extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/trip/${trip.id}/suggestions/add'),
+        onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
         icon: const Icon(Icons.add),
         label: const Text('Add Suggestion'),
       ),

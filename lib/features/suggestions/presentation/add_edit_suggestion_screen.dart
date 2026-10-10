@@ -72,6 +72,14 @@ class _AddEditSuggestionScreenState
     }
   }
 
+  void _returnToSuggestions() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/trip/${widget.tripId}/suggestions');
+    }
+  }
+
   Future<void> _submit(String currency) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -117,7 +125,7 @@ class _AddEditSuggestionScreenState
       }
 
       if (mounted) {
-        context.go('/trip/${widget.tripId}/suggestions');
+        _returnToSuggestions();
       }
     } catch (e) {
       if (mounted) {
@@ -197,7 +205,7 @@ class _AddEditSuggestionScreenState
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/trip/${widget.tripId}/suggestions'),
+              onPressed: _returnToSuggestions,
             ),
           ),
           body: SingleChildScrollView(
