@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wayfound/app/router.dart';
 import 'package:wayfound/app/theme/app_theme.dart';
 import 'package:wayfound/app/theme/theme_provider.dart';
 import 'package:wayfound/features/auth/data/auth_provider.dart';
@@ -18,6 +19,7 @@ extension PumpApp on WidgetTester {
     AsyncValue<User?>? authUserValue,
     AsyncValue<AppUser?>? appUserValue,
     ThemeMode themeMode = ThemeMode.system,
+    List<dynamic> overrides = const [],
   }) async {
     if (sharedPreferences == null) {
       SharedPreferences.setMockInitialValues({});
@@ -58,12 +60,77 @@ extension PumpApp on WidgetTester {
             authUserProvider.overrideWithValue(authUserValue),
           if (effectiveAppUser != null)
             appUserProvider.overrideWithValue(effectiveAppUser),
+          ...overrides,
         ],
         child: MaterialApp(
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
           home: widget,
+        ),
+      ),
+    );
+  }
+
+  Future<void> pumpAppRouter({
+    AuthRepository? authRepository,
+    SharedPreferences? sharedPreferences,
+    AsyncValue<User?>? authUserValue,
+    AsyncValue<AppUser?>? appUserValue,
+    ThemeMode themeMode = ThemeMode.system,
+    List<dynamic> overrides = const [],
+  }) async {
+    if (sharedPreferences == null) {
+      SharedPreferences.setMockInitialValues({});
+    }
+    final prefs = sharedPreferences ?? await SharedPreferences.getInstance();
+
+    final AsyncValue<AppUser?>? effectiveAppUser;
+    if (appUserValue != null) {
+      effectiveAppUser = appUserValue;
+    } else if (authUserValue != null) {
+      effectiveAppUser = authUserValue.when(
+        data: (user) => AsyncData(
+          user == null
+              ? null
+              : AppUser(
+                  uid: user.uid,
+                  email: user.email ?? '',
+                  displayName:
+                      user.displayName ?? user.email?.split('@').first ?? '',
+                  photoUrl: user.photoURL,
+                ),
+        ),
+        loading: () => const AsyncLoading(),
+        error: (e, st) => AsyncError(e, st),
+      );
+    } else {
+      effectiveAppUser = null;
+    }
+
+    return pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          myTripsProvider.overrideWithValue(const AsyncData([])),
+          if (authRepository != null)
+            authRepositoryProvider.overrideWithValue(authRepository),
+          if (authUserValue != null)
+            authUserProvider.overrideWithValue(authUserValue),
+          if (effectiveAppUser != null)
+            appUserProvider.overrideWithValue(effectiveAppUser),
+          ...overrides,
+        ],
+        child: Consumer(
+          builder: (context, ref, _) {
+            final router = ref.watch(routerProvider);
+            return MaterialApp.router(
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              routerConfig: router,
+            );
+          },
         ),
       ),
     );
