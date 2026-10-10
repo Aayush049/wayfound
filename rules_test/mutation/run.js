@@ -182,14 +182,14 @@ const mutations = [
     name: 'm13',
     description: 'dayIndex upper bound',
     relevantTarget: 'Yes (Denied scheduling for dayIndex beyond last day)',
-    find: `\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`,
+    find: `\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`,
     replace: ``,
   },
   {
     name: 'm14',
     description: 'status/dayIndex/order coherence',
     relevantTarget: 'Yes (Denied scheduling for status pending with dayIndex or order)',
-    find: `\n          && (\n            (request.resource.data.status == 'pending' && request.resource.data.dayIndex == null && request.resource.data.order == null)\n            ||\n            (\n              request.resource.data.status == 'scheduled'\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000\n              && request.resource.data.order is int\n              && request.resource.data.order >= 0\n              && request.resource.data.order <= 10000\n            )\n          );`,
+    find: `\n          && (\n            (request.resource.data.status == 'pending' && request.resource.data.dayIndex == null && request.resource.data.order == null)\n            ||\n            (\n              request.resource.data.status == 'scheduled'\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000\n              && request.resource.data.order is int\n              && request.resource.data.order >= 0\n              && request.resource.data.order <= 10000\n            )\n          );`,
     replace: `;`,
   },
   {
@@ -203,8 +203,8 @@ const mutations = [
     name: 'm16',
     description: 'integer type checks',
     relevantTarget: 'Yes (Denied scheduling for dayIndex float or order float)',
-    find: `\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000\n              && request.resource.data.order is int`,
-    replace: `\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`,
+    find: `\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000\n              && request.resource.data.order is int`,
+    replace: `\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`,
   },
   {
     name: 'm17',
