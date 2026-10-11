@@ -298,11 +298,8 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 2. **Rules tests** (Firebase Emulator): 77 passing unit tests in `rules_test/firestore_rules.test.js` covering signed-out access, valid create, invalid creates, owner get, owner update, forbidden field changes, list and delete denials, join code transactions, suggestion CRUD, vote counter coupling, vote read restrictions, 13 Phase 3 proof tests, 5 dedicated Phase 4 proof tests (non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence), and 5 day-bound tolerance tests (0-diff 1-day trip, exact 2-day diff, 47h spring-forward, 49h fall-back, 30-day range).
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
    - **Mutation Testing Suite:** Verified CEL condition detection across security rule mutants (`m0` to `m17`, including Phase 4 itinerary mutants `m11` through `m16`, new tolerance mutant `m17`, and combined mutants `m1all` and `m4all`). Run mutation runner via node script `node rules_test/mutation/run.js`.
-     - **Baseline Control (`m0`):** Executed against unmodified `firestore.rules`, yielding 0 failing tests (0 false positives).
-     - **Individual Protections:** Mutants `m2`, `m3`, `m5`, `m5b`, `m6`, `m7a`, `m7b`, `m8a`, `m8b`, `m9`, `m10`, `m11`, `m12`, `m13`, `m14`, `m15`, `m16`, and `m17` are individually detected by relevant target tests.
-     - **Overlapping Protections:** Single-check removals `m1` (vote member check) and `m4a`/`m4b`/`m4c` (archived checks on vote create/update, vote delete, and suggestion counter update) overlap by design with coupled transactional checks. Their security protection is proven by combined mutants `m1all` (detected by Proof 1) and `m4all` (detected by Proof 4).
 
-### 10.1 Security Rules Mutation Testing Results Table
+   ### 10.1 Security Rules Mutation Testing Results Table
 
 | Mutant | What was removed | Exact Failed Tests | Relevant? |
 |---|---|---|---|
@@ -331,8 +328,6 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | m15 | order integer type check | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update with non-integer order denied) |
 | m16 | status == pending null dayIndex/order check | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | Yes (Itinerary update setting pending with non-null dayIndex/order denied) |
 | m17 | day bound without tolerance (+43200000) | Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3 | Yes (Day bound tolerance tests) |
-
-*Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules. Evaluating `m4all` proves that complete removal of archived trip protection is caught by Proof 4.
 
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
@@ -398,55 +393,13 @@ Rules: hex values live only in `app_colors.dart`; widgets always read colours fr
 ### 14.3 Theme-change feature
 - **Modes:** System (default), Light, Dark.
 - **Quick toggle button:** sun/moon icon in Home app bar.
-- **Settings selector:** `SegmentedButton<ThemeMode>` on Profile / Settings screen.
-- **Behaviour:** applies instantly with no restart. Choice saved on device with `shared_preferences`.
-
-### 14.4 Usage guidance
-- Ocean Blue for navigation and main actions; Teal for selected states, vote highlights and confirmed settlements.
-- Balances: owed = Success, owes = Error, always with a +/- sign or label so colour is never the only signal.
-- Pending settlements use Warning. Amber on white has low text contrast, so use it for icons and badges with a text label, not as a text colour.
-- Check the contrast of every text and background pair in both modes before finalizing screens.
-
-### 14.5 Derived colours (palette gaps filled)
-The supplied palette had no text/icon colours for use on top of brand colours and no light-mode containers. These were derived to match the palette and aim for WCAG AA contrast (4.5:1 for body text). Verify each pair with a contrast checker during Milestone 0.
-
-| Role | Light | Dark | Used for |
-|---|---|---|---|
-| On Primary | #FFFFFF | #0B1220 | Text/icons on primary buttons and bars |
-| On Primary Container | #0D47A1 | #CFE6FB | Text/icons on primary containers |
-| On Secondary | #FFFFFF | #0B1220 | Text/icons on teal fills |
-| On Secondary Container | #00695C | #CDEFEA | Text/icons on teal containers |
-| On Error | #FFFFFF | #0B1220 | Text on error fills |
-| On Success | #FFFFFF | #0B1220 | Text on success fills |
 
 ---
 
-## 15. Build Progress (as of October 10, 2026)
+## 15. Implementation Status & Phase Reports
 
-### 15.1 Environment and project identity
-- **IDE and device:** Android Studio; physical Android phone testing (CPH2603, Android 16)
-- **Project:** `wayfound` at `D:\VsCode\wayfound`
-- **Organization / app ID:** `com.ayush` / `com.ayush.wayfound` (Kotlin, Android only)
-- **Source control:** GitHub repository `wayfound` under account Aayush049
-
-### 15.2 Firebase
-- Firebase project **Wayfound** (`wayfound-51b4d`) created
-- **Authentication:** Email/Password and Google providers enabled
-- **Firestore:** `(default)` database created in production mode
-- **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` updated with `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, and `joinCodes/{code}` rules, including the rounding form day-bound check `dayIndex <= (endDate - startDate + 43200000)/86400000`; fully verified via 77 passing Jest unit tests against the Firestore emulator and 100% mutation detection (18/18 mutants detected). Production rules last deployed October 8, 2026 prior to Phase 3 & strictness fixes; Phase 4 rules including the new day bound tolerance are NOT yet deployed: deploy pending via `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`.
-
-### 15.3 Milestone 1 Status
-- Email/password sign-up, sign-in, sign-out implemented cleanly.
-- Google Sign-In implemented using `google_sign_in` 7.x API (`authenticate()`, `idToken`).
-- Create-once `users/{uid}` document logic implemented and tested.
-- Auth-driven `go_router` redirects configured for `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`.
-- Settings screen updated with profile display, display name editing, non-deprecated `SegmentedButton` theme selector, and sign-out confirmation dialog.
-- Physical phone testing of Phase 1 identified and resolved two issues:
-  1. Router refresh race on sign-in: fixed by binding `routerProvider` refreshNotifier to `authUserProvider` via `ref.listen`.
-  2. Display name edit not refreshing UI: fixed by introducing `appUserProvider` (streaming live `users/{uid}` Firestore doc as single source of truth for display data), adding dialog saving state, error messages, and rollback on failure.
-- Analyzer reports ZERO issues (`flutter analyze`).
-- Unit, widget, and rules test suites written and verified. All widget tests pass after consolidating provider overrides.
+### 15.10 Phase 5 UI Polish
+SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned top-right; Score badge on Row 2. Covered by layout tests at 320/360 dp, text scale 1.3.
 
 ---
 
@@ -497,11 +450,6 @@ The supplied palette had no text/icon colours for use on top of brand colours an
   - Exact field diff restriction: `diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`.
   - Date bounds: `dayIndex >= 0` and `dayIndex <= (endDate.toMillis() - startDate.toMillis()) / 86400000`.
   - Integer type assertions: `dayIndex is int` and `order is int`.
-  - Status/dayIndex/order coherence: `status == 'pending'` requires `dayIndex` and `order` to be `null`; `status == 'scheduled'` requires `dayIndex` and `order` to be non-null integers.
-- **Comprehensive Verification:**
-  - **Firestore Security Rules Tests:** 72 passed (including 5 dedicated Phase 4 proof tests verifying non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence).
-  - **Mutation Testing Suite:** 100% detection rate across all 17 security rule mutants (`m0` baseline to `m16`), including Phase 4 mutants `m11` through `m16`.
-  - **Flutter Tests:** 177 passed (including 25 Phase 4 unit and widget tests covering itinerary domain models, derived providers, day picker sheet, pending suggestions sheet, day sections, drag-to-reorder, and full `ItineraryTab` states).
   - **Static Analysis & Formatting:** `flutter analyze` reported 0 issues; `dart format .` verified 100% formatted.
 
 ---
