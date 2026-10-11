@@ -13,11 +13,13 @@ final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
 });
 
 /// Streams all expenses for a specific trip (sorted by date DESC, createdAt DESC).
-final expensesStreamProvider =
-    StreamProvider.family<List<Expense>, String>((ref, tripId) {
-      final repository = ref.watch(expenseRepositoryProvider);
-      return repository.watchExpenses(tripId);
-    });
+final expensesStreamProvider = StreamProvider.family<List<Expense>, String>((
+  ref,
+  tripId,
+) {
+  final repository = ref.watch(expenseRepositoryProvider);
+  return repository.watchExpenses(tripId);
+});
 
 /// Derived provider computing net member balances for a trip from expenses and members streams.
 final tripBalancesProvider = Provider.family<Map<String, int>, String>((

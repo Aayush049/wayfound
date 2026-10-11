@@ -150,11 +150,13 @@ List<SuggestedPayment> suggestSettlements(Map<String, int> balances) {
     final creditAmount = maxCreditor.value;
 
     final payAmount = min(debtAmount, creditAmount);
-    payments.add(SuggestedPayment(
-      fromUid: debtorUid,
-      toUid: creditorUid,
-      amount: payAmount,
-    ));
+    payments.add(
+      SuggestedPayment(
+        fromUid: debtorUid,
+        toUid: creditorUid,
+        amount: payAmount,
+      ),
+    );
 
     working[debtorUid] = working[debtorUid]! + payAmount;
     working[creditorUid] = working[creditorUid]! - payAmount;

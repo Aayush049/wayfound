@@ -30,8 +30,9 @@ class ExpenseRepository {
         .collection('expenses')
         .snapshots()
         .map((snapshot) {
-          final expenses =
-              snapshot.docs.map((doc) => Expense.fromFirestore(doc)).toList();
+          final expenses = snapshot.docs
+              .map((doc) => Expense.fromFirestore(doc))
+              .toList();
           return sortExpenses(expenses);
         });
   }

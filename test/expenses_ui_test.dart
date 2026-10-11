@@ -153,32 +153,30 @@ void main() {
 
       expect(find.text('Seafood Dinner'), findsOneWidget);
       expect(find.textContaining('900.00'), findsOneWidget);
-      expect(
-        find.text('Paid by Creator Ravi · split among 3'),
-        findsOneWidget,
-      );
+      expect(find.text('Paid by Creator Ravi · split among 3'), findsOneWidget);
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
     });
 
-    testWidgets('ExpenseCard hides overflow popup menu when canManage is false', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ExpenseCard(
-              expense: sampleExpense,
-              currency: 'INR',
-              members: members,
-              canManage: false,
+    testWidgets(
+      'ExpenseCard hides overflow popup menu when canManage is false',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ExpenseCard(
+                expense: sampleExpense,
+                currency: 'INR',
+                members: members,
+                canManage: false,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Seafood Dinner'), findsOneWidget);
-      expect(find.byType(PopupMenuButton<String>), findsNothing);
-    });
+        expect(find.text('Seafood Dinner'), findsOneWidget);
+        expect(find.byType(PopupMenuButton<String>), findsNothing);
+      },
+    );
 
     testWidgets(
       'Tapping ExpenseCard opens ExpenseSplitSheet with per-participant shares',
@@ -263,9 +261,8 @@ void main() {
           overrides: [
             firestoreProvider.overrideWithValue(fakeFirestore),
             tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-            expensesStreamProvider(
-              tripId,
-            ).overrideWithValue(AsyncData([sampleExpense])),
+            expensesStreamProvider(tripId)
+                .overrideWithValue(AsyncData([sampleExpense])),
           ],
         );
 
@@ -298,29 +295,31 @@ void main() {
       },
     );
 
-    testWidgets('BalancesView shows All Settled state when expenses are empty', (
-      tester,
-    ) async {
-      final mockUser = MockUser(uid: creatorUid);
+    testWidgets(
+      'BalancesView shows All Settled state when expenses are empty',
+      (tester) async {
+        final mockUser = MockUser(uid: creatorUid);
 
-      await tester.pumpApp(
-        Scaffold(body: BalancesView(trip: activeTrip)),
-        authUserValue: AsyncData(mockUser),
-        overrides: [
-          firestoreProvider.overrideWithValue(fakeFirestore),
-          tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-          expensesStreamProvider(tripId).overrideWithValue(const AsyncData([])),
-        ],
-      );
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(mockUser),
+          overrides: [
+            firestoreProvider.overrideWithValue(fakeFirestore),
+            tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
+            expensesStreamProvider(tripId)
+                .overrideWithValue(const AsyncData([])),
+          ],
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      expect(find.text('All Settled!'), findsOneWidget);
-      expect(
-        find.text('Everyone is at zero net balance. No payments needed.'),
-        findsOneWidget,
-      );
-    });
+        expect(find.text('All Settled!'), findsOneWidget);
+        expect(
+          find.text('Everyone is at zero net balance. No payments needed.'),
+          findsOneWidget,
+        );
+      },
+    );
   });
 
   group('ExpensesTab Widget Tests', () {
@@ -342,7 +341,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No expenses yet'), findsOneWidget);
-      expect(find.widgetWithText(FloatingActionButton, 'Add Expense'), findsOneWidget);
+      expect(
+        find.widgetWithText(FloatingActionButton, 'Add Expense'),
+        findsOneWidget,
+      );
     });
 
     testWidgets(
@@ -356,7 +358,8 @@ void main() {
           overrides: [
             firestoreProvider.overrideWithValue(fakeFirestore),
             tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-            expensesStreamProvider(tripId).overrideWithValue(const AsyncData([])),
+            expensesStreamProvider(tripId)
+                .overrideWithValue(const AsyncData([])),
           ],
         );
 
@@ -378,9 +381,8 @@ void main() {
         overrides: [
           firestoreProvider.overrideWithValue(fakeFirestore),
           tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-          expensesStreamProvider(
-            tripId,
-          ).overrideWithValue(AsyncData([sampleExpense])),
+          expensesStreamProvider(tripId)
+              .overrideWithValue(AsyncData([sampleExpense])),
         ],
       );
 
@@ -411,7 +413,8 @@ void main() {
             firestoreProvider.overrideWithValue(fakeFirestore),
             tripProvider(tripId).overrideWithValue(AsyncData(activeTrip)),
             tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-            expensesStreamProvider(tripId).overrideWithValue(const AsyncData([])),
+            expensesStreamProvider(tripId)
+                .overrideWithValue(const AsyncData([])),
           ],
         );
 
@@ -439,33 +442,35 @@ void main() {
       },
     );
 
-    testWidgets('AddEditExpenseScreen shows validation errors for invalid input', (
-      tester,
-    ) async {
-      final mockUser = MockUser(uid: creatorUid);
+    testWidgets(
+      'AddEditExpenseScreen shows validation errors for invalid input',
+      (tester) async {
+        final mockUser = MockUser(uid: creatorUid);
 
-      await tester.pumpApp(
-        AddEditExpenseScreen(tripId: tripId),
-        authUserValue: AsyncData(mockUser),
-        overrides: [
-          firestoreProvider.overrideWithValue(fakeFirestore),
-          tripProvider(tripId).overrideWithValue(AsyncData(activeTrip)),
-          tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-          expensesStreamProvider(tripId).overrideWithValue(const AsyncData([])),
-        ],
-      );
+        await tester.pumpApp(
+          AddEditExpenseScreen(tripId: tripId),
+          authUserValue: AsyncData(mockUser),
+          overrides: [
+            firestoreProvider.overrideWithValue(fakeFirestore),
+            tripProvider(tripId).overrideWithValue(AsyncData(activeTrip)),
+            tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
+            expensesStreamProvider(tripId)
+                .overrideWithValue(const AsyncData([])),
+          ],
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Scroll to submit button and tap with empty form
-      final submitFinder = find.widgetWithText(FilledButton, 'Add Expense');
-      await tester.ensureVisible(submitFinder);
-      await tester.tap(submitFinder);
-      await tester.pumpAndSettle();
+        // Scroll to submit button and tap with empty form
+        final submitFinder = find.widgetWithText(FilledButton, 'Add Expense');
+        await tester.ensureVisible(submitFinder);
+        await tester.tap(submitFinder);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Description is required'), findsOneWidget);
-      expect(find.text('Amount is required'), findsOneWidget);
-    });
+        expect(find.text('Description is required'), findsOneWidget);
+        expect(find.text('Amount is required'), findsOneWidget);
+      },
+    );
 
     testWidgets('JPY trip formats amounts with zero decimal places', (
       tester,
@@ -513,9 +518,8 @@ void main() {
         overrides: [
           firestoreProvider.overrideWithValue(fakeFirestore),
           tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-          expensesStreamProvider(
-            tripId,
-          ).overrideWithValue(AsyncData([sampleExpense])),
+          expensesStreamProvider(tripId)
+              .overrideWithValue(AsyncData([sampleExpense])),
         ],
       );
       await tester.pumpAndSettle();
@@ -529,9 +533,8 @@ void main() {
         overrides: [
           firestoreProvider.overrideWithValue(fakeFirestore),
           tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
-          expensesStreamProvider(
-            tripId,
-          ).overrideWithValue(AsyncData([sampleExpense])),
+          expensesStreamProvider(tripId)
+              .overrideWithValue(AsyncData([sampleExpense])),
         ],
       );
       await tester.pumpAndSettle();

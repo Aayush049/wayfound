@@ -23,7 +23,10 @@ void main() {
     });
 
     test('handles n = 15 participants', () {
-      final participants = List.generate(15, (i) => 'uid_${i.toString().padLeft(2, '0')}');
+      final participants = List.generate(
+        15,
+        (i) => 'uid_${i.toString().padLeft(2, '0')}',
+      );
       final shares = splitEqually(100, participants);
       // 100 ~/ 15 = 6, remainder 10
       // First 10 get 7, last 5 get 6
@@ -117,11 +120,15 @@ void main() {
       expect(suggestions.length, equals(2));
       expect(
         suggestions,
-        contains(const SuggestedPayment(fromUid: 'sam', toUid: 'asha', amount: 400)),
+        contains(
+          const SuggestedPayment(fromUid: 'sam', toUid: 'asha', amount: 400),
+        ),
       );
       expect(
         suggestions,
-        contains(const SuggestedPayment(fromUid: 'ravi', toUid: 'asha', amount: 100)),
+        contains(
+          const SuggestedPayment(fromUid: 'ravi', toUid: 'asha', amount: 100),
+        ),
       );
     });
 
@@ -183,7 +190,11 @@ void main() {
         amount: 400,
       );
 
-      final balances = computeBalances([dinner], members, confirmedSettlements: [settlement]);
+      final balances = computeBalances(
+        [dinner],
+        members,
+        confirmedSettlements: [settlement],
+      );
       // Asha: +900 - 300 + 400 = +1000... wait:
       // Dinner: Asha paid 900, share 300 -> net +600.
       // Settlement: Sam paid Asha 400 -> Asha gets +400?
@@ -215,7 +226,11 @@ void main() {
         amount: 200,
       );
 
-      final balances = computeBalances([dinner], members, confirmedSettlements: [partial]);
+      final balances = computeBalances(
+        [dinner],
+        members,
+        confirmedSettlements: [partial],
+      );
       // Asha net: +600 - 200 = +400
       // Sam net: -300 + 200 = -100
       // Ravi net: -300
@@ -230,11 +245,15 @@ void main() {
       // Ravi pays Asha 300, Sam pays Asha 100.
       expect(
         suggested,
-        contains(const SuggestedPayment(fromUid: 'ravi', toUid: 'asha', amount: 300)),
+        contains(
+          const SuggestedPayment(fromUid: 'ravi', toUid: 'asha', amount: 300),
+        ),
       );
       expect(
         suggested,
-        contains(const SuggestedPayment(fromUid: 'sam', toUid: 'asha', amount: 100)),
+        contains(
+          const SuggestedPayment(fromUid: 'sam', toUid: 'asha', amount: 100),
+        ),
       );
     });
 
@@ -305,7 +324,8 @@ void main() {
           expect(
             sharesSum,
             equals(amount),
-            reason: 'Iteration $iteration expense $e shares sum must equal amount',
+            reason:
+                'Iteration $iteration expense $e shares sum must equal amount',
           );
 
           expenses.add(
@@ -340,13 +360,15 @@ void main() {
           expect(
             suggestedPayments.length,
             lessThanOrEqualTo(nonZeroCount - 1),
-            reason: 'Iteration $iteration payments count must be <= nonZeroCount - 1',
+            reason:
+                'Iteration $iteration payments count must be <= nonZeroCount - 1',
           );
         } else {
           expect(
             suggestedPayments,
             isEmpty,
-            reason: 'Iteration $iteration when all balances zero, payments must be empty',
+            reason:
+                'Iteration $iteration when all balances zero, payments must be empty',
           );
         }
 
@@ -356,11 +378,14 @@ void main() {
           expect(
             p.amount,
             greaterThan(0),
-            reason: 'Iteration $iteration payment amount must be strictly positive (> 0)',
+            reason:
+                'Iteration $iteration payment amount must be strictly positive (> 0)',
           );
 
-          testWorkingBalances[p.fromUid] = testWorkingBalances[p.fromUid]! + p.amount;
-          testWorkingBalances[p.toUid] = testWorkingBalances[p.toUid]! - p.amount;
+          testWorkingBalances[p.fromUid] =
+              testWorkingBalances[p.fromUid]! + p.amount;
+          testWorkingBalances[p.toUid] =
+              testWorkingBalances[p.toUid]! - p.amount;
         }
 
         for (final entry in testWorkingBalances.entries) {

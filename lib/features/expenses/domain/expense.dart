@@ -44,7 +44,8 @@ class Expense {
       amount: (data['amount'] as num?)?.toInt() ?? 0,
       description: (data['description'] as String?) ?? '',
       paidBy: (data['paidBy'] as String?) ?? '',
-      participantIds: (data['participantIds'] as List<dynamic>?)
+      participantIds:
+          (data['participantIds'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],

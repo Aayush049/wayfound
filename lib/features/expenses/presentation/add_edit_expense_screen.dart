@@ -18,11 +18,7 @@ class AddEditExpenseScreen extends ConsumerStatefulWidget {
   final String tripId;
   final String? expenseId;
 
-  const AddEditExpenseScreen({
-    super.key,
-    required this.tripId,
-    this.expenseId,
-  });
+  const AddEditExpenseScreen({super.key, required this.tripId, this.expenseId});
 
   bool get isEditing => expenseId != null && expenseId!.isNotEmpty;
 
@@ -169,9 +165,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
     final currentUser = ref.read(authUserProvider).asData?.value;
     if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be signed in.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('You must be signed in.')));
       return;
     }
 
@@ -304,9 +300,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(
-              widget.isEditing ? 'Edit Expense' : 'Add Expense',
-            ),
+            title: Text(widget.isEditing ? 'Edit Expense' : 'Add Expense'),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: _returnToExpenses,
@@ -419,7 +413,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                             onChanged: (checked) {
                               setState(() {
                                 if (checked == true) {
-                                  _selectedParticipants.addAll(activeMemberUids);
+                                  _selectedParticipants.addAll(
+                                    activeMemberUids,
+                                  );
                                 } else {
                                   _selectedParticipants.clear();
                                 }
@@ -437,8 +433,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   Card(
                     child: Column(
                       children: activeMembers.map((member) {
-                        final isChecked =
-                            _selectedParticipants.contains(member.uid);
+                        final isChecked = _selectedParticipants.contains(
+                          member.uid,
+                        );
                         return CheckboxListTile(
                           value: isChecked,
                           title: Text(
@@ -501,9 +498,10 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                                     ),
                                     Text(
                                       formattedShare,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -531,9 +529,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                             ),
                           )
                         : Text(
-                            widget.isEditing
-                                ? 'Save Changes'
-                                : 'Add Expense',
+                            widget.isEditing ? 'Save Changes' : 'Add Expense',
                           ),
                   ),
                 ],

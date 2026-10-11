@@ -74,7 +74,8 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
             child: _selectedSegment == ExpenseTabSegment.balances
                 ? BalancesView(trip: widget.trip)
                 : expensesAsync.when(
-                    loading: () => const AppLoading(message: 'Loading expenses...'),
+                    loading: () =>
+                        const AppLoading(message: 'Loading expenses...'),
                     error: (err, stack) => AppError(
                       message: 'Failed to load expenses: ${err.toString()}',
                       onRetry: () => ref.invalidate(
@@ -82,21 +83,19 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
                       ),
                     ),
                     data: (expenses) {
-                      final members =
-                          membersAsync.asData?.value ?? <Member>[];
+                      final members = membersAsync.asData?.value ?? <Member>[];
 
                       if (expenses.isEmpty) {
                         return AppEmpty(
                           title: 'No expenses yet',
-                          message:
-                              'Record group expenses to easily split costs among members.',
+                          message: 'Record group expenses to easily split costs among members.',
                           icon: Icons.account_balance_wallet_outlined,
                           actionLabel: isArchived ? null : 'Add Expense',
                           onAction: isArchived
                               ? null
                               : () => context.push(
-                                    '/trip/${widget.trip.id}/expenses/add',
-                                  ),
+                                  '/trip/${widget.trip.id}/expenses/add',
+                                ),
                         );
                       }
 
@@ -142,8 +141,7 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
                                       content: Text(
                                         'Failed to delete expense: ${e.toString()}',
                                       ),
-                                      backgroundColor:
-                                          theme.colorScheme.error,
+                                      backgroundColor: theme.colorScheme.error,
                                     ),
                                   );
                                 }
@@ -159,14 +157,13 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
       ),
       floatingActionButton:
           (!isArchived && _selectedSegment == ExpenseTabSegment.expenses)
-              ? FloatingActionButton.extended(
-                  onPressed: () => context.push(
-                    '/trip/${widget.trip.id}/expenses/add',
-                  ),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Expense'),
-                )
-              : null,
+          ? FloatingActionButton.extended(
+              onPressed: () =>
+                  context.push('/trip/${widget.trip.id}/expenses/add'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Expense'),
+            )
+          : null,
     );
   }
 }

@@ -143,7 +143,9 @@ class ExpenseCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 'Delete',
-                                style: TextStyle(color: theme.colorScheme.error),
+                                style: TextStyle(
+                                  color: theme.colorScheme.error,
+                                ),
                               ),
                             ],
                           ),

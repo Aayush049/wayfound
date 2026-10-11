@@ -111,56 +111,53 @@ void main() {
       expect(doc.exists, isFalse);
     });
 
-    test(
-      'watchExpenses streams and sorts expenses by date DESC, then createdAt DESC',
-      () async {
-        final colRef = fakeFirestore
-            .collection('trips')
-            .doc(tripId)
-            .collection('expenses');
+    test('watchExpenses streams and sorts expenses by date DESC, then createdAt DESC', () async {
+      final colRef = fakeFirestore
+          .collection('trips')
+          .doc(tripId)
+          .collection('expenses');
 
-        final t1 = DateTime(2026, 11, 1, 10, 0);
-        final t2 = DateTime(2026, 11, 3, 12, 0);
-        final t3 = DateTime(2026, 11, 3, 14, 0);
+      final t1 = DateTime(2026, 11, 1, 10, 0);
+      final t2 = DateTime(2026, 11, 3, 12, 0);
+      final t3 = DateTime(2026, 11, 3, 14, 0);
 
-        await colRef.doc('e1').set({
-          'amount': 1000,
-          'description': 'Earliest Date',
-          'paidBy': userUid,
-          'participantIds': [userUid],
-          'createdBy': userUid,
-          'date': Timestamp.fromDate(t1),
-          'createdAt': Timestamp.fromDate(t1),
-        });
+      await colRef.doc('e1').set({
+        'amount': 1000,
+        'description': 'Earliest Date',
+        'paidBy': userUid,
+        'participantIds': [userUid],
+        'createdBy': userUid,
+        'date': Timestamp.fromDate(t1),
+        'createdAt': Timestamp.fromDate(t1),
+      });
 
-        await colRef.doc('e2').set({
-          'amount': 2000,
-          'description': 'Later Date, Earlier CreatedAt',
-          'paidBy': userUid,
-          'participantIds': [userUid],
-          'createdBy': userUid,
-          'date': Timestamp.fromDate(t2),
-          'createdAt': Timestamp.fromDate(t2),
-        });
+      await colRef.doc('e2').set({
+        'amount': 2000,
+        'description': 'Later Date, Earlier CreatedAt',
+        'paidBy': userUid,
+        'participantIds': [userUid],
+        'createdBy': userUid,
+        'date': Timestamp.fromDate(t2),
+        'createdAt': Timestamp.fromDate(t2),
+      });
 
-        await colRef.doc('e3').set({
-          'amount': 3000,
-          'description': 'Later Date, Later CreatedAt',
-          'paidBy': userUid,
-          'participantIds': [userUid],
-          'createdBy': userUid,
-          'date': Timestamp.fromDate(t2),
-          'createdAt': Timestamp.fromDate(t3),
-        });
+      await colRef.doc('e3').set({
+        'amount': 3000,
+        'description': 'Later Date, Later CreatedAt',
+        'paidBy': userUid,
+        'participantIds': [userUid],
+        'createdBy': userUid,
+        'date': Timestamp.fromDate(t2),
+        'createdAt': Timestamp.fromDate(t3),
+      });
 
-        final stream = repository.watchExpenses(tripId);
-        final list = await stream.first;
+      final stream = repository.watchExpenses(tripId);
+      final list = await stream.first;
 
-        expect(list.length, equals(3));
-        expect(list[0].description, equals('Later Date, Later CreatedAt'));
-        expect(list[1].description, equals('Later Date, Earlier CreatedAt'));
-        expect(list[2].description, equals('Earliest Date'));
-      },
-    );
+      expect(list.length, equals(3));
+      expect(list[0].description, equals('Later Date, Later CreatedAt'));
+      expect(list[1].description, equals('Later Date, Earlier CreatedAt'));
+      expect(list[2].description, equals('Earliest Date'));
+    });
   });
 }
