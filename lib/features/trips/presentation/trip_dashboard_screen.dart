@@ -6,6 +6,7 @@ import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
 import '../../auth/data/auth_provider.dart';
+import '../../expenses/presentation/expenses_tab.dart';
 import '../../itinerary/presentation/itinerary_tab.dart';
 import '../../suggestions/presentation/suggestions_tab.dart';
 import '../data/trips_providers.dart';
@@ -166,12 +167,8 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
                 isArchived: trip.archived,
               ),
 
-              // Tab 2: Expenses Placeholder TEMP(phase-5)
-              const AppEmpty(
-                title: 'Expenses Coming Soon',
-                message: 'TEMP(phase-5): Log group expenses and see balances in Phase 5.',
-                icon: Icons.account_balance_wallet_outlined,
-              ),
+              // Tab 2: Expenses Tab (Phase 5)
+              ExpensesTab(trip: trip),
 
               // Tab 3: Members Tab (Working!)
               MembersTab(trip: trip),

@@ -2683,5 +2683,547 @@ describe('Trips & Join Security Rules', () => {
       await assertFails(suggRef.update({ status: 'scheduled', dayIndex: 31, order: 0 }));
     });
   });
+
+  describe('Phase 5 expense rules', () => {
+    const tripId = 'trip_expense_1';
+    const organizerUid = 'organizer_exp';
+    const creatorUid = 'creator_exp';
+    const member2Uid = 'member2_exp';
+    const nonMemberUid = 'non_member_exp';
+    const expenseId = 'expense_1';
+
+    async function seedExpenseEnv(options = {}) {
+      const {
+        archived = false,
+        expense = null,
+        extraMembers = [],
+      } = options;
+
+      const memberIds = [organizerUid, creatorUid, member2Uid, ...extraMembers];
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('users').doc(organizerUid).set({
+          displayName: 'Organizer Exp',
+          email: 'org@exp.com',
+          createdAt: new Date(),
+        });
+        await db.collection('users').doc(creatorUid).set({
+          displayName: 'Creator Exp',
+          email: 'creator@exp.com',
+          createdAt: new Date(),
+        });
+        await db.collection('users').doc(member2Uid).set({
+          displayName: 'Member 2 Exp',
+          email: 'mem2@exp.com',
+          createdAt: new Date(),
+        });
+        await db.collection('users').doc(nonMemberUid).set({
+          displayName: 'NonMember Exp',
+          email: 'nonmem@exp.com',
+          createdAt: new Date(),
+        });
+        for (const mId of extraMembers) {
+          await db.collection('users').doc(mId).set({
+            displayName: `Extra ${mId}`,
+            email: `${mId}@exp.com`,
+            createdAt: new Date(),
+          });
+        }
+
+        await db.collection('trips').doc(tripId).set({
+          name: 'Expense Trip',
+          destination: 'Tokyo',
+          startDate: firebase.firestore.Timestamp.fromDate(new Date('2026-11-01T00:00:00Z')),
+          endDate: firebase.firestore.Timestamp.fromDate(new Date('2026-11-05T00:00:00Z')),
+          currency: 'JPY',
+          organizerId: organizerUid,
+          joinCode: 'EXP001',
+          memberIds,
+          memberCount: memberIds.length,
+          archived,
+          createdAt: new Date(),
+        });
+
+        if (expense) {
+          await db.collection('trips').doc(tripId).collection('expenses').doc(expenseId).set({
+            amount: 1000,
+            description: 'Ramen Dinner',
+            paidBy: creatorUid,
+            participantIds: [creatorUid, member2Uid],
+            createdBy: creatorUid,
+            date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+            createdAt: new Date(),
+            ...expense,
+          });
+        }
+      });
+    }
+
+    test('Valid create: payer is creator, payer is another member, subset, all 15 participants', async () => {
+      const finalExtraMembers = Array.from({ length: 12 }, (_, i) => `extra_m_${i + 1}`);
+      await seedExpenseEnv({ extraMembers: finalExtraMembers });
+
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef1 = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_valid_1');
+
+      // Payer is creator, subset of participants
+      await assertSucceeds(expRef1.set({
+        amount: 1000,
+        description: 'Ramen',
+        paidBy: creatorUid,
+        participantIds: [creatorUid, member2Uid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Payer is another member (member2Uid)
+      const expRef2 = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_valid_2');
+      await assertSucceeds(expRef2.set({
+        amount: 500,
+        description: 'Snack',
+        paidBy: member2Uid,
+        participantIds: [creatorUid, member2Uid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // All 15 participants
+      const all15Members = [organizerUid, creatorUid, member2Uid, ...finalExtraMembers];
+      const expRef3 = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_valid_3');
+      await assertSucceeds(expRef3.set({
+        amount: 15000,
+        description: 'Big Banquet',
+        paidBy: organizerUid,
+        participantIds: all15Members,
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Create denied for signed out and non-member', async () => {
+      await seedExpenseEnv();
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+
+      const unauthRef = unauthDb.collection('trips').doc(tripId).collection('expenses').doc('exp_unauth');
+      const nonMemberRef = nonMemberDb.collection('trips').doc(tripId).collection('expenses').doc('exp_nonmember');
+      const validRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_valid');
+
+      await assertFails(unauthRef.set({
+        amount: 1000,
+        description: 'Test',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      await assertFails(nonMemberRef.set({
+        amount: 1000,
+        description: 'Test',
+        paidBy: nonMemberUid,
+        participantIds: [nonMemberUid],
+        createdBy: nonMemberUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Control: Member create succeeds
+      await assertSucceeds(validRef.set({
+        amount: 1000,
+        description: 'Test',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Create denied when createdBy is not the caller', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_createdby');
+
+      // Spoofed createdBy as organizerUid
+      await assertFails(expRef.set({
+        amount: 1000,
+        description: 'Spoofed createdBy',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: organizerUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Control: Matching createdBy succeeds
+      await assertSucceeds(expRef.set({
+        amount: 1000,
+        description: 'Valid createdBy',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Create denied for extra key or missing key', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_keys');
+
+      // Extra key 'extraField'
+      await assertFails(expRef.set({
+        amount: 1000,
+        description: 'Extra key',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        extraField: 'unauthorized',
+      }));
+
+      // Missing required key 'date'
+      await assertFails(expRef.set({
+        amount: 1000,
+        description: 'Missing date',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Control: Exact 7 keys succeeds
+      await assertSucceeds(expRef.set({
+        amount: 1000,
+        description: 'Exact 7 keys',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Create denied for invalid amount (0, negative, float, string, over cap)', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_amount');
+
+      const baseValid = {
+        description: 'Amount test',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // 0
+      await assertFails(expRef.set({ ...baseValid, amount: 0 }));
+      // negative
+      await assertFails(expRef.set({ ...baseValid, amount: -500 }));
+      // float
+      await assertFails(expRef.set({ ...baseValid, amount: 12.5 }));
+      // string
+      await assertFails(expRef.set({ ...baseValid, amount: '1000' }));
+      // over cap (> 100,000,000,000)
+      await assertFails(expRef.set({ ...baseValid, amount: 100000000001 }));
+
+      // Control: Valid amount succeeds
+      await assertSucceeds(expRef.set({ ...baseValid, amount: 1000 }));
+    });
+
+    test('Create denied for invalid description (empty, >100 chars, non-string)', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_desc');
+
+      const baseValid = {
+        amount: 1000,
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // Empty string
+      await assertFails(expRef.set({ ...baseValid, description: '' }));
+      // Over 100 chars (101 chars)
+      await assertFails(expRef.set({ ...baseValid, description: 'a'.repeat(101) }));
+      // Non-string
+      await assertFails(expRef.set({ ...baseValid, description: 12345 }));
+
+      // Control: Valid description succeeds
+      await assertSucceeds(expRef.set({ ...baseValid, description: 'Valid description' }));
+    });
+
+    test('Create denied for invalid paidBy (not a member, non-string)', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_paidby');
+
+      const baseValid = {
+        amount: 1000,
+        description: 'PaidBy test',
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // paidBy not a member
+      await assertFails(expRef.set({ ...baseValid, paidBy: nonMemberUid }));
+      // paidBy non-string
+      await assertFails(expRef.set({ ...baseValid, paidBy: 9999 }));
+
+      // Control: Valid paidBy (member2Uid) succeeds
+      await assertSucceeds(expRef.set({ ...baseValid, paidBy: member2Uid }));
+    });
+
+    test('Create denied for invalid participantIds (empty, 16 elements, non-member, duplicates, non-list, non-strings)', async () => {
+      const extra13 = Array.from({ length: 13 }, (_, i) => `extra_p_${i + 1}`);
+      await seedExpenseEnv({ extraMembers: extra13 });
+
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_parts');
+
+      const baseValid = {
+        amount: 1000,
+        description: 'Participants test',
+        paidBy: creatorUid,
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // Empty list
+      await assertFails(expRef.set({ ...baseValid, participantIds: [] }));
+
+      // 16 elements (organizer, creator, member2, 13 extra = 16)
+      const list16 = [organizerUid, creatorUid, member2Uid, ...extra13];
+      await assertFails(expRef.set({ ...baseValid, participantIds: list16 }));
+
+      // Containing non-member
+      await assertFails(expRef.set({ ...baseValid, participantIds: [creatorUid, nonMemberUid] }));
+
+      // Duplicates [A, A, B]
+      await assertFails(expRef.set({ ...baseValid, participantIds: [creatorUid, creatorUid, member2Uid] }));
+
+      // Duplicates [A, B, A]
+      await assertFails(expRef.set({ ...baseValid, participantIds: [creatorUid, member2Uid, creatorUid] }));
+
+      // Non-list
+      await assertFails(expRef.set({ ...baseValid, participantIds: creatorUid }));
+
+      // Containing non-strings
+      await assertFails(expRef.set({ ...baseValid, participantIds: [creatorUid, 12345] }));
+
+      // Control: Valid participantIds succeeds
+      await assertSucceeds(expRef.set({ ...baseValid, participantIds: [creatorUid, member2Uid] }));
+    });
+
+    test('Create denied when date is not a timestamp or createdAt is a client date', async () => {
+      await seedExpenseEnv();
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_dates');
+
+      const baseValid = {
+        amount: 1000,
+        description: 'Date test',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+      };
+
+      // Date string instead of timestamp
+      await assertFails(expRef.set({
+        ...baseValid,
+        date: '2026-11-02',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // createdAt client Date instead of serverTimestamp
+      await assertFails(expRef.set({
+        ...baseValid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: new Date(),
+      }));
+
+      // Control: Valid timestamps succeed
+      await assertSucceeds(expRef.set({
+        ...baseValid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Create denied on archived trip', async () => {
+      await seedExpenseEnv({ archived: true });
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc('exp_archived');
+
+      await assertFails(expRef.set({
+        amount: 1000,
+        description: 'Archived create',
+        paidBy: creatorUid,
+        participantIds: [creatorUid],
+        createdBy: creatorUid,
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-11-02T00:00:00Z')),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Update: creator and organizer succeed; other member and non-member denied', async () => {
+      await seedExpenseEnv({ expense: {} });
+
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const member2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+
+      const creatorRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const organizerRef = organizerDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const member2Ref = member2Db.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const nonMemberRef = nonMemberDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+
+      // Other member denied
+      await assertFails(member2Ref.update({ description: 'Member2 Update' }));
+
+      // Non-member denied
+      await assertFails(nonMemberRef.update({ description: 'NonMember Update' }));
+
+      // Creator succeeds
+      await assertSucceeds(creatorRef.update({ description: 'Creator Update' }));
+
+      // Organizer succeeds
+      await assertSucceeds(organizerRef.update({ description: 'Organizer Update' }));
+    });
+
+    test('Update denied when changing createdBy or createdAt', async () => {
+      await seedExpenseEnv({ expense: {} });
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+
+      // Changing createdBy denied
+      await assertFails(expRef.update({ createdBy: organizerUid }));
+
+      // Changing createdAt denied
+      await assertFails(expRef.update({ createdAt: firebase.firestore.Timestamp.fromDate(new Date('2025-01-01T00:00:00Z')) }));
+
+      // Extra key in update denied
+      await assertFails(expRef.update({ amount: 2000, extraKey: 'forbidden' }));
+
+      // Control: Valid affected keys succeed
+      await assertSucceeds(expRef.update({ amount: 2000, description: 'Updated Amount' }));
+    });
+
+    test('Update denied for invalid resulting values (amount, description, paidBy, participantIds, date)', async () => {
+      await seedExpenseEnv({ expense: {} });
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+
+      // Invalid resulting amount (0, negative, float, string)
+      await assertFails(expRef.update({ amount: 0 }));
+      await assertFails(expRef.update({ amount: -10 }));
+      await assertFails(expRef.update({ amount: 1.5 }));
+      await assertFails(expRef.update({ amount: '2000' }));
+
+      // Invalid resulting description (empty, >100)
+      await assertFails(expRef.update({ description: '' }));
+      await assertFails(expRef.update({ description: 'b'.repeat(101) }));
+
+      // Invalid resulting paidBy (non-member)
+      await assertFails(expRef.update({ paidBy: nonMemberUid }));
+
+      // Invalid resulting participantIds (empty, duplicates, non-member)
+      await assertFails(expRef.update({ participantIds: [] }));
+      await assertFails(expRef.update({ participantIds: [creatorUid, creatorUid] }));
+      await assertFails(expRef.update({ participantIds: [nonMemberUid] }));
+
+      // Invalid resulting date (string)
+      await assertFails(expRef.update({ date: 'invalid-date' }));
+
+      // Control: Valid update succeeds
+      await assertSucceeds(expRef.update({ amount: 1200, description: 'Valid Update' }));
+    });
+
+    test('Update denied on archived trip', async () => {
+      await seedExpenseEnv({ archived: true, expense: {} });
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const expRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+
+      await assertFails(expRef.update({ description: 'Archived update' }));
+    });
+
+    test('Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied', async () => {
+      // Seed 1: Other member denied
+      await seedExpenseEnv({ expense: {} });
+      const member2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      await assertFails(member2Db.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+
+      // Seed 2: Non-member denied
+      await seedExpenseEnv({ expense: {} });
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      await assertFails(nonMemberDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+
+      // Seed 3: Signed out denied
+      await seedExpenseEnv({ expense: {} });
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+      await assertFails(unauthDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+
+      // Seed 4: Archived denied
+      await seedExpenseEnv({ archived: true, expense: {} });
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      await assertFails(creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+
+      // Seed 5: Creator delete succeeds
+      await seedExpenseEnv({ expense: {} });
+      await assertSucceeds(creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+
+      // Seed 6: Organizer delete succeeds
+      await seedExpenseEnv({ expense: {} });
+      const organizerDb = testEnv.authenticatedContext(organizerUid).firestore();
+      await assertSucceeds(organizerDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId).delete());
+    });
+
+    test('Read: member succeeds; non-member and signed out denied', async () => {
+      await seedExpenseEnv({ expense: {} });
+
+      const creatorDb = testEnv.authenticatedContext(creatorUid).firestore();
+      const member2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+
+      const creatorExpRef = creatorDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const member2ExpRef = member2Db.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const nonMemberExpRef = nonMemberDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+      const unauthExpRef = unauthDb.collection('trips').doc(tripId).collection('expenses').doc(expenseId);
+
+      // Members get succeeds
+      await assertSucceeds(creatorExpRef.get());
+      await assertSucceeds(member2ExpRef.get());
+
+      // Members list succeeds
+      await assertSucceeds(creatorDb.collection('trips').doc(tripId).collection('expenses').get());
+
+      // Non-member get and list denied
+      await assertFails(nonMemberExpRef.get());
+      await assertFails(nonMemberDb.collection('trips').doc(tripId).collection('expenses').get());
+
+      // Signed out get and list denied
+      await assertFails(unauthExpRef.get());
+      await assertFails(unauthDb.collection('trips').doc(tripId).collection('expenses').get());
+    });
+  });
 });
 });

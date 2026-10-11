@@ -217,6 +217,46 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount + getDownDelta(resource.data.value, 0);
         }
       }
+
+      // Subcollection: trips/{tripId}/expenses/{expenseId}
+      match /expenses/{expenseId} {
+        allow get, list: if isSignedIn() && isTripMember(tripId);
+
+        allow create: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && request.resource.data.keys().hasAll(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])
+          && request.resource.data.keys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000
+          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100
+          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)
+          && request.resource.data.participantIds is list
+          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15
+          && get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds.hasAll(request.resource.data.participantIds)
+          && request.resource.data.participantIds.toSet().size() == request.resource.data.participantIds.size()
+          && request.resource.data.date is timestamp
+          && request.resource.data.createdAt == request.time;
+
+        allow update: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])
+          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000
+          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100
+          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)
+          && request.resource.data.participantIds is list
+          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15
+          && get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds.hasAll(request.resource.data.participantIds)
+          && request.resource.data.participantIds.toSet().size() == request.resource.data.participantIds.size()
+          && request.resource.data.date is timestamp;
+
+        allow delete: if isSignedIn()
+          && isTripMember(tripId)
+          && isTripNotArchived(tripId)
+          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));
+      }
     }
 
     // Collection: joinCodes/{code}

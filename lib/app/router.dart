@@ -9,6 +9,7 @@ import '../features/auth/presentation/settings_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/expenses/presentation/add_edit_expense_screen.dart';
 import '../features/suggestions/presentation/add_edit_suggestion_screen.dart';
 import '../features/trips/presentation/create_trip_screen.dart';
 import '../features/trips/presentation/home_screen.dart';
@@ -128,6 +129,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => TripDashboardScreen(
               tripId: state.pathParameters['id']!,
               activeTab: 'itinerary',
+            ),
+          ),
+          GoRoute(
+            path: 'expenses/add',
+            builder: (context, state) =>
+                AddEditExpenseScreen(tripId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: 'expenses/:eid/edit',
+            builder: (context, state) => AddEditExpenseScreen(
+              tripId: state.pathParameters['id']!,
+              expenseId: state.pathParameters['eid'],
             ),
           ),
           GoRoute(

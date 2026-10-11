@@ -3,7 +3,7 @@
 *Wayfound is a collaborative trip planner for groups.*
 
 **Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026 (Updated: October 6, 2026)
-**Status:** Milestone 0, Milestone 1, Milestone 2 & Milestone 3 complete (Phase 0 setup, Phase 1 auth, Phase 2 trips, Phase 3 suggestions & voting finished)
+**Status:** Milestone 0, Milestone 1, Milestone 2, Milestone 3, Milestone 4 & Milestone 5 complete (Phase 0 setup, Phase 1 auth, Phase 2 trips, Phase 3 suggestions & voting, Phase 4 itinerary, Phase 5 expenses & balances finished)
 
 ---
 
@@ -502,6 +502,24 @@ The supplied palette had no text/icon colours for use on top of brand colours an
   - **Firestore Security Rules Tests:** 72 passed (including 5 dedicated Phase 4 proof tests verifying non-organizer scheduling block, invalid day index block, key restriction enforcement, integer validation, and status/dayIndex/order coherence).
   - **Mutation Testing Suite:** 100% detection rate across all 17 security rule mutants (`m0` baseline to `m16`), including Phase 4 mutants `m11` through `m16`.
   - **Flutter Tests:** 177 passed (including 25 Phase 4 unit and widget tests covering itinerary domain models, derived providers, day picker sheet, pending suggestions sheet, day sections, drag-to-reorder, and full `ItineraryTab` states).
+  - **Static Analysis & Formatting:** `flutter analyze` reported 0 issues; `dart format .` verified 100% formatted.
+
+---
+
+### 15.9 Milestone 5 Status (Phase 5: Expenses and Balances Completed)
+- **Expense Domain & Pure Integer Architecture:** Implemented `Expense` model, `ExpensePayloadBuilders` (7-key create payload, 5-key update payload), `ExpenseValidators`, pure integer equal split calculation (`splitEqually`) with deterministic UID-sorted remainder distribution, `computeBalances` (net balances per member summing strictly to 0), and `suggestSettlements` (greedy minimal payment suggestions pairing largest debtor and largest creditor, yielding at most N-1 payments).
+- **Data Layer & Riverpod 3.x Reactive Streams:** `ExpenseRepository` for Firestore operations (`watchExpenses`, `createExpense`, `updateExpense`, `deleteExpense`, client-side date DESC sort) and derived Riverpod providers (`expensesStreamProvider`, `derivedMemberBalancesProvider`, `derivedSuggestedPaymentsProvider`, `derivedTotalTripSpentProvider`).
+- **Presentation Components:**
+  - `ExpenseCard`: Localized currency formatting in minor units, description, payer name, split count, date, tap action for split modal, overflow popover menu for creator/organizer with confirm-delete dialog.
+  - `ExpenseSplitSheet`: Modal bottom sheet displaying individual calculated participant shares.
+  - `BalancesView`: Summary card with total trip spent, caller's net position card ("You owe" / "You are owed" / "Settled"), list of member balances with explicit text status ("is owed" / "owes" / "settled"), suggested payments list, and "All Settled!" empty state.
+  - `ExpensesTab`: Main tab view with `SegmentedButton` switching between Expenses and Balances views, FloatingActionButton for Add Expense, and archived trip read-only state handling.
+  - `AddEditExpenseScreen`: Form with description input, decimal amount input, paidBy dropdown, participant checkboxes with Select All toggle, date picker, live share preview card, prefilled initial data on edit, and router integration (`/trip/:id/expenses/add`, `/trip/:id/expenses/:eid/edit`).
+- **Firestore Security Rules (CEL):** Security rules for `trips/{tripId}/expenses/{expenseId}` enforcing membership, non-archived status, creator identity (`createdBy == request.auth.uid`), organizer/creator update & delete authority, exact key sets (`hasOnly` and `hasAll`), strict document types, range checks, and distinct participant UIDs (`toSet().size() == size()`). Document access count margin kept at max 5 calls (well below 20-call limit).
+- **Comprehensive Verification:**
+  - **Firestore Security Rules Tests:** 93 passed (including 16 dedicated Phase 5 tests covering valid create, signed-out/non-member denials, createdBy spoofing, key restrictions, amount bounds, description validation, paidBy membership, participantIds bounds/duplicates/membership, timestamp types, archived trip locks, creator/organizer update/delete permissions, and read permissions).
+  - **Mutation Testing Suite:** 100% detection score across all 36 security rule mutants (`m0` baseline through `m35`), including all 18 Phase 5 mutants (`m18` through `m35`). Run via `node rules_test/mutation/run.js`.
+  - **Flutter Tests:** 227 passed (100% passing across unit, repository, provider, widget, router, currency formatting, dark mode, and archived read-only tests).
   - **Static Analysis & Formatting:** `flutter analyze` reported 0 issues; `dart format .` verified 100% formatted.
 
 ---

@@ -128,3 +128,18 @@ String formatMinorUnits(int amountInMinorUnits, String currencyCode) {
     return formatter.format(majorAmount).trim();
   }
 }
+
+/// Formats an integer minor unit value into a signed localized currency string.
+///
+/// Positive values add a '+' prefix (e.g. "+₹450.00" or "+¥450").
+/// Zero returns formatted zero without sign (e.g. "₹0.00" or "¥0").
+/// Negative values keep standard formatting (e.g. "-₹450.00" or "-¥450").
+String formatSignedMinorUnits(int amountInMinorUnits, String currencyCode) {
+  if (amountInMinorUnits > 0) {
+    return '+${formatMinorUnits(amountInMinorUnits, currencyCode)}';
+  } else if (amountInMinorUnits < 0) {
+    return '-${formatMinorUnits(amountInMinorUnits.abs(), currencyCode)}';
+  } else {
+    return formatMinorUnits(0, currencyCode);
+  }
+}
