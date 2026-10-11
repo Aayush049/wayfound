@@ -33,6 +33,10 @@ class ExpenseCard extends StatelessWidget {
     final memberMap = {for (final m in members) m.uid: m.displayName};
     final payerName = memberMap[expense.paidBy] ?? expense.paidBy;
 
+    final hasLeftMember = members.any((m) =>
+        (m.uid == expense.paidBy || expense.participantIds.contains(m.uid)) &&
+        !m.isActive);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
@@ -114,20 +118,44 @@ class ExpenseCard extends StatelessWidget {
                       icon: const Icon(Icons.more_vert, size: 20),
                       tooltip: 'Expense Options',
                       onSelected: (val) {
-                        if (val == 'edit' && onEdit != null) {
-                          onEdit!();
+                        if (val == 'edit') {
+                          if (hasLeftMember) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Includes a member who left; delete it and add a new one',
+                                ),
+                              ),
+                            );
+                          } else if (onEdit != null) {
+                            onEdit!();
+                          }
                         } else if (val == 'delete' && onDelete != null) {
                           _confirmDelete(context);
                         }
                       },
                       itemBuilder: (ctx) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'edit',
+                          enabled: !hasLeftMember,
                           child: Row(
                             children: [
-                              Icon(Icons.edit, size: 18),
-                              SizedBox(width: 8),
-                              Text('Edit'),
+                              Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: hasLeftMember
+                                    ? theme.colorScheme.outline
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: hasLeftMember
+                                      ? theme.colorScheme.outline
+                                      : null,
+                                ),
+                              ),
                             ],
                           ),
                         ),

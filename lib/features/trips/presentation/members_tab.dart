@@ -6,6 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
+import '../../auth/data/auth_provider.dart';
+import '../../expenses/data/expenses_providers.dart';
+import '../../settlements/data/settlements_providers.dart';
+import '../../settlements/domain/leave_eligibility.dart';
+import '../../settlements/domain/settlement.dart';
 import '../data/trips_providers.dart';
 import '../domain/trip.dart';
 
@@ -24,10 +29,148 @@ class MembersTab extends ConsumerWidget {
     );
   }
 
+  Future<void> _handleLeaveTrip(
+    BuildContext context,
+    WidgetRef ref,
+    String currentUid,
+    Map<String, int> balances,
+    List<Settlement> settlements,
+  ) async {
+    final eligibility = checkLeaveEligibility(
+      uid: currentUid,
+      organizerId: trip.organizerId,
+      balances: balances,
+      settlements: settlements,
+      currencyCode: trip.currency,
+    );
+
+    if (!eligibility.allowed) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Cannot Leave Trip'),
+            content: Text(eligibility.reason ?? 'Eligibility check failed.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Leave Trip'),
+        content: const Text(
+          'Are you sure you want to leave this trip? You can rejoin later using the invite code if space allows.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final repo = ref.read(tripRepositoryProvider);
+        await repo.leaveTrip(
+          tripId: trip.id,
+          userUid: currentUid,
+          currentMemberIds: trip.memberIds,
+        );
+        if (context.mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('You have left the trip.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to leave trip: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _handleRemoveMember(
+    BuildContext context,
+    WidgetRef ref,
+    String targetUid,
+    String targetName,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remove Member'),
+        content: Text(
+          'Are you sure you want to remove $targetName from this trip?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final repo = ref.read(tripRepositoryProvider);
+        await repo.removeMember(
+          tripId: trip.id,
+          targetUid: targetUid,
+          currentMemberIds: trip.memberIds,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$targetName has been removed.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to remove member: $e')),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final currentUser = ref.watch(authUserProvider).asData?.value;
+    final currentUid = currentUser?.uid ?? '';
+    final isOrganizer = trip.organizerId == currentUid;
+
     final membersAsync = ref.watch(tripMembersProvider(trip.id));
+    final balances = ref.watch(tripBalancesProvider(trip.id));
+    final settlementsAsync = ref.watch(settlementsStreamProvider(trip.id));
+    final settlements = settlementsAsync.asData?.value ?? const <Settlement>[];
+
     final dateFormat = DateFormat('MMM d, yyyy');
 
     return Column(
@@ -136,6 +279,8 @@ class MembersTab extends ConsumerWidget {
                       ? 'Joined ${dateFormat.format(member.joinedAt!)}'
                       : 'Active';
 
+                  final canRemove = isOrganizer && !member.isOrganizer && member.uid != currentUid && !trip.archived;
+
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -202,12 +347,48 @@ class MembersTab extends ConsumerWidget {
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
+                    trailing: canRemove
+                        ? TextButton(
+                            onPressed: () => _handleRemoveMember(
+                              context,
+                              ref,
+                              member.uid,
+                              displayName,
+                            ),
+                            child: Text(
+                              'Remove',
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          )
+                        : null,
                   );
                 },
               );
             },
           ),
         ),
+
+        // Leave Trip Button for non-organizers
+        if (!isOrganizer && !trip.archived)
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: theme.colorScheme.error,
+                side: BorderSide(color: theme.colorScheme.error),
+                minimumSize: const Size.fromHeight(48),
+              ),
+              onPressed: () => _handleLeaveTrip(
+                context,
+                ref,
+                currentUid,
+                balances,
+                settlements,
+              ),
+              icon: const Icon(Icons.exit_to_app),
+              label: const Text('Leave Trip'),
+            ),
+          ),
       ],
     );
   }

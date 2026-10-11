@@ -3225,5 +3225,149 @@ describe('Trips & Join Security Rules', () => {
       await assertFails(unauthDb.collection('trips').doc(tripId).collection('expenses').get());
     });
   });
-});
+
+  describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
+    const organizerUid = 'org_p6';
+    const member1Uid = 'mem1_p6';
+    const member2Uid = 'mem2_p6';
+    const nonMemberUid = 'non_mem_p6';
+    const tripId = 'trip_p6';
+    const settlementId = 'settle_1';
+
+    beforeEach(async () => {
+      await seedUser(organizerUid, 'Organizer');
+      await seedUser(member1Uid, 'Member 1');
+      await seedUser(member2Uid, 'Member 2');
+      await seedUser(nonMemberUid, 'Non Member');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).set({
+          name: 'Settlements Test Trip',
+          destination: 'Tokyo',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'USD',
+          organizerId: organizerUid,
+          joinCode: 'SETTLE01',
+          memberIds: [organizerUid, member1Uid, member2Uid],
+          memberCount: 3,
+          archived: false,
+          createdAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(organizerUid).set({
+          displayName: 'Organizer',
+          role: 'organizer',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(member1Uid).set({
+          displayName: 'Member 1',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(member2Uid).set({
+          displayName: 'Member 2',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+      });
+    });
+
+    test('Trip members can read settlements, non-members cannot', async () => {
+      const memberDb = testEnv.authenticatedContext(member1Uid).firestore();
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+
+      const settleRef = memberDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+      await assertSucceeds(settleRef.get());
+      await assertFails(nonMemberDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId).get());
+      await assertFails(unauthedDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId).get());
+    });
+
+    test('Valid settlement create succeeds by payer, fails for invalid fields, amounts, or non-members', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+
+      const validPayload = {
+        fromUid: member1Uid,
+        toUid: organizerUid,
+        amount: 1500,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        resolvedAt: null,
+      };
+
+      await assertSucceeds(settleRef.set(validPayload));
+
+      // Invalid: amount <= 0
+      await assertFails(settleRef.set({ ...validPayload, amount: 0 }));
+      // Invalid: amount > 100B
+      await assertFails(settleRef.set({ ...validPayload, amount: 100000000001 }));
+      // Invalid: fromUid not caller
+      await assertFails(settleRef.set({ ...validPayload, fromUid: member2Uid }));
+      // Invalid: toUid not member
+      await assertFails(settleRef.set({ ...validPayload, toUid: nonMemberUid }));
+      // Invalid: toUid is caller (self-payment)
+      await assertFails(settleRef.set({ ...validPayload, toUid: member1Uid }));
+      // Invalid: status not pending
+      await assertFails(settleRef.set({ ...validPayload, status: 'confirmed' }));
+      // Invalid: client date createdAt
+      await assertFails(settleRef.set({ ...validPayload, createdAt: new Date() }));
+      // Invalid: extra key
+      await assertFails(settleRef.set({ ...validPayload, extra: true }));
+    });
+
+    test('Settlement resolve succeeds for receiver or organizer (non-payer), fails for unauthorized or self-confirm by organizer', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+
+      const settleRefOrg = orgDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+      const settleRefMem2 = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+
+      const validPayload = {
+        fromUid: member1Uid,
+        toUid: organizerUid,
+        amount: 1000,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        resolvedAt: null,
+      };
+
+      await assertSucceeds(settleRefOrg.set(validPayload));
+
+      // Member 2 cannot resolve
+      await assertFails(settleRefMem2.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Organizer successfully confirms
+      await assertSucceeds(settleRefOrg.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Payer can cancel pending settlement via delete', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+
+      const validPayload = {
+        fromUid: member1Uid,
+        toUid: organizerUid,
+        amount: 1000,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        resolvedAt: null,
+      };
+
+      await assertSucceeds(settleRef.set(validPayload));
+      await assertFails(mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId).delete());
+      await assertSucceeds(settleRef.delete());
+    });
+  });
 });

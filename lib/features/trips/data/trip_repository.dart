@@ -225,4 +225,75 @@ class TripRepository {
       );
     }
   }
+
+  /// Leaves a trip atomically.
+  Future<void> leaveTrip({
+    required String tripId,
+    required String userUid,
+    required List<String> currentMemberIds,
+  }) async {
+    final tripDocRef = _firestore.collection('trips').doc(tripId);
+    final memberDocRef = tripDocRef.collection('members').doc(userUid);
+
+    final newMemberIds = currentMemberIds.where((id) => id != userUid).toList();
+
+    final batch = _firestore.batch();
+    batch.update(tripDocRef, {
+      'memberIds': newMemberIds,
+      'memberCount': newMemberIds.length,
+    });
+    batch.update(memberDocRef, {
+      'status': 'left',
+    });
+
+    await batch.commit();
+  }
+
+  /// Removes a member from a trip atomically (organizer action).
+  Future<void> removeMember({
+    required String tripId,
+    required String targetUid,
+    required List<String> currentMemberIds,
+  }) async {
+    final tripDocRef = _firestore.collection('trips').doc(tripId);
+    final memberDocRef = tripDocRef.collection('members').doc(targetUid);
+
+    final newMemberIds = currentMemberIds.where((id) => id != targetUid).toList();
+
+    final batch = _firestore.batch();
+    batch.update(tripDocRef, {
+      'memberIds': newMemberIds,
+      'memberCount': newMemberIds.length,
+    });
+    batch.update(memberDocRef, {
+      'status': 'left',
+    });
+
+    await batch.commit();
+  }
+
+  /// Streams all members of a trip (active and left).
+  Stream<List<Member>> watchAllMembers(String tripId) {
+    return _firestore
+        .collection('trips')
+        .doc(tripId)
+        .collection('members')
+        .snapshots()
+        .map((snapshot) {
+          final members = snapshot.docs
+              .map((doc) => Member.fromFirestore(doc))
+              .toList();
+
+          members.sort((a, b) {
+            if (a.isOrganizer && !b.isOrganizer) return -1;
+            if (!a.isOrganizer && b.isOrganizer) return 1;
+            if (a.joinedAt != null && b.joinedAt != null) {
+              return a.joinedAt!.compareTo(b.joinedAt!);
+            }
+            return 0;
+          });
+
+          return members;
+        });
+  }
 }

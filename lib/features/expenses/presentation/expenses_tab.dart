@@ -34,7 +34,7 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
     final currentUid = currentUser?.uid ?? '';
 
     final expensesAsync = ref.watch(expensesStreamProvider(widget.trip.id));
-    final membersAsync = ref.watch(tripMembersProvider(widget.trip.id));
+    final membersAsync = ref.watch(tripAllMembersProvider(widget.trip.id));
 
     final isArchived = widget.trip.archived;
     final isOrganizer = widget.trip.isOrganizer(currentUid);
@@ -88,7 +88,8 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
                       if (expenses.isEmpty) {
                         return AppEmpty(
                           title: 'No expenses yet',
-                          message: 'Record group expenses to easily split costs among members.',
+                          message:
+                              'Record group expenses to easily split costs among members.',
                           icon: Icons.account_balance_wallet_outlined,
                           actionLabel: isArchived ? null : 'Add Expense',
                           onAction: isArchived

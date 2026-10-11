@@ -37,3 +37,12 @@ final tripMembersProvider = StreamProvider.family<List<Member>, String>((
   final repo = ref.watch(tripRepositoryProvider);
   return repo.watchMembers(tripId);
 });
+
+/// Streams all members (active and left) of a trip by ID.
+final tripAllMembersProvider = StreamProvider.family<List<Member>, String>((
+  ref,
+  tripId,
+) {
+  final repo = ref.watch(tripRepositoryProvider);
+  return repo.watchAllMembers(tripId);
+});
