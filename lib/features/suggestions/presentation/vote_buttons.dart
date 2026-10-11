@@ -31,8 +31,10 @@ class VoteButtons extends StatelessWidget {
     final activeColor = colorScheme.secondary;
     final inactiveColor = colorScheme.onSurfaceVariant;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         // Upvote Button
         Semantics(

@@ -14,6 +14,28 @@ class ExpenseValidators {
     return null;
   }
 
+  /// Validates expense amount string input using [tryParseMinorUnits] for currency [currencyCode],
+  /// or validates integer minor units.
+  static String? validateAmountInput(String? input, String currencyCode) {
+    if (input == null || input.trim().isEmpty) {
+      return 'Amount is required';
+    }
+    final (val, err) = tryParseMinorUnits(input, currencyCode);
+    if (err != null) {
+      return err;
+    }
+    if (val == null) {
+      return 'Amount is required';
+    }
+    if (val <= 0) {
+      return 'Amount must be greater than 0';
+    }
+    if (val > kMaxMinorUnitsCap) {
+      return 'Amount exceeds maximum allowed limit';
+    }
+    return null;
+  }
+
   /// Validates expense amount in minor units: integer, 1 to 100,000,000,000.
   static String? validateAmount(int? amountInMinorUnits) {
     if (amountInMinorUnits == null) {

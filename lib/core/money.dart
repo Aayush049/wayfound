@@ -80,7 +80,8 @@ int? parseMinorUnits(String? input, String currencyCode) {
       if (frac == null) {
         throw const FormatException('Invalid number format.');
       }
-      final totalMinorUnits = whole * 100 + frac;
+      final multiplier = digits == 1 ? 10 : 100;
+      final totalMinorUnits = whole * multiplier + frac;
       if (totalMinorUnits < 0) {
         throw const FormatException('Amount cannot be negative.');
       }
@@ -96,12 +97,35 @@ int? parseMinorUnits(String? input, String currencyCode) {
       if (whole < 0) {
         throw const FormatException('Amount cannot be negative.');
       }
-      final totalMinorUnits = whole * 100;
+      final multiplier = digits == 1 ? 10 : 100;
+      final totalMinorUnits = whole * multiplier;
       if (totalMinorUnits > kMaxMinorUnitsCap) {
         throw const FormatException('Amount exceeds maximum allowed limit.');
       }
       return totalMinorUnits;
     }
+  }
+}
+
+/// Safely parses a user input string into an integer minor unit value for the given [currencyCode].
+///
+/// Returns a Record `(int? value, String? error)` where `value` is non-null only on success,
+/// and `error` is non-null if parsing failed. Returns `(null, null)` if input is null or empty.
+(int? value, String? error) tryParseMinorUnits(
+  String? input,
+  String currencyCode,
+) {
+  if (input == null) return (null, null);
+  final trimmed = input.trim();
+  if (trimmed.isEmpty) return (null, null);
+
+  try {
+    final val = parseMinorUnits(trimmed, currencyCode);
+    return (val, null);
+  } on FormatException catch (e) {
+    return (null, e.message);
+  } catch (e) {
+    return (null, 'Invalid number format.');
   }
 }
 

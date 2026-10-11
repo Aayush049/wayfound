@@ -118,12 +118,13 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
   Future<void> _submit(String currency, List<String> activeMemberUids) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final amountInMinorUnits = parseMinorUnits(
+    final (amountInMinorUnits, parseErr) = tryParseMinorUnits(
       _amountController.text.trim(),
       currency,
     );
 
-    final amountErr = ExpenseValidators.validateAmount(amountInMinorUnits);
+    final amountErr =
+        parseErr ?? ExpenseValidators.validateAmount(amountInMinorUnits);
     if (amountErr != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -285,8 +286,8 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
             kCurrencyDetails[trip.currency.toUpperCase()]?.symbol ??
             trip.currency;
 
-        // Compute live split preview
-        final parsedAmount = parseMinorUnits(
+        // Compute live split preview safely
+        final (parsedAmount, _) = tryParseMinorUnits(
           _amountController.text.trim(),
           trip.currency,
         );
@@ -342,11 +343,12 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                     ),
                     onChanged: (val) {
                       setState(() {}); // Trigger live share preview rebuild
+                      _formKey.currentState?.validate();
                     },
-                    validator: (val) {
-                      final parsed = parseMinorUnits(val, trip.currency);
-                      return ExpenseValidators.validateAmount(parsed);
-                    },
+                    validator: (val) => ExpenseValidators.validateAmountInput(
+                      val,
+                      trip.currency,
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -397,8 +399,11 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   const SizedBox(height: 24),
 
                   // Participants Header & Select All Checkbox
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
                     children: [
                       Text(
                         'Split Among (${_selectedParticipants.length}/${activeMembers.length})',
@@ -407,6 +412,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                         ),
                       ),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Checkbox(
                             value: allSelected,
@@ -458,7 +464,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Live Share Preview Card
+                  // Live Share Preview Card (hidden when amount is invalid or zero/empty)
                   if (_selectedParticipants.isNotEmpty &&
                       parsedAmount != null &&
                       parsedAmount > 0) ...[
@@ -492,10 +498,14 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      name,
-                                      style: theme.textTheme.bodyMedium,
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: theme.textTheme.bodyMedium,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
+                                    const SizedBox(width: 8),
                                     Text(
                                       formattedShare,
                                       style: theme.textTheme.bodyMedium

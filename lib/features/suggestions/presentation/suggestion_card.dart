@@ -157,8 +157,11 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Category chip, Score badge & Overflow menu
-            Row(
+            // Header: Wrap containing all header elements (category chip, day chip, score badge, menu)
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Chip(
                   avatar: Icon(categoryInfo.icon, size: 16),
@@ -167,8 +170,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                   visualDensity: VisualDensity.compact,
                 ),
                 if (widget.suggestion.isScheduled &&
-                    widget.suggestion.dayIndex != null) ...[
-                  const SizedBox(width: 6),
+                    widget.suggestion.dayIndex != null)
                   Chip(
                     avatar: Icon(
                       Icons.event,
@@ -185,8 +187,6 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                     padding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,
                   ),
-                ],
-                const Spacer(),
                 // Score Badge
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -204,10 +204,11 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                     ),
                   ),
                 ),
-                if (_canEditOrDelete) ...[
-                  const SizedBox(width: 4),
+                if (_canEditOrDelete)
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                     onSelected: (value) {
                       if (value == 'edit') {
                         context.push(
@@ -237,7 +238,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                               size: 20,
                               color: theme.colorScheme.error,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Delete',
                               style: TextStyle(color: theme.colorScheme.error),
@@ -247,7 +248,6 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                       ),
                     ],
                   ),
-                ],
               ],
             ),
 
@@ -274,11 +274,11 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
 
             const SizedBox(height: 12),
 
-            // Footer: Cost & Author info on left, Vote buttons on right
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
+            // Footer: Cost & Author info & Vote buttons in responsive layout
+            LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 340) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (costText != null) ...[
@@ -302,23 +302,71 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                         const SizedBox(height: 2),
                       ],
                       Text(
-                        'By $_authorName',
+                        'Suggested by $_authorName',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: VoteButtons(
+                          upCount: widget.suggestion.upCount,
+                          downCount: widget.suggestion.downCount,
+                          myVote: myVote,
+                          onUpVote: () => _handleVote(1),
+                          onDownVote: () => _handleVote(-1),
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                VoteButtons(
-                  upCount: widget.suggestion.upCount,
-                  downCount: widget.suggestion.downCount,
-                  myVote: myVote,
-                  isInFlight: _isVoteInFlight,
-                  onUpVote: () => _handleVote(1),
-                  onDownVote: () => _handleVote(-1),
-                ),
-              ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (costText != null) ...[
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.payments_outlined,
+                                  size: 16,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  costText,
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                          ],
+                          Text(
+                            'Suggested by $_authorName',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    VoteButtons(
+                      upCount: widget.suggestion.upCount,
+                      downCount: widget.suggestion.downCount,
+                      myVote: myVote,
+                      onUpVote: () => _handleVote(1),
+                      onDownVote: () => _handleVote(-1),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

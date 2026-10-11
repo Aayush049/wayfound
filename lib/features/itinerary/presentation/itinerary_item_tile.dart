@@ -93,55 +93,54 @@ class ItineraryItemTile extends StatelessWidget {
             ),
             // Actions menu for organizer on non-archived trips
             if (isOrganizer && !isArchived)
-              Semantics(
-                label: 'Item options for ${suggestion.title}',
-                child: PopupMenuButton<String>(
-                  tooltip: 'Options',
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  onSelected: (value) {
-                    if (value == 'move') {
-                      onMoveToDay?.call();
-                    } else if (value == 'unschedule') {
-                      onUnschedule?.call();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'move',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 20,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('Move to another day'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'unschedule',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.event_busy_outlined,
-                            size: 20,
-                            color: theme.colorScheme.error,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Remove from itinerary',
-                            style: TextStyle(color: theme.colorScheme.error),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+              PopupMenuButton<String>(
+                tooltip: 'Options',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(
+                  Icons.more_vert,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
+                onSelected: (value) {
+                  if (value == 'move') {
+                    onMoveToDay?.call();
+                  } else if (value == 'unschedule') {
+                    onUnschedule?.call();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'move',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 20,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('Move to another day'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'unschedule',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.event_busy_outlined,
+                          size: 20,
+                          color: theme.colorScheme.error,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Remove from itinerary',
+                          style: TextStyle(color: theme.colorScheme.error),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
           ],
         ),
