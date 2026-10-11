@@ -157,15 +157,14 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Chips in Expanded Wrap, score badge and menu pinned right
+            // Header: Row 1 (chips wrap, menu top-right), Row 2 (Score badge left-aligned)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // First row: chips in Expanded Wrap, score badge + menu on right
+                // Row 1: Chips in Expanded Wrap, PopupMenuButton pinned to top-right when present
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Chips in Expanded Wrap (category, day)
                     Expanded(
                       child: Wrap(
                         spacing: 8,
@@ -202,76 +201,76 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                         ],
                       ),
                     ),
-                    // Score Badge and Menu pinned to right
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            'Score: ${widget.suggestion.score >= 0 ? '+' : ''}${widget.suggestion.score}',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                    if (_canEditOrDelete) ...[
+                      const SizedBox(width: 8),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            context.push(
+                              '/trip/${widget.suggestion.tripId}/suggestions/${widget.suggestion.id}/edit',
+                            );
+                          } else if (value == 'delete') {
+                            _confirmDelete();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit, size: 20),
+                                SizedBox(width: 8),
+                                Text('Edit'),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        if (_canEditOrDelete)
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                context.push(
-                                  '/trip/${widget.suggestion.tripId}/suggestions/${widget.suggestion.id}/edit',
-                                );
-                              } else if (value == 'delete') {
-                                _confirmDelete();
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'edit',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.edit, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
-                                  ],
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  size: 20,
+                                  color: theme.colorScheme.error,
                                 ),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      size: 20,
-                                      color: theme.colorScheme.error,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.error,
-                                      ),
-                                    ),
-                                  ],
+                                SizedBox(width: 8),
+                                Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ],
+                ),
+                const SizedBox(height: 8),
+                // Row 2: Score badge left-aligned
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Score: ${widget.suggestion.score >= 0 ? '+' : ''}${widget.suggestion.score}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
