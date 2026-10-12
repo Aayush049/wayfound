@@ -261,6 +261,7 @@ void main() {
           overrides: [
             firestoreProvider.overrideWithValue(fakeFirestore),
             tripMembersProvider(tripId).overrideWithValue(AsyncData(members)),
+            tripAllMembersProvider(tripId).overrideWithValue(AsyncData(members)),
             expensesStreamProvider(tripId)
                 .overrideWithValue(AsyncData([sampleExpense])),
           ],
