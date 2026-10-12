@@ -3577,3 +3577,4 @@ describe('Trips & Join Security Rules', () => {
     });
   });
 });
+});
