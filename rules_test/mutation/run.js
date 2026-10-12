@@ -325,8 +325,8 @@ const mutations = [
     name: 'm32',
     description: 'expense delete archived check',
     relevantTarget: 'Yes (Expense delete denied on archived trip)',
-    find: `allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));\n      }\n    }`,
-    replace: `allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));\n      }\n    }`,
+    find: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));`,
+    replace: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));`,
   },
   {
     name: 'm33',

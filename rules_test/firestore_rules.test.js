@@ -3369,5 +3369,211 @@ describe('Trips & Join Security Rules', () => {
       await assertFails(mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId).delete());
       await assertSucceeds(settleRef.delete());
     });
+
+    // Phase 6 Leave / Remove Tests
+    test('Member leaves successfully (batch update + member status left)', async () => {
+      // Setup extra members for leave/remove testing
+      const leaveMemberUid = 'leave_mem_p6';
+      const removedMemberUid = 'removed_mem_p6';
+      await seedUser(leaveMemberUid, 'Leave Member');
+      await seedUser(removedMemberUid, 'Removed Member');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid, member2Uid, leaveMemberUid, removedMemberUid],
+          memberCount: 5,
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(leaveMemberUid).set({
+          displayName: 'Leave Member',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(removedMemberUid).set({
+          displayName: 'Removed Member',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+      });
+
+      const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
+      const tripRef = leaveDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(leaveMemberUid);
+
+      await assertSucceeds(tripRef.update({
+        memberIds: [organizerUid, member1Uid, member2Uid, removedMemberUid],
+        memberCount: 4,
+      }));
+
+      const tripAfter = await tripRef.get();
+      expect(tripAfter.data().memberIds).toEqual([organizerUid, member1Uid, member2Uid, removedMemberUid]);
+      expect(tripAfter.data().memberCount).toEqual(4);
+
+      const memberAfter = await memberRef.get();
+      expect(memberAfter.data().status).toEqual('left');
+    });
+
+    test('Organizer removes member successfully', async () => {
+      const removedMemberUid = 'removed_mem_p6_2';
+      await seedUser(removedMemberUid, 'Removed Member 2');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid, member2Uid, removedMemberUid],
+          memberCount: 4,
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(removedMemberUid).set({
+          displayName: 'Removed Member 2',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+      });
+
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(removedMemberUid);
+
+      await assertSucceeds(tripRef.update({
+        memberIds: [organizerUid, member1Uid, member2Uid],
+        memberCount: 3,
+      }));
+
+      const tripAfter = await tripRef.get();
+      expect(tripAfter.data().memberIds).toEqual([organizerUid, member1Uid, member2Uid]);
+      expect(tripAfter.data().memberCount).toEqual(3);
+
+      const memberAfter = await memberRef.get();
+      expect(memberAfter.data().status).toEqual('left');
+    });
+
+    test('Plain member cannot remove another member', async () => {
+      const member1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const tripRef = member1Db.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('Cannot remove the organizer (including organizer leaving)', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [member1Uid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('Padding attack denial - cannot add uid while removing', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member1Uid, member1Uid, member2Uid],
+        memberCount: 3,
+      }));
+    });
+
+    test('Padding attack denial - removing two uids at once', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid],
+        memberCount: 1,
+      }));
+    });
+
+    test('memberCount must decrease by exactly 1', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('Cannot change other trip fields during leave/remove', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid],
+        memberCount: 2,
+        name: 'Hacked',
+      }));
+    });
+
+    test('Cannot leave/remove from archived trip', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: false });
+      });
+    });
+
+    test('Non-member cannot leave/remove', async () => {
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const tripRef = nonMemberDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('Signed-out user cannot leave/remove', async () => {
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+      const tripRef = unauthDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('Marking status "left" WITHOUT removing uid from memberIds is denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const memberRef = orgDb.collection('trips').doc(tripId).collection('members').doc(member2Uid);
+
+      await assertFails(memberRef.update({ status: 'left' }));
+    });
+
+    test('Removing uid from memberIds WITHOUT marking status "left" is denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid],
+        memberCount: 1,
+      }));
+    });
+
+    test('members/{uid} updates changing keys other than status are denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const memberRef = orgDb.collection('trips').doc(tripId).collection('members').doc(member2Uid);
+
+      await assertFails(memberRef.update({
+        displayName: 'Hacked',
+        status: 'left',
+      }));
+    });
   });
 });
