@@ -3322,8 +3322,10 @@ describe('Trips & Join Security Rules', () => {
 
     test('Settlement resolve succeeds for receiver or organizer (non-payer), fails for unauthorized or self-confirm by organizer', async () => {
       const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
       const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
 
+      const settleRefMem1 = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
       const settleRefOrg = orgDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
       const settleRefMem2 = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
 
@@ -3336,7 +3338,8 @@ describe('Trips & Join Security Rules', () => {
         resolvedAt: null,
       };
 
-      await assertSucceeds(settleRefOrg.set(validPayload));
+      // Created by payer (member1Uid)
+      await assertSucceeds(settleRefMem1.set(validPayload));
 
       // Member 2 cannot resolve
       await assertFails(settleRefMem2.update({
@@ -3399,19 +3402,23 @@ describe('Trips & Join Security Rules', () => {
       });
 
       const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
       const tripRef = leaveDb.collection('trips').doc(tripId);
       const memberRef = tripRef.collection('members').doc(leaveMemberUid);
 
-      await assertSucceeds(tripRef.update({
+      const batch = leaveDb.batch();
+      batch.update(tripRef, {
         memberIds: [organizerUid, member1Uid, member2Uid, removedMemberUid],
         memberCount: 4,
-      }));
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertSucceeds(batch.commit());
 
-      const tripAfter = await tripRef.get();
+      const tripAfter = await orgDb.collection('trips').doc(tripId).get();
       expect(tripAfter.data().memberIds).toEqual([organizerUid, member1Uid, member2Uid, removedMemberUid]);
       expect(tripAfter.data().memberCount).toEqual(4);
 
-      const memberAfter = await memberRef.get();
+      const memberAfter = await orgDb.collection('trips').doc(tripId).collection('members').doc(leaveMemberUid).get();
       expect(memberAfter.data().status).toEqual('left');
     });
 
@@ -3437,10 +3444,13 @@ describe('Trips & Join Security Rules', () => {
       const tripRef = orgDb.collection('trips').doc(tripId);
       const memberRef = tripRef.collection('members').doc(removedMemberUid);
 
-      await assertSucceeds(tripRef.update({
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
         memberIds: [organizerUid, member1Uid, member2Uid],
         memberCount: 3,
-      }));
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertSucceeds(batch.commit());
 
       const tripAfter = await tripRef.get();
       expect(tripAfter.data().memberIds).toEqual([organizerUid, member1Uid, member2Uid]);
@@ -3576,4 +3586,5 @@ describe('Trips & Join Security Rules', () => {
       }));
     });
   });
+});
 });

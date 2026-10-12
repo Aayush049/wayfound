@@ -4,10 +4,7 @@ class LeaveEligibilityResult {
   final bool allowed;
   final String? reason;
 
-  const LeaveEligibilityResult({
-    required this.allowed,
-    this.reason,
-  });
+  const LeaveEligibilityResult({required this.allowed, this.reason});
 
   const LeaveEligibilityResult.allowed() : allowed = true, reason = null;
   const LeaveEligibilityResult.denied(this.reason) : allowed = false;

@@ -242,9 +242,7 @@ class TripRepository {
       'memberIds': newMemberIds,
       'memberCount': newMemberIds.length,
     });
-    batch.update(memberDocRef, {
-      'status': 'left',
-    });
+    batch.update(memberDocRef, {'status': 'left'});
 
     await batch.commit();
   }
@@ -258,16 +256,16 @@ class TripRepository {
     final tripDocRef = _firestore.collection('trips').doc(tripId);
     final memberDocRef = tripDocRef.collection('members').doc(targetUid);
 
-    final newMemberIds = currentMemberIds.where((id) => id != targetUid).toList();
+    final newMemberIds = currentMemberIds
+        .where((id) => id != targetUid)
+        .toList();
 
     final batch = _firestore.batch();
     batch.update(tripDocRef, {
       'memberIds': newMemberIds,
       'memberCount': newMemberIds.length,
     });
-    batch.update(memberDocRef, {
-      'status': 'left',
-    });
+    batch.update(memberDocRef, {'status': 'left'});
 
     await batch.commit();
   }

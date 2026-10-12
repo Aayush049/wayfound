@@ -12,14 +12,29 @@ void main() {
     test('validateSettlementAmount validates correct amounts and errors', () {
       // USD supports 2 decimals
       expect(validateSettlementAmount('10.50', 'USD', 2000), null);
-      expect(validateSettlementAmount('0', 'USD', 2000), 'Amount must be greater than zero.');
-      expect(validateSettlementAmount('-5', 'USD', 2000), 'Amount cannot be negative.');
-      expect(validateSettlementAmount('abc', 'USD', 2000), 'Invalid number format.');
-      expect(validateSettlementAmount('10.555', 'USD', 2000), 'Amount cannot have more than 2 decimal places.');
+      expect(
+        validateSettlementAmount('0', 'USD', 2000),
+        'Amount must be greater than zero.',
+      );
+      expect(
+        validateSettlementAmount('-5', 'USD', 2000),
+        'Amount cannot be negative.',
+      );
+      expect(
+        validateSettlementAmount('abc', 'USD', 2000),
+        'Invalid number format.',
+      );
+      expect(
+        validateSettlementAmount('10.555', 'USD', 2000),
+        'Amount cannot have more than 2 decimal places.',
+      );
 
       // JPY supports 0 decimals
       expect(validateSettlementAmount('1000', 'JPY', 5000), null);
-      expect(validateSettlementAmount('10.5', 'JPY', 5000), 'JPY does not support decimal amounts.');
+      expect(
+        validateSettlementAmount('10.5', 'JPY', 5000),
+        'JPY does not support decimal amounts.',
+      );
     });
 
     test('tryParseMinorUnits parses currency amounts correctly', () {
@@ -99,7 +114,12 @@ void main() {
     test('Confirmed settlements reduce net debt balances', () {
       final now = DateTime.now();
       final members = [
-        Member(uid: 'u1', displayName: 'Alice', role: 'organizer', status: 'active'),
+        Member(
+          uid: 'u1',
+          displayName: 'Alice',
+          role: 'organizer',
+          status: 'active',
+        ),
         Member(uid: 'u2', displayName: 'Bob', role: 'member', status: 'active'),
       ];
 
@@ -127,7 +147,11 @@ void main() {
         ConfirmedSettlementInput(fromUid: 'u2', toUid: 'u1', amount: 500),
       ];
 
-      balances = computeBalances(expenses, members, confirmedSettlements: confirmedSettlements);
+      balances = computeBalances(
+        expenses,
+        members,
+        confirmedSettlements: confirmedSettlements,
+      );
       expect(balances['u1'], 0);
       expect(balances['u2'], 0);
 

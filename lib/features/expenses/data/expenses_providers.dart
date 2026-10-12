@@ -35,14 +35,20 @@ final tripBalancesProvider = Provider.family<Map<String, int>, String>((
   final members = membersAsync.asData?.value ?? const <Member>[];
 
   final settlementInputs = confirmedSettlements
-      .map((s) => ConfirmedSettlementInput(
-            fromUid: s.fromUid,
-            toUid: s.toUid,
-            amount: s.amount,
-          ))
+      .map(
+        (s) => ConfirmedSettlementInput(
+          fromUid: s.fromUid,
+          toUid: s.toUid,
+          amount: s.amount,
+        ),
+      )
       .toList();
 
-  return computeBalances(expenses, members, confirmedSettlements: settlementInputs);
+  return computeBalances(
+    expenses,
+    members,
+    confirmedSettlements: settlementInputs,
+  );
 });
 
 /// Derived provider computing minimal suggested payments for a trip from balances.

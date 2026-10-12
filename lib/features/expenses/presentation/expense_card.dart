@@ -33,9 +33,11 @@ class ExpenseCard extends StatelessWidget {
     final memberMap = {for (final m in members) m.uid: m.displayName};
     final payerName = memberMap[expense.paidBy] ?? expense.paidBy;
 
-    final hasLeftMember = members.any((m) =>
-        (m.uid == expense.paidBy || expense.participantIds.contains(m.uid)) &&
-        !m.isActive);
+    final hasLeftMember = members.any(
+      (m) =>
+          (m.uid == expense.paidBy || expense.participantIds.contains(m.uid)) &&
+          !m.isActive,
+    );
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),

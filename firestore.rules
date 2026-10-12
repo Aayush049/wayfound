@@ -94,14 +94,14 @@ service cloud.firestore {
         && request.resource.data.memberCount is number
         && request.resource.data.memberCount == resource.data.memberCount - 1
         && resource.data.memberIds.size() == resource.data.memberCount
-        && resource.data.memberIds.removeAll(resource.data.memberIds).size() == 1
-        && (resource.data.memberIds.removeAll(resource.data.memberIds)[0] == request.auth.uid || isTripOrganizer(tripId))
-        && !(resource.data.memberIds.removeAll(resource.data.memberIds)[0] == resource.data.organizerId && resource.data.memberIds.removeAll(resource.data.memberIds)[0] == request.auth.uid)
-        && request.resource.data.memberIds.toSet().size() == resource.data.memberCount
+        && resource.data.memberIds.removeAll(request.resource.data.memberIds).size() == 1
+        && (resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid || get(/databases/$(database)/documents/trips/$(tripId)).data.organizerId == request.auth.uid)
+        && !(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == resource.data.organizerId && resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid)
+        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount
         && resource.data.archived == false
-        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(resource.data.memberIds)[0]))
-        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(resource.data.memberIds)[0])).data.status == 'left'
-        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);
+        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))
+        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'
+        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);
 
       // Join update (the high-risk rule)
       // Important: guard against missing resource fields during create writes.
@@ -308,7 +308,7 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
           && request.resource.data.status in ['confirmed', 'rejected']
           && request.resource.data.resolvedAt == request.time
-          && (request.auth.uid == resource.data.toUid || (isTripOrganizer(tripId) && resource.data.fromUid != request.auth.uid));
+          && (request.auth.uid == resource.data.toUid || (request.auth.uid == get(/databases/$(database)/documents/trips/$(tripId)).data.organizerId && resource.data.fromUid != request.auth.uid));
 
         allow delete: if isSignedIn()
           && isTripNotArchived(tripId)

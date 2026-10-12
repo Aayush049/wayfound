@@ -99,9 +99,9 @@ class MembersTab extends ConsumerWidget {
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to leave trip: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to leave trip: $e')));
         }
       }
     }
@@ -279,7 +279,11 @@ class MembersTab extends ConsumerWidget {
                       ? 'Joined ${dateFormat.format(member.joinedAt!)}'
                       : 'Active';
 
-                  final canRemove = isOrganizer && !member.isOrganizer && member.uid != currentUid && !trip.archived;
+                  final canRemove =
+                      isOrganizer &&
+                      !member.isOrganizer &&
+                      member.uid != currentUid &&
+                      !trip.archived;
 
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(

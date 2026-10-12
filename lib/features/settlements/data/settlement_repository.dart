@@ -17,8 +17,11 @@ class SettlementRepository {
         .collection('settlements')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Settlement.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Settlement.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   Future<void> createPending({

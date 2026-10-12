@@ -5,12 +5,14 @@ import 'settlement_repository.dart';
 
 final settlementsStreamProvider =
     StreamProvider.family<List<Settlement>, String>((ref, tripId) {
-  final repo = ref.watch(settlementRepositoryProvider);
-  return repo.watchSettlements(tripId);
-});
+      final repo = ref.watch(settlementRepositoryProvider);
+      return repo.watchSettlements(tripId);
+    });
 
-final confirmedSettlementsProvider =
-    Provider.family<List<Settlement>, String>((ref, tripId) {
+final confirmedSettlementsProvider = Provider.family<List<Settlement>, String>((
+  ref,
+  tripId,
+) {
   final settlementsAsync = ref.watch(settlementsStreamProvider(tripId));
   return settlementsAsync.maybeWhen(
     data: (settlements) => settlements
@@ -20,13 +22,14 @@ final confirmedSettlementsProvider =
   );
 });
 
-final pendingSettlementsProvider =
-    Provider.family<List<Settlement>, String>((ref, tripId) {
+final pendingSettlementsProvider = Provider.family<List<Settlement>, String>((
+  ref,
+  tripId,
+) {
   final settlementsAsync = ref.watch(settlementsStreamProvider(tripId));
   return settlementsAsync.maybeWhen(
-    data: (settlements) => settlements
-        .where((s) => s.status == SettlementStatus.pending)
-        .toList(),
+    data: (settlements) =>
+        settlements.where((s) => s.status == SettlementStatus.pending).toList(),
     orElse: () => [],
   );
 });

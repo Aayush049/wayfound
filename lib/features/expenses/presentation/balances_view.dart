@@ -311,11 +311,8 @@ class BalancesView extends ConsumerWidget {
                     subtitle: Text(formattedPayment),
                     trailing: isMyPayment && !trip.archived
                         ? FilledButton.tonal(
-                            onPressed: () => _showMarkAsPaidSheet(
-                              context,
-                              p,
-                              toName,
-                            ),
+                            onPressed: () =>
+                                _showMarkAsPaidSheet(context, p, toName),
                             child: const Text('Mark as Paid'),
                           )
                         : Text(
@@ -363,7 +360,10 @@ class BalancesView extends ConsumerWidget {
                   final s = settlements[idx];
                   final fromName = memberMap[s.fromUid] ?? s.fromUid;
                   final toName = memberMap[s.toUid] ?? s.toUid;
-                  final formattedAmount = formatMinorUnits(s.amount, trip.currency);
+                  final formattedAmount = formatMinorUnits(
+                    s.amount,
+                    trip.currency,
+                  );
 
                   final String statusLabel;
                   final Color statusColor;
@@ -389,8 +389,10 @@ class BalancesView extends ConsumerWidget {
 
                   final isMyPayment = s.fromUid == currentUid;
                   final isMyReceiver = s.toUid == currentUid;
-                  final isOrganizer = trip.organizerId == currentUid && s.fromUid != currentUid;
-                  final canActOnPending = s.status == SettlementStatus.pending && !trip.archived;
+                  final isOrganizer =
+                      trip.organizerId == currentUid && s.fromUid != currentUid;
+                  final canActOnPending =
+                      s.status == SettlementStatus.pending && !trip.archived;
 
                   return Padding(
                     padding: const EdgeInsets.all(12),
@@ -447,10 +449,14 @@ class BalancesView extends ConsumerWidget {
                                         settlementId: s.id,
                                       );
                                 },
-                                icon: const Icon(Icons.cancel_outlined, size: 16),
+                                icon: const Icon(
+                                  Icons.cancel_outlined,
+                                  size: 16,
+                                ),
                                 label: const Text('Cancel'),
                               ),
-                            if (canActOnPending && (isMyReceiver || isOrganizer)) ...[
+                            if (canActOnPending &&
+                                (isMyReceiver || isOrganizer)) ...[
                               TextButton(
                                 onPressed: () async {
                                   await ref
@@ -463,7 +469,9 @@ class BalancesView extends ConsumerWidget {
                                 },
                                 child: Text(
                                   'Reject',
-                                  style: TextStyle(color: theme.colorScheme.error),
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 4),

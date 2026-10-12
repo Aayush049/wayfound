@@ -15,9 +15,7 @@ Map<String, dynamic> buildCreateSettlementPayload({
   };
 }
 
-Map<String, dynamic> buildResolveSettlementPayload({
-  required bool confirmed,
-}) {
+Map<String, dynamic> buildResolveSettlementPayload({required bool confirmed}) {
   return {
     'status': confirmed ? 'confirmed' : 'rejected',
     'resolvedAt': FieldValue.serverTimestamp(),
