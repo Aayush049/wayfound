@@ -37,6 +37,21 @@ beforeEach(async () => {
   }
 });
 
+async function seedUser(uid, name = 'Test User', photo = null) {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await context
+      .firestore()
+      .collection('users')
+      .doc(uid)
+      .set({
+        displayName: name,
+        email: `${uid}@example.com`,
+        photoUrl: photo,
+        createdAt: new Date(),
+      });
+  });
+}
+
 describe('Users Collection Security Rules', () => {
   const userId = 'user_123';
   const userEmail = 'user123@example.com';
@@ -2387,8 +2402,10 @@ describe('Trips & Join Security Rules', () => {
       await assertSucceeds(batchValid.commit());
     });
   });
+});
+});
 
-  describe('Phase 4 itinerary rules', () => {
+describe('Phase 4 itinerary rules', () => {
     const tripId = 'trip_itinerary_1';
     const organizerUid = 'organizer_itin';
     const memberUid = 'member_itin';
@@ -2684,7 +2701,7 @@ describe('Trips & Join Security Rules', () => {
     });
   });
 
-  describe('Phase 5 expense rules', () => {
+describe('Phase 5 expense rules', () => {
     const tripId = 'trip_expense_1';
     const organizerUid = 'organizer_exp';
     const creatorUid = 'creator_exp';
@@ -3226,7 +3243,7 @@ describe('Trips & Join Security Rules', () => {
     });
   });
 
-  describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
+describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
     const organizerUid = 'org_p6';
     const member1Uid = 'mem1_p6';
     const member2Uid = 'mem2_p6';
@@ -3276,101 +3293,409 @@ describe('Trips & Join Security Rules', () => {
       });
     });
 
-    test('Trip members can read settlements, non-members cannot', async () => {
+    test('Settlement read: member allowed', async () => {
       const memberDb = testEnv.authenticatedContext(member1Uid).firestore();
-      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
-      const unauthedDb = testEnv.unauthenticatedContext().firestore();
-
       const settleRef = memberDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
       await assertSucceeds(settleRef.get());
-      await assertFails(nonMemberDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId).get());
-      await assertFails(unauthedDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId).get());
     });
 
-    test('Valid settlement create succeeds by payer, fails for invalid fields, amounts, or non-members', async () => {
-      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
-      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+    test('Settlement read: non-member denied', async () => {
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const settleRef = nonMemberDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+      await assertFails(settleRef.get());
+    });
 
-      const validPayload = {
+    test('Settlement read: unauthenticated denied', async () => {
+      const unauthedDb = testEnv.unauthenticatedContext().firestore();
+      const settleRef = unauthedDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+      await assertFails(settleRef.get());
+    });
+
+    function getValidSettlementPayload(overrides = {}) {
+      return {
         fromUid: member1Uid,
         toUid: organizerUid,
         amount: 1500,
         status: 'pending',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         resolvedAt: null,
+        ...overrides,
       };
+    }
 
-      await assertSucceeds(settleRef.set(validPayload));
-
-      // Invalid: amount <= 0
-      await assertFails(settleRef.set({ ...validPayload, amount: 0 }));
-      // Invalid: amount > 100B
-      await assertFails(settleRef.set({ ...validPayload, amount: 100000000001 }));
-      // Invalid: fromUid not caller
-      await assertFails(settleRef.set({ ...validPayload, fromUid: member2Uid }));
-      // Invalid: toUid not member
-      await assertFails(settleRef.set({ ...validPayload, toUid: nonMemberUid }));
-      // Invalid: toUid is caller (self-payment)
-      await assertFails(settleRef.set({ ...validPayload, toUid: member1Uid }));
-      // Invalid: status not pending
-      await assertFails(settleRef.set({ ...validPayload, status: 'confirmed' }));
-      // Invalid: client date createdAt
-      await assertFails(settleRef.set({ ...validPayload, createdAt: new Date() }));
-      // Invalid: extra key
-      await assertFails(settleRef.set({ ...validPayload, extra: true }));
+    test('Settlement create: valid create succeeds', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_valid');
+      await assertSucceeds(settleRef.set(getValidSettlementPayload()));
     });
 
-    test('Settlement resolve succeeds for receiver or organizer (non-payer), fails for unauthorized or self-confirm by organizer', async () => {
+    test('Settlement create: non-member denied', async () => {
+      const nonMemberDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const settleRef = nonMemberDb.collection('trips').doc(tripId).collection('settlements').doc('settle_non_member');
+      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: nonMemberUid })));
+    });
+
+    test('Settlement create: archived trip denied', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc('trip_archived_p6').set({
+          memberIds: [organizerUid, member1Uid],
+          memberCount: 2,
+          archived: true,
+        });
+      });
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc('trip_archived_p6').collection('settlements').doc('settle_arch');
+      await assertFails(settleRef.set(getValidSettlementPayload()));
+    });
+
+    test('Settlement create: extra key denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_extra');
+      await assertFails(settleRef.set(getValidSettlementPayload({ extraKey: 'bad' })));
+    });
+
+    test('Settlement create: missing key denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_missing');
+      const payload = getValidSettlementPayload();
+      delete payload.amount;
+      await assertFails(settleRef.set(payload));
+    });
+
+    test('Settlement create: fromUid != auth uid denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_spoof');
+      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: member2Uid })));
+    });
+
+    test('Settlement create: toUid == auth uid (self-payment) denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_self');
+      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: member1Uid })));
+    });
+
+    test('Settlement create: toUid not a member denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_to_non_member');
+      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: nonMemberUid })));
+    });
+
+    test('Settlement create: amount 0 denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_0');
+      await assertFails(settleRef.set(getValidSettlementPayload({ amount: 0 })));
+    });
+
+    test('Settlement create: amount negative denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_neg');
+      await assertFails(settleRef.set(getValidSettlementPayload({ amount: -1 })));
+    });
+
+    test('Settlement create: amount float denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_float');
+      await assertFails(settleRef.set(getValidSettlementPayload({ amount: 1.5 })));
+    });
+
+    test('Settlement create: amount string denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_str');
+      await assertFails(settleRef.set(getValidSettlementPayload({ amount: '5' })));
+    });
+
+    test('Settlement create: amount over cap denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_over');
+      await assertFails(settleRef.set(getValidSettlementPayload({ amount: 100000000001 })));
+    });
+
+    test('Settlement create: amount boundaries 1 and 100000000000 allowed', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef1 = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_1');
+      const settleRefCap = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_amt_cap');
+      await assertSucceeds(settleRef1.set(getValidSettlementPayload({ amount: 1 })));
+      await assertSucceeds(settleRefCap.set(getValidSettlementPayload({ amount: 100000000000 })));
+    });
+
+    test('Settlement create: status confirmed denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_stat_conf');
+      await assertFails(settleRef.set(getValidSettlementPayload({ status: 'confirmed' })));
+    });
+
+    test('Settlement create: status rejected denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_stat_rej');
+      await assertFails(settleRef.set(getValidSettlementPayload({ status: 'rejected' })));
+    });
+
+    test('Settlement create: createdAt client value denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_client_date');
+      await assertFails(settleRef.set(getValidSettlementPayload({ createdAt: new Date() })));
+    });
+
+    test('Settlement create: resolvedAt not null denied', async () => {
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_res_not_null');
+      await assertFails(settleRef.set(getValidSettlementPayload({ resolvedAt: firebase.firestore.FieldValue.serverTimestamp() })));
+    });
+
+    async function seedPendingSettlement(id = 'settle_test_pending') {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('settlements').doc(id).set({
+          fromUid: member1Uid,
+          toUid: member2Uid,
+          amount: 2000,
+          status: 'pending',
+          createdAt: new Date(),
+          resolvedAt: null,
+        });
+      });
+      return id;
+    }
+
+    test('Settlement update: payer confirming own settlement denied', async () => {
+      const id = await seedPendingSettlement('settle_up_payer_own');
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: receiver confirm allowed', async () => {
+      const id = await seedPendingSettlement('settle_up_rec_conf');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertSucceeds(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: receiver reject allowed', async () => {
+      const id = await seedPendingSettlement('settle_up_rec_rej');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertSucceeds(settleRef.update({
+        status: 'rejected',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: organizer (not payer) confirm allowed', async () => {
+      const id = await seedPendingSettlement('settle_up_org_conf');
       const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
-      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
-      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
-
-      const settleRefMem1 = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
-      const settleRefOrg = orgDb.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
-      const settleRefMem2 = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
-
-      const validPayload = {
-        fromUid: member1Uid,
-        toUid: organizerUid,
-        amount: 1000,
-        status: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        resolvedAt: null,
-      };
-
-      // Created by payer (member1Uid)
-      await assertSucceeds(settleRefMem1.set(validPayload));
-
-      // Member 2 cannot resolve
-      await assertFails(settleRefMem2.update({
-        status: 'confirmed',
-        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      }));
-
-      // Organizer successfully confirms
-      await assertSucceeds(settleRefOrg.update({
+      const settleRef = orgDb.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertSucceeds(settleRef.update({
         status: 'confirmed',
         resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       }));
     });
 
-    test('Payer can cancel pending settlement via delete', async () => {
-      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+    test('Settlement update: organizer who is the payer denied', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('settlements').doc('settle_org_is_payer').set({
+          fromUid: organizerUid,
+          toUid: member1Uid,
+          amount: 3000,
+          status: 'pending',
+          createdAt: new Date(),
+          resolvedAt: null,
+        });
+      });
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const settleRef = orgDb.collection('trips').doc(tripId).collection('settlements').doc('settle_org_is_payer');
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: third member denied', async () => {
+      const id = await seedPendingSettlement('settle_up_third');
+      await seedUser('third_mem', 'Third Member');
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid, member2Uid, 'third_mem'],
+          memberCount: 4,
+        });
+      });
+      const thirdDb = testEnv.authenticatedContext('third_mem').firestore();
+      const settleRef = thirdDb.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: non-member denied', async () => {
+      const id = await seedPendingSettlement('settle_up_non_mem');
+      const nonDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const settleRef = nonDb.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: already confirmed -> rejected denied', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('settlements').doc('settle_already_conf').set({
+          fromUid: member1Uid,
+          toUid: member2Uid,
+          amount: 1000,
+          status: 'confirmed',
+          createdAt: new Date(),
+          resolvedAt: new Date(),
+        });
+      });
       const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
-      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId);
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc('settle_already_conf');
+      await assertFails(settleRef.update({
+        status: 'rejected',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
 
-      const validPayload = {
-        fromUid: member1Uid,
+    test('Settlement update: amount change denied', async () => {
+      const id = await seedPendingSettlement('settle_up_amt');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        amount: 9999,
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: fromUid change denied', async () => {
+      const id = await seedPendingSettlement('settle_up_from');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        fromUid: member2Uid,
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: toUid change denied', async () => {
+      const id = await seedPendingSettlement('settle_up_to');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
         toUid: organizerUid,
-        amount: 1000,
-        status: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        resolvedAt: null,
-      };
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
 
-      await assertSucceeds(settleRef.set(validPayload));
-      await assertFails(mem2Db.collection('trips').doc(tripId).collection('settlements').doc(settlementId).delete());
+    test('Settlement update: status pending or foo denied', async () => {
+      const id = await seedPendingSettlement('settle_up_bad_status');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'foo',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Settlement update: resolvedAt != request.time denied', async () => {
+      const id = await seedPendingSettlement('settle_up_bad_res');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: new Date(),
+      }));
+    });
+
+    test('Settlement update: extra key denied', async () => {
+      const id = await seedPendingSettlement('settle_up_extra');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        extra: 123,
+      }));
+    });
+
+    test('Settlement update: archived trip denied', async () => {
+      const id = await seedPendingSettlement('settle_up_arch');
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.update({
+        status: 'confirmed',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: false });
+      });
+    });
+
+    test('Settlement delete: payer deletes pending allowed', async () => {
+      const id = await seedPendingSettlement('settle_del_payer');
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(id);
       await assertSucceeds(settleRef.delete());
+    });
+
+    test('Settlement delete: payer deletes confirmed denied', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).collection('settlements').doc('settle_del_conf').set({
+          fromUid: member1Uid,
+          toUid: member2Uid,
+          amount: 500,
+          status: 'confirmed',
+          createdAt: new Date(),
+          resolvedAt: new Date(),
+        });
+      });
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc('settle_del_conf');
+      await assertFails(settleRef.delete());
+    });
+
+    test('Settlement delete: receiver delete denied', async () => {
+      const id = await seedPendingSettlement('settle_del_rec');
+      const mem2Db = testEnv.authenticatedContext(member2Uid).firestore();
+      const settleRef = mem2Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.delete());
+    });
+
+    test('Settlement delete: organizer delete denied', async () => {
+      const id = await seedPendingSettlement('settle_del_org');
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const settleRef = orgDb.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.delete());
+    });
+
+    test('Settlement delete: non-member delete denied', async () => {
+      const id = await seedPendingSettlement('settle_del_non_mem');
+      const nonDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const settleRef = nonDb.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.delete());
+    });
+
+    test('Settlement delete: archived trip delete denied', async () => {
+      const id = await seedPendingSettlement('settle_del_arch');
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      const mem1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const settleRef = mem1Db.collection('trips').doc(tripId).collection('settlements').doc(id);
+      await assertFails(settleRef.delete());
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: false });
+      });
     });
 
     // Phase 6 Leave / Remove Tests
@@ -3426,29 +3751,47 @@ describe('Trips & Join Security Rules', () => {
       const leaveMemberUid = member1Uid;
       const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
       const tripRef = leaveDb.collection('trips').doc(tripId);
-      await assertFails(tripRef.update({
+      const memberRef = tripRef.collection('members').doc(leaveMemberUid);
+      const batch = leaveDb.batch();
+      batch.update(tripRef, {
         memberIds: [organizerUid, organizerUid, member2Uid],
         memberCount: 2,
-      }));
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
     });
 
     test('b) [A,B]->[A,A], count 2->1, B leaves (denied)', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid],
+          memberCount: 2,
+        });
+      });
       const leaveMemberUid = member1Uid;
       const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
       const tripRef = leaveDb.collection('trips').doc(tripId);
-      await assertFails(tripRef.update({
+      const memberRef = tripRef.collection('members').doc(leaveMemberUid);
+      const batch = leaveDb.batch();
+      batch.update(tripRef, {
         memberIds: [organizerUid, organizerUid],
         memberCount: 1,
-      }));
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
     });
 
     test('c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)', async () => {
       const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
       const tripRef = orgDb.collection('trips').doc(tripId);
-      await assertFails(tripRef.update({
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
         memberIds: [organizerUid, member2Uid, member2Uid],
         memberCount: 2,
-      }));
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
     });
 
     test('d) [A,B,C]->[A,C], count 2 (valid, allowed - positive control)', async () => {
@@ -3469,6 +3812,29 @@ describe('Trips & Join Security Rules', () => {
       });
       batch.update(memberRef, { status: 'left' });
       await assertSucceeds(batch.commit());
+    });
+
+    test('Rejoin by previously left member denied directly through memberIds update', async () => {
+      const rejoinUid = 'rejoin_mem_p6';
+      await seedUser(rejoinUid, 'Rejoin Member');
+
+      // Setup rejoinUid as left
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).collection('members').doc(rejoinUid).set({
+          displayName: 'Rejoin Member',
+          role: 'member',
+          status: 'left',
+          joinedAt: new Date(),
+        });
+      });
+
+      const rejoinDb = testEnv.authenticatedContext(rejoinUid).firestore();
+      const tripRef = rejoinDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member1Uid, member2Uid, rejoinUid],
+        memberCount: 4,
+      }));
     });
 
     test('Organizer removes member successfully', async () => {
@@ -3634,6 +4000,193 @@ describe('Trips & Join Security Rules', () => {
         status: 'left',
       }));
     });
+
+    test('Batch missing members status doc write denied', async () => {
+      const leaveDb = testEnv.authenticatedContext(member1Uid).firestore();
+      const tripRef = leaveDb.collection('trips').doc(tripId);
+      const batch = leaveDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      await assertFails(batch.commit());
+    });
+
+    test('Member status updated to something other than left denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(memberRef, { status: 'suspended' });
+      await assertFails(batch.commit());
+    });
+
+    test('Member doc update with fields other than status denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(memberRef, { status: 'left', displayName: 'Hacker' });
+      await assertFails(batch.commit());
+    });
+
+    test('Trip update with fields other than memberIds and memberCount denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+        name: 'Hacked Trip Name',
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('memberCount unchanged while dropping UID denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 3,
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('memberCount decreased by 2 while dropping 1 UID denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 1,
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Removing two UIDs at once denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const m1Ref = tripRef.collection('members').doc(member1Uid);
+      const m2Ref = tripRef.collection('members').doc(member2Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid],
+        memberCount: 1,
+      });
+      batch.update(m1Ref, { status: 'left' });
+      batch.update(m2Ref, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Adding a UID while removing one denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const m1Ref = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid, 'extra_intruder'],
+        memberCount: 3,
+      });
+      batch.update(m1Ref, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Organizer self-removal denied', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const orgMemberRef = tripRef.collection('members').doc(organizerUid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [member1Uid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(orgMemberRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Plain member removing another member denied', async () => {
+      const m1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const tripRef = m1Db.collection('trips').doc(tripId);
+      const m2Ref = tripRef.collection('members').doc(member2Uid);
+      const batch = m1Db.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member1Uid],
+        memberCount: 2,
+      });
+      batch.update(m2Ref, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Removing organizer by member denied', async () => {
+      const m1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const tripRef = m1Db.collection('trips').doc(tripId);
+      const orgMemberRef = tripRef.collection('members').doc(organizerUid);
+      const batch = m1Db.batch();
+      batch.update(tripRef, {
+        memberIds: [member1Uid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(orgMemberRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Archived trip leave denied', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      const m1Db = testEnv.authenticatedContext(member1Uid).firestore();
+      const tripRef = m1Db.collection('trips').doc(tripId);
+      const m1Ref = tripRef.collection('members').doc(member1Uid);
+      const batch = m1Db.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(m1Ref, { status: 'left' });
+      await assertFails(batch.commit());
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: false });
+      });
+    });
+
+    test('Non-member leave denied', async () => {
+      const nonDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const tripRef = nonDb.collection('trips').doc(tripId);
+      const nonRef = tripRef.collection('members').doc(nonMemberUid);
+      const batch = nonDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member1Uid],
+        memberCount: 2,
+      });
+      batch.update(nonRef, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Signed-out leave denied', async () => {
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+      const tripRef = unauthDb.collection('trips').doc(tripId);
+      const m1Ref = tripRef.collection('members').doc(member1Uid);
+      const batch = unauthDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(m1Ref, { status: 'left' });
+      await assertFails(batch.commit());
+    });
   });
-});
-});
