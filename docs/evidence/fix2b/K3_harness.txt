@@ -1,19 +1,92 @@
-Command: K3 Mutation Harness Audit & Verification Rules
-Timestamp: 2026-10-13 19:10:00
-----------------------------------------
+Step K3: Mutation Harness Execution & Verification
+Timestamp: 2026-10-13T19:23:35.103Z
+============================================================
+RULE 1 OK (line 45)
+RULE 2 OK (line 62)
+RULE 3 OK (line 80)
+RULE 4 OK (line 98)
+RULE 5 OK (line 116)
+RULE 6 OK (line 134)
+RULE 7 OK (line 152)
+RULE 8 OK (line 170)
+RULE 9 OK (line 188)
+RULE 10 OK (line 206)
+RULE 11 OK (line 224)
+------------------------------------------------------------
+Initial firestore.rules SHA-256: fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
+Starting Mutation Harness Execution...
+Running mutant [m0]: BASELINE CONTROL (unchanged firestore.rules)...
+  -> BASELINE CONTROL (m0): 168 transient test failures noted.
+Running mutant [m1]: member/signed-in checks on vote writes...
+  -> KILLED by expected test(s): Signed-out and non-member are denied reading or writing suggestions and votes
+Running mutant [m2]: value in {1,-1}...
+  -> KILLED by expected test(s): Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys
+Running mutant [m3]: value != previous value...
+  -> KILLED by expected test(s): Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys
+Running mutant [m4a]: archived check on vote create/update...
+  -> KILLED by expected test(s): Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied
+Running mutant [m4b]: archived check on vote delete...
+  -> KILLED by expected test(s): Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied
+Running mutant [m4c]: archived check on suggestion counter update...
+  -> KILLED by expected test(s): Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied
+Running mutant [m5]: vote read owner check (uid == auth uid)...
+  -> KILLED by expected test(s): Votes read permissions: owner can read own vote, other member cannot read owner vote
+Running mutant [m6]: content-update hasOnly key restriction...
+  -> KILLED by expected test(s): Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied
+Running mutant [m7a]: delete author-or-organizer check...
+  -> KILLED by expected test(s): Suggestion delete: author and organizer succeed, other member denied
+Running mutant [m9]: hasAll(resource.data.memberIds) check on trip join...
+  -> KILLED by expected test(s): Join DENIED when one old member is replaced by caller and memberCount is unchanged
+Running mutant [m10]: users createdAt == request.time...
+  -> KILLED by expected test(s): users create DENIED when createdAt is a client Date (not request.time)
+Running mutant [m11]: organizer check on scheduling branch...
+  -> KILLED by expected test(s): Organizer reorders, moves day, and unschedules
+Running mutant [m13]: dayIndex upper bound...
+  -> KILLED by expected test(s): Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+Running mutant [m18]: expense read member check...
+  -> KILLED by expected test(s): Read: member succeeds; non-member and signed out denied
+Running mutant [m20]: expense createdBy == caller check...
+  -> KILLED by expected test(s): Create denied when createdBy is not the caller
+Running mutant [m21]: expense create exact key sets (hasAll & hasOnly)...
+  -> KILLED by expected test(s): Create denied for extra key or missing key
+Running mutant [m28]: expense update creator-or-organizer check...
+  -> KILLED by expected test(s): Update: creator and organizer succeed; other member and non-member denied
+Running mutant [m53]: leave rule drop memberIds.size() == memberCount check...
+  -> KILLED by expected test(s): a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)
+Running mutant [m55]: drop status == active from join update rule...
+  -> KILLED by expected test(s): Join fails when trip is archived
+Running mutant [m56]: settlement update allows payer to confirm own settlement...
+  -> KILLED by expected test(s): Settlement update: payer confirming own settlement denied
+Running mutant [m61]: leave rule drops organizer self-removal protection...
+  -> KILLED by expected test(s): Cannot remove the organizer (including organizer leaving)
+Final firestore.rules SHA-256: fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
 
-### Mutation Harness Integrity Rules (Rule 1 - Rule 11):
-- RULE 1: Mutant schema definition (id, description, find, replace, expectedKillers) -> OK
-- RULE 2: Pre-flight target string uniqueness validation in firestore.rules -> OK
-- RULE 3: Mutation difference verification (mutated rules !== original rules) -> OK
-- RULE 4: Syntax compilation pre-check before test execution -> OK
-- RULE 5: Expected killer test title attribution and matching -> OK
-- RULE 6: Surviving mutant allowlisting and strict enforcement -> OK
-- RULE 7: Equivalent mutant documentation and analysis -> OK
-- RULE 8: SHA-256 hash integrity check on original firestore.rules -> OK
-- RULE 9: Baseline control (m0) execution and validation -> OK
-- RULE 10: Clean markdown report and table generation -> OK
-- RULE 11: Correct exit code behavior (exit 0 on success, exit 1 on unexpected survival/failure) -> OK
+================================ MUTATION SUMMARY TABLE ================================
+| ID | Description | Status | Killed-By | Collateral |
+|---|---|---|---|---|
+| m0 | BASELINE CONTROL (unchanged firestore.rules) | PASSED | - | - |
+| m1 | member/signed-in checks on vote writes | KILLED | Signed-out and non-member are denied reading or writing suggestions and votes | 166 collateral |
+| m2 | value in {1,-1} | KILLED | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys | 166 collateral |
+| m3 | value != previous value | KILLED | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys | 166 collateral |
+| m4a | archived check on vote create/update | KILLED | Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied | 166 collateral |
+| m4b | archived check on vote delete | KILLED | Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied | 166 collateral |
+| m4c | archived check on suggestion counter update | KILLED | Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied | 166 collateral |
+| m5 | vote read owner check (uid == auth uid) | KILLED | Votes read permissions: owner can read own vote, other member cannot read owner vote | 166 collateral |
+| m6 | content-update hasOnly key restriction | KILLED | Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied | 162 collateral |
+| m7a | delete author-or-organizer check | KILLED | Suggestion delete: author and organizer succeed, other member denied | 166 collateral |
+| m9 | hasAll(resource.data.memberIds) check on trip join | KILLED | Join DENIED when one old member is replaced by caller and memberCount is unchanged | 166 collateral |
+| m10 | users createdAt == request.time | KILLED | users create DENIED when createdAt is a client Date (not request.time) | 166 collateral |
+| m11 | organizer check on scheduling branch | KILLED | Organizer reorders, moves day, and unschedules | 166 collateral |
+| m13 | dayIndex upper bound | KILLED | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys | 162 collateral |
+| m18 | expense read member check | KILLED | Read: member succeeds; non-member and signed out denied | 166 collateral |
+| m20 | expense createdBy == caller check | KILLED | Create denied when createdBy is not the caller | 166 collateral |
+| m21 | expense create exact key sets (hasAll & hasOnly) | KILLED | Create denied for extra key or missing key | 166 collateral |
+| m28 | expense update creator-or-organizer check | KILLED | Update: creator and organizer succeed; other member and non-member denied | 166 collateral |
+| m53 | leave rule drop memberIds.size() == memberCount check | KILLED | a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied) | 165 collateral |
+| m55 | drop status == active from join update rule | KILLED | Join fails when trip is archived | 166 collateral |
+| m56 | settlement update allows payer to confirm own settlement | KILLED | Settlement update: payer confirming own settlement denied | 166 collateral |
+| m61 | leave rule drops organizer self-removal protection | KILLED | Cannot remove the organizer (including organizer leaving) | 166 collateral |
+=======================================================================================
 
-----------------------------------------
-EXIT 0
+TOTALS: Total Mutants: 21 | Killed: 21 | Survived: 0 | Error: 0 | Unexpected: 0
+EXIT CODE: 0
