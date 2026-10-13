@@ -1,0 +1,26 @@
+STEP K0 — LOST WORK SEARCH
+FOUND: Evidence file docs/evidence/phase6/04_mutation.txt (mutant descriptions m36..m52 present)
+FOUND: docs/evidence/fix2/G1_suite.json (previous suite file)
+NOT FOUND: docs/evidence/Evidence_phase6.zip (no zip present)
+NOT FOUND: firestore.rules.base (not in working tree or evidence)
+NOT FOUND: firestore.rules.commit1
+NOT FOUND: rules_test/check_eof.js
+NOT FOUND: rules_test/mutation/run_fixed.js
+NOT FOUND: rules_test/firestore_rules.test.js.backup
+NOT FOUND: rules_test/report_2bce7d7.md
+FOUND: Untracked/missing mutation additions (m36..m52 ~119 lines) — not recovered from lost-found; only descriptions exist in phase6/04_mutation.txt
+FOUND: git reflog shows c074c1d (structure repair) and previous commits; no dangling commits for lost files
+NOT FOUND: VS Code Local History folder (%APPDATA%\Code\User\History) — listing attempted via bash but Windows path not fully reachable; copies not made
+RECOVERED FROM phase6/04_mutation.txt (first 10 lines):
+  # Phase 6 mutation report
+  # m36: drop member count check on trip leave
+  # m37: drop archived==false check on leave
+  # m38: drop existsAfter on members doc
+  # m39: drop status=='left' on leave
+  # m40: drop organizer-removal protection
+  # m41: settlement read allows non-payer
+  # m42: settlement update lets non-payer confirm
+  # m43: trip join allows non-active
+  # m44: members create missing uid check
+  # m45: members update missing size check
+EXIT 0

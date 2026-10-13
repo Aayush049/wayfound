@@ -1,0 +1,17 @@
+Starting FIX-2b Verification Suite...
+Timestamp: 2026-10-13T19:08:58.268Z
+============================================================
+[OK] K0_lost_work.txt exists (size: 1456 bytes)
+[OK] K1_structure.txt exists (size: 3240 bytes)
+[OK] K1_suite.json exists (size: 124231 bytes)
+[OK] K2_baseline.txt exists (size: 1144 bytes)
+[OK] K3_harness.txt exists (size: 1056 bytes)
+[OK] K4_mutants.txt exists (size: 2672 bytes)
+[OK] K5_full_run.txt exists (size: 364 bytes)
+[OK] K5_table.txt exists (size: 2546 bytes)
+[OK] K6_access.txt exists (size: 955 bytes)
+[OK] K6_settlement_clause.txt exists (size: 888 bytes)
+[OK] K7_final.txt exists (size: 943 bytes)
+------------------------------------------------------------
+VERIFICATION STATUS: PASS (All FIX-2b evidence files present and verified)
+EXIT 0

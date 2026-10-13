@@ -1,0 +1,23 @@
+# FIX-2b Summary Report
+
+1. **Baseline Reliability (K2):**
+   - Analyzed persistent vs fresh emulator modes.
+   - Established `fresh-per-mutant` mode using `firebase emulators:exec` for pristine, isolated state across all test runs (RUN 1..5: PASS).
+   - Identified root cause of persistence test-order collisions (m0 failures).
+
+2. **Mutation Harness Audit & Rules (K3):**
+   - Verified 11-rule audit framework for mutation runner integrity.
+
+3. **Mutant Definitions & Execution (K4, K5):**
+   - Defined 38 mutants (m1..m61 including Phase 6 security rules mutants).
+   - Executed full mutation suite producing `K5_full_run.txt` and `K5_table.txt` (100% kill rate, 0 survivors).
+
+4. **Access Call Matrix & Settlement Clauses (K6):**
+   - Audited access control rules for reads, joins, leaves, and settlements.
+   - Verified payer self-confirmation prevention and receiver/organizer confirmation rules.
+
+5. **Verification & Final Reporting (K7, V_verify.txt):**
+   - Implemented and executed `rules_test/tools/verify_fix2b.js`, verifying all evidence files with exit code 0 (`V_verify.txt`).
+
+----------------------------------------
+EXIT 0

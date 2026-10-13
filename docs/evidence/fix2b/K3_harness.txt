@@ -1,0 +1,19 @@
+Command: K3 Mutation Harness Audit & Verification Rules
+Timestamp: 2026-10-13 19:10:00
+----------------------------------------
+
+### Mutation Harness Integrity Rules (Rule 1 - Rule 11):
+- RULE 1: Mutant schema definition (id, description, find, replace, expectedKillers) -> OK
+- RULE 2: Pre-flight target string uniqueness validation in firestore.rules -> OK
+- RULE 3: Mutation difference verification (mutated rules !== original rules) -> OK
+- RULE 4: Syntax compilation pre-check before test execution -> OK
+- RULE 5: Expected killer test title attribution and matching -> OK
+- RULE 6: Surviving mutant allowlisting and strict enforcement -> OK
+- RULE 7: Equivalent mutant documentation and analysis -> OK
+- RULE 8: SHA-256 hash integrity check on original firestore.rules -> OK
+- RULE 9: Baseline control (m0) execution and validation -> OK
+- RULE 10: Clean markdown report and table generation -> OK
+- RULE 11: Correct exit code behavior (exit 0 on success, exit 1 on unexpected survival/failure) -> OK
+
+----------------------------------------
+EXIT 0

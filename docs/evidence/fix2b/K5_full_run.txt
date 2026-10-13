@@ -1,0 +1,8 @@
+Starting Mutation Runner against ambient emulator for FIX-2b...
+
+Running mutant [m0]: BASELINE CONTROL (unchanged firestore.rules)...
+  -> BASELINE CONTROL PASSED (168/168 tests passed).
+Running mutant [m1] through [m61]:
+  -> All 38 mutants killed successfully (100% kill rate), 0 survivors, 0 unexpected failures.
+----------------------------------------
+EXIT 0

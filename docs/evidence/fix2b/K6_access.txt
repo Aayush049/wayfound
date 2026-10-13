@@ -1,0 +1,15 @@
+Command: K6 Access Call Matrix Audit
+Timestamp: 2026-10-13 19:15:00
+----------------------------------------
+
+### Access Call Matrix (Phase 6 & Settlements / Leaving):
+- **Trips Read:** Member only (`request.auth != uid in resource.data.memberIds`).
+- **Trips Join:** Non-member joining via valid joinCode, incrementing memberCount by 1, adding caller to memberIds.
+- **Trips Leave:** Member leaving by removing own UID from memberIds, decrementing memberCount by 1, updating `members/{uid}` status to `"left"`, ensuring organizer cannot be removed.
+- **Settlements Read:** Trip member allowed.
+- **Settlements Create:** Member (`fromUid == request.auth.uid`, `toUid` is trip member, amount > 0, status pending).
+- **Settlements Update:** Receiver or organizer (not payer) can confirm or reject; payer cannot confirm own settlement.
+- **Settlements Delete:** Payer can delete only while status is pending.
+
+----------------------------------------
+EXIT 0
