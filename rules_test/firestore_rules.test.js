@@ -3422,6 +3422,55 @@ describe('Trips & Join Security Rules', () => {
       expect(memberAfter.data().status).toEqual('left');
     });
 
+    test('a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)', async () => {
+      const leaveMemberUid = member1Uid;
+      const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
+      const tripRef = leaveDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, organizerUid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('b) [A,B]->[A,A], count 2->1, B leaves (denied)', async () => {
+      const leaveMemberUid = member1Uid;
+      const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
+      const tripRef = leaveDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, organizerUid],
+        memberCount: 1,
+      }));
+    });
+
+    test('c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({
+        memberIds: [organizerUid, member2Uid, member2Uid],
+        memberCount: 2,
+      }));
+    });
+
+    test('d) [A,B,C]->[A,C], count 2 (valid, allowed - positive control)', async () => {
+      // Setup members [org, m1, m2]
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid, member2Uid],
+          memberCount: 3,
+        });
+      });
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(member1Uid);
+      const batch = orgDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, member2Uid],
+        memberCount: 2,
+      });
+      batch.update(memberRef, { status: 'left' });
+      await assertSucceeds(batch.commit());
+    });
+
     test('Organizer removes member successfully', async () => {
       const removedMemberUid = 'removed_mem_p6_2';
       await seedUser(removedMemberUid, 'Removed Member 2');
