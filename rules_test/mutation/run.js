@@ -307,19 +307,30 @@ const mutants = [
     expectedKillers: ['Create denied when date is not a timestamp or createdAt is a client date'],
   },
   // Phase 6 specific mutants m53..m61
-  {
+      {
     id: 'm53',
     description: 'leave rule drop memberIds.size() == memberCount check',
     find: `\n        && request.resource.data.memberIds.size() == request.resource.data.memberCount\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount`,
     replace: `\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount`,
-    expectedKillers: ['memberCount unchanged while dropping UID denied', 'memberCount decreased by 2 while dropping 1 UID denied'],
+    expectedKillers: [
+      'memberCount unchanged while dropping UID denied',
+      'memberCount decreased by 2 while dropping 1 UID denied',
+      'a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)',
+      'b) [A,B]->[A,A], count 2->1, B leaves (denied)',
+      'c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)'
+    ],
   },
   {
     id: 'm54',
     description: 'leave rule drop memberIds.toSet().size() == memberCount check',
     find: `\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount\n        && resource.data.archived == false`,
     replace: `\n        && resource.data.archived == false`,
-    expectedKillers: ['a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)', 'c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)'],
+    expectedKillers: [
+      'a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)',
+      'c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)',
+      'b) [A,B]->[A,A], count 2->1, B leaves (denied)',
+      'Padding attack denial - cannot add uid while removing'
+    ],
   },
   {
     id: 'm55',
@@ -354,21 +365,21 @@ const mutants = [
     description: 'leave rule drops existsAfter member doc check',
     find: `\n        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'`,
     replace: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'`,
-    expectedKillers: ['Batch missing members status doc write denied'],
+    expectedKillers: ['Batch missing members status doc write denied', 'Marking status "left" WITHOUT removing uid from memberIds is denied'],
   },
   {
     id: 'm60',
     description: 'leave rule drops status == left check',
     find: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);`,
     replace: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);`,
-    expectedKillers: ['Member status updated to something other than left denied'],
+    expectedKillers: ['Member status updated to something other than left denied', 'Member doc update with fields other than status denied'],
   },
   {
     id: 'm61',
     description: 'leave rule drops organizer self-removal protection',
     find: `\n        && !(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == resource.data.organizerId && resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid)`,
     replace: ``,
-    expectedKillers: ['Cannot remove the organizer (including organizer leaving)'],
+    expectedKillers: ['Cannot remove the organizer (including organizer leaving)', 'Organizer self-removal denied'],
   }
 ];
 
@@ -428,7 +439,7 @@ function main() {
 
     try {
       execSync(
-        `node node_modules/jest/bin/jest.js firestore_rules.test.js --forceExit --json --outputFile=mutation_run.json`,
+        `node node_modules/jest/bin/jest.js firestore_rules.test.js --runInBand --forceExit --json --outputFile=mutation_run.json`,
         {
           cwd: path.join(rootDir, 'rules_test'),
           env: { ...process.env, RULES_PATH: mutantPath },
