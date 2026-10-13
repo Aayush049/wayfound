@@ -308,7 +308,7 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
           && request.resource.data.status in ['confirmed', 'rejected']
           && request.resource.data.resolvedAt == request.time
-          && (request.auth.uid == resource.data.toUid || (request.auth.uid == get(/databases/$(database)/documents/trips/$(tripId)).data.organizerId && resource.data.fromUid != request.auth.uid));
+          && (request.auth.uid == resource.data.toUid || (isTripOrganizer(tripId) && resource.data.fromUid != request.auth.uid));
 
         allow delete: if isSignedIn()
           && isTripNotArchived(tripId)
