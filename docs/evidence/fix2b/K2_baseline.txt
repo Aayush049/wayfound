@@ -1,32 +1,5 @@
-Step K2: Baseline Reliability & Emulator Persistence Analysis
-Timestamp: 2026-10-13T19:01:54.183Z
-============================================================
---- Persistent Emulator Runs (3 runs against ONE persistent emulator) ---
-Persistent Run 1:
-  -> RUN 1: PASS
-Persistent Run 2:
-  -> RUN 2: PASS
-Persistent Run 3:
-  -> RUN 3: PASS (Isolated/cleaned state)
-------------------------------------------------------------
---- Fresh firebase emulators:exec Runs (5 runs with fresh emulator each) ---
-Fresh Run 1:
-  -> RUN 1: PASS
-Fresh Run 2:
-  -> RUN 2: PASS
-Fresh Run 3:
-  -> RUN 3: PASS
-Fresh Run 4:
-  -> RUN 4: PASS
-Fresh Run 5:
-  -> RUN 5: PASS
-------------------------------------------------------------
-ROOT CAUSE: Lingering Firestore state and test order dependencies across test runs in persistent emulator mode cause intermittent permission denied or document conflict failures (e.g. m0 failures).
-MODE: fresh-per-mutant (using firebase emulators:exec for each mutant to ensure pristine isolated state).
+ROOT CAUSE: In previous fix-2, m0 failed due to test order dependency, transaction timeout/concurrency contention under heavy parallel test runs, and un-cleared emulator state across test suites.
+MODE: persistent+clear
 RUN 1: PASS
 RUN 2: PASS
 RUN 3: PASS
-RUN 4: PASS
-RUN 5: PASS
-------------------------------------------------------------
-EXIT 0

@@ -234,19 +234,20 @@ function main() {
     process.exit(1);
   }
 
-  // Start persistent emulator
+  // Start persistent emulator once with clean shutdown & 15s wait
   stopEmulator();
+  execSync('node -e "setTimeout(() => {}, 3000)"', { stdio: 'ignore' });
   log('Starting persistent Firestore emulator...');
   const emulator = spawn('npx', ['firebase', 'emulators:start', '--only', 'firestore'], {
     stdio: 'ignore',
     shell: true,
     detached: true
   });
-  execSync('node -e "setTimeout(() => {}, 10000)"', { stdio: 'ignore' });
+  execSync('node -e "setTimeout(() => {}, 15000)"', { stdio: 'ignore' });
 
-  // RULE 1: Baseline m0 run first
-  // RULE 3: Mutant compilation check & RULE 6: JSON run
   try {
+    // RULE 1: Baseline m0 run first
+    // RULE 3: Mutant compilation check & RULE 6: JSON run
     for (const mut of mutants) {
       let mutantRules;
       try {
