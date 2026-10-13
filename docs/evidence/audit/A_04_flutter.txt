@@ -1,0 +1,4 @@
+=== A_04 Flutter analyze ===
+Analyzing wayfound...                                           
+No issues found! (ran in 11.0s)
+EXIT CODE: 0

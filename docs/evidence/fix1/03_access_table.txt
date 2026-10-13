@@ -1,0 +1,36 @@
+=== DOCUMENT-ACCESS TABLE FOR PHASE 6 RULES ===
+
+1. Trip leave/remove write:
+   - Path: trips/{tripId} (update)
+   - get calls:
+     * isTripOrganizer(tripId) calls get(/databases/$(database)/documents/trips/$(tripId)) -> 1 read
+     * existsAfter(...) / getAfter(...) calls on members subcollection:
+       - existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(memberId)) -> 1 read/exists
+       - getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(memberId)) -> 1 read
+   - Total document reads/exists/get calls per trip leave/remove write: 3 document access calls.
+   - Well within the 20-call limit per write operation.
+
+2. Member doc status update write:
+   - Path: trips/{tripId}/members/{memberId} (update)
+   - Access calls: 0 additional gets (relies on batch/transaction context).
+   - Total access calls: 0.
+
+3. Atomic leave batch (trip write + member write):
+   - Total document access calls: 3 calls (<< 20 call limit).
+
+4. Settlement operations:
+   - Settlement create:
+     * isTripMember(tripId) -> 1 read (get trip memberIds)
+     * get(...) for toUid check -> 1 read
+     * Total reads: 2 calls (<< 10 call limit).
+   - Settlement update:
+     * isTripMember(tripId) -> 1 read
+     * isTripOrganizer(tripId) -> 1 read
+     * Total reads: 2 calls (<< 10 call limit).
+   - Settlement delete:
+     * No get/exists calls (reads resource.data directly).
+     * Total reads: 0 calls (<< 10 call limit).
+
+5. Settlement Read / List:
+   - isTripMember(tripId) -> 1 read.
+   - Total reads: 1 call (<< 10 call limit).

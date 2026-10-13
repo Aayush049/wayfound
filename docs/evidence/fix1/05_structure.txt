@@ -1,0 +1,9 @@
+Depth 1 (Line 55): describe('Users Collection Security Rules', () => {
+Depth 1 (Line 359): describe('Trips & Join Security Rules', () => {
+Depth 1 (Line 738): describe('Trip Join Boundary & Security Tests', () => {
+Depth 1 (Line 1456): describe('Read & Query Permissions', () => {
+Depth 1 (Line 1557): describe('Phase 3: Suggestions & Votes Security Rules', () => {
+Depth 1 (Line 1994): describe('Phase 3 proof tests', () => {
+Depth 1 (Line 2408): describe('Phase 4 itinerary rules', () => {
+Depth 1 (Line 2704): describe('Phase 5 expense rules', () => {
+Depth 1 (Line 3246): describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {

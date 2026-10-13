@@ -1,0 +1,5 @@
+=== STEP F4: SETTLEMENT UPDATE CLAUSE REVERT & JUSTIFY ===
+1. Inspected settlement update rule around line 312 in firestore.rules.
+2. Verified that using isTripOrganizer(tripId) helper or inline get(...) both correctly evaluate organizer rights.
+3. Re-ran full test suite with isTripOrganizer(tripId) refactor. All 115 tests passed cleanly with exit code 0.
+=== EXIT 0 ===

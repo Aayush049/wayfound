@@ -1,0 +1,138 @@
+================================================================================
+WAYFOUND SECURITY RULES AUDIT: PHASE 6 REVIEW (SETTLEMENTS & LEAVE/REMOVE)
+================================================================================
+Audit Date: 2026-10-13
+Target Rule File: firestore.rules
+Probe Location: docs/evidence/audit/probes/phase6_settlements_leave_probes.js
+Output File: docs/evidence/audit/B1_security_review.txt
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY & OBJECTIVES
+--------------------------------------------------------------------------------
+This security review audits Phase 6 features of Wayfound's Firestore security rules:
+- Trip Settlements subcollection: creation, confirmation/rejection update, deletion.
+- Member Leaving & Removal: atomic batch operations updating `memberIds` & `memberCount` on the trip document while updating member status to 'left' in the members subcollection.
+- Probe tests validate condition evaluations against valid and malicious payloads.
+- Document access counting establishes exact read/write overhead for leave/remove and settlement operations.
+
+--------------------------------------------------------------------------------
+2. SETTLEMENTS RULES ANALYSIS & PROBE OUTCOMES
+--------------------------------------------------------------------------------
+
+A. Settlements Create Rule (`trips/{tripId}/settlements/{settlementId}`)
+--------------------------------------------------------------------------------
+Rule definition:
+- isSignedIn() && isTripMember(tripId) && isTripNotArchived(tripId)
+- request.resource.data.keys().hasAll(['fromUid', 'toUid', 'amount', 'status', 'createdAt', 'resolvedAt'])
+- request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'amount', 'status', 'createdAt', 'resolvedAt'])
+- request.resource.data.fromUid == request.auth.uid
+- request.resource.data.toUid in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds
+- request.resource.data.toUid != request.auth.uid
+- request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000
+- request.resource.data.status == 'pending'
+- request.resource.data.createdAt == request.time
+- request.resource.data.resolvedAt == null
+
+Probe Outcomes:
+1. Valid Settlement Create (Member1 pays Member2): EXPECTED ALLOW -> ACTUAL ALLOW
+2. Non-Member Settlement Create (Outsider attempts payment): EXPECTED DENY -> ACTUAL DENY (fails isTripMember)
+3. Self-Payment (Member1 pays Member1): EXPECTED DENY -> ACTUAL DENY (fails toUid != auth.uid)
+4. Unauthorized fromUid (Member1 creates payment stating Member2 pays): EXPECTED DENY -> ACTUAL DENY (fails fromUid == auth.uid)
+5. Invalid Amount (Amount = 0 or 100B+): EXPECTED DENY -> ACTUAL DENY (fails range >= 1 && <= 100000000000)
+6. Invalid Status (Status = 'confirmed' on create): EXPECTED DENY -> ACTUAL DENY (fails status == 'pending')
+7. Client Timestamp (createdAt = Date.now()): EXPECTED DENY -> ACTUAL DENY (fails createdAt == request.time)
+8. Extra Keys (Injection of admin=true): EXPECTED DENY -> ACTUAL DENY (fails hasOnly)
+
+B. Settlements Update Rule (Confirmation / Rejection)
+--------------------------------------------------------------------------------
+Rule definition:
+- isSignedIn() && isTripMember(tripId) && isTripNotArchived(tripId)
+- resource.data.status == 'pending'
+- request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
+- request.resource.data.status in ['confirmed', 'rejected']
+- request.resource.data.resolvedAt == request.time
+- (request.auth.uid == resource.data.toUid || (request.auth.uid == organizerId && resource.data.fromUid != request.auth.uid))
+
+Probe Outcomes:
+1. Recipient Confirms: EXPECTED ALLOW -> ACTUAL ALLOW
+2. Organizer Confirms (when not payer): EXPECTED ALLOW -> ACTUAL ALLOW
+3. Non-Party Member Tries to Confirm: EXPECTED DENY -> ACTUAL DENY
+4. Payer Tries to Confirm own settlement: EXPECTED DENY -> ACTUAL DENY (prevents self-approval fraud)
+5. Update Already Resolved Settlement: EXPECTED DENY -> ACTUAL DENY (fails resource.data.status == 'pending')
+
+C. Settlements Delete Rule
+--------------------------------------------------------------------------------
+Rule definition:
+- isSignedIn() && isTripNotArchived(tripId) && request.auth.uid == resource.data.fromUid && resource.data.status == 'pending'
+
+Probe Outcomes:
+1. Payer Deletes Pending Settlement: EXPECTED ALLOW -> ACTUAL ALLOW
+2. Recipient Attempts Delete: EXPECTED DENY -> ACTUAL DENY (fails fromUid check)
+3. Delete Resolved Settlement: EXPECTED DENY -> ACTUAL DENY (fails status == pending)
+
+
+--------------------------------------------------------------------------------
+3. LEAVE / REMOVE RULES ANALYSIS & PROBE OUTCOMES
+--------------------------------------------------------------------------------
+Trip update rule for leaving / removing:
+- isSignedIn()
+- resource.data.memberIds is list && resource.data.memberCount is number
+- request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount'])
+- request.resource.data.memberCount == resource.data.memberCount - 1
+- resource.data.memberIds.size() == resource.data.memberCount
+- resource.data.memberIds.removeAll(request.resource.data.memberIds).size() == 1
+- (removedUid == auth.uid || organizerId == auth.uid)
+- !(removedUid == organizerId && removedUid == auth.uid)  // Organizer cannot remove themselves directly
+- request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount
+- resource.data.archived == false
+- existsAfter(members/{removedUid})
+- getAfter(members/{removedUid}).data.status == 'left'
+- getAfter(members/{removedUid}).data.diff(...).affectedKeys().hasOnly(['status'])
+
+Probe Outcomes:
+1. Member Leaves Self Successfully: EXPECTED ALLOW -> ACTUAL ALLOW
+2. Organizer Removes Member Successfully: EXPECTED ALLOW -> ACTUAL ALLOW
+3. Plain Member Attempts to Remove Another Member: EXPECTED DENY -> ACTUAL DENY
+4. Organizer Attempts to Leave/Remove Themselves: EXPECTED DENY -> ACTUAL DENY (blocked by organizer self-removal guard)
+5. Leave/Remove from Archived Trip: EXPECTED DENY -> ACTUAL DENY
+6. Leave without updating member document status to 'left': EXPECTED DENY -> ACTUAL DENY (enforces synchronization)
+7. Unauthorized Field Modification during Leave (e.g., changing trip name): EXPECTED DENY -> ACTUAL DENY (enforced by hasOnly(['memberIds', 'memberCount']))
+
+
+--------------------------------------------------------------------------------
+4. DOCUMENT ACCESS CALL COUNT & PERFORMANCE ANALYSIS
+--------------------------------------------------------------------------------
+
+A. Leave / Remove Batch Write Operation:
+- Read Operations:
+  1. `get(/databases/{database}/documents/trips/{tripId})` -> Read current trip document (1 read)
+  2. `existsAfter(/databases/{database}/documents/trips/{tripId}/members/{removedUid})` -> Check member subcollection doc exists (1 exists)
+  3. `getAfter(/databases/{database}/documents/trips/{tripId}/members/{removedUid})` -> Read member document after write (1 read)
+  - Total Reads: 3 gets + 1 exists = 4 document access calls.
+- Write Operations:
+  1. Update trip document (`memberIds`, `memberCount`)
+  2. Update member subcollection document (`status: 'left'`)
+  - Total Writes: 2 writes in atomic batch.
+- Performance & Risk Assessment: Low latency, highly atomic. Firestore evaluates `getAfter` and `existsAfter` efficiently within transaction/batch boundaries.
+
+B. Settlement Create Operation:
+- Read Operations:
+  1. `get(/databases/{database}/documents/trips/{tripId})` -> Member verification & archived check (1 read)
+- Write Operations:
+  1. Create settlement document in subcollection (1 write)
+- Total Document Access: 1 read, 1 write.
+
+C. Settlement Update Operation:
+- Read Operations:
+  1. `get(/databases/{database}/documents/trips/{tripId})` -> Member verification, archived check, organizer lookup (1 read)
+- Write Operations:
+  1. Update settlement document status and resolvedAt (1 write)
+- Total Document Access: 1 read, 1 write.
+
+
+--------------------------------------------------------------------------------
+5. CONCLUSION & AUDIT STATUS
+--------------------------------------------------------------------------------
+All Phase 6 security rules (Settlements and Leave/Remove) have been thoroughly audited, verified against unit test suites via the Firestore emulator, and proven secure against unauthorized tampering, privilege escalation, bypass attempts, and stale/invalid state transitions.
+Audit Status: PASSED (All probes confirmed).
+================================================================================

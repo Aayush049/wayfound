@@ -1,0 +1,6 @@
+mutation: exit 1
+rules_diff: exit 0
+flutter: exit 1
+report_integrity: exit 0
+individual_runs: exit 1
+mutation_exit: 1

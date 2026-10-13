@@ -1,0 +1,21 @@
+=== A_02 locate documents ===
+./phase_6_handoff_report.md
+---docs-evidence-files---
+docs/evidence/audit/A_01_git.txt
+docs/evidence/audit/A_02_documents.txt
+docs/evidence/Evidence_phase6.zip
+docs/evidence/phase6/00_exit_codes.txt
+docs/evidence/phase6/01_git.txt
+docs/evidence/phase6/02_rules_file.txt
+docs/evidence/phase6/03_rules_suite.txt
+docs/evidence/phase6/04_mutation.txt
+docs/evidence/phase6/05_rules_diff.txt
+docs/evidence/phase6/06_flutter.txt
+docs/evidence/phase6/07_report_integrity.txt
+docs/evidence/phase6/08_diagnosis.txt
+docs/evidence/phase6/09_individual_runs.txt
+docs/evidence/phase6/D1_00_baseline.txt
+docs/evidence/phase6/D1_01_format.txt
+---trip-planner-report---
+507 ./trip_planner_project_report.md
+-rw-r--r-- 1 KIIT 197609 43252 Oct 11 21:19 trip_planner_project_report.md

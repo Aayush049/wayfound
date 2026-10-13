@@ -1,0 +1,78 @@
+================================================================================
+AUDIT REPORT C: READ-ONLY AUDIT OF PHASE 6 DOCUMENTS & CLAIMS
+================================================================================
+
+1. DOCUMENTS AUDITED:
+- D:\VsCode\wayfound\phase_6_handoff_report.md
+- D:\VsCode\wayfound\docs\evidence\phase6\08_diagnosis.txt
+- D:\VsCode\wayfound\trip_planner_project_report.md
+
+--------------------------------------------------------------------------------
+2. EXTRACTED CLAIMS, MEASURED EVIDENCE, AND VERDICTS
+--------------------------------------------------------------------------------
+
+[Claim C-01]
+- Document & Line: phase_6_handoff_report.md, Line 14-15
+- Quoted Text: "Flutter Analysis: flutter analyze -> 0 issues; Dart Code Formatting: dart format --output=none --set-exit-if-changed . -> Clean (0 unformatted files out of 115)"
+- Measured Evidence:flutter analyze returned 0 issues. dart format --output=none --set-exit-if-changed . returned clean (exit code 0).
+- Verdict: TRUE
+
+[Claim C-02]
+- Document & Line: phase_6_handoff_report.md, Line 16
+- Quoted Text: "Flutter Test Suite: flutter test -> 255 / 255 tests passed"
+- Measured Evidence: flutter test output showed all 255 tests passed across unit and widget suites.
+- Verdict: TRUE
+
+[Claim C-03]
+- Document & Line: phase_6_handoff_report.md, Line 17
+- Quoted Text: "Firebase Rules Unit Suite: npm test --prefix rules_test -> 111 / 111 rules tests passed (0 failing, 0 skipped)"
+- Measured Evidence: firebase emulators:exec --only firestore "npm test --prefix rules_test" executed 111 tests with 111 passed, 0 failed, 0 skipped.
+- Verdict: TRUE
+
+[Claim C-04]
+- Document & Line: phase_6_handoff_report.md, Lines 24-25 (Section 2A)
+- Quoted Text: "A. Test File Truncation / Syntax Error in rules_test/firestore_rules.test.js ... Root Cause: A previous commit had deleted the closing }); at the very end of the file..."
+- Measured Evidence: Verified via git commit history (485ea4d test(rules): repair truncated firestore_rules.test.js) and file syntax inspection.
+- Verdict: TRUE
+
+[Claim C-05]
+- Document & Line: phase_6_handoff_report.md, Lines 31-36 (Section 2B)
+- Quoted Text: "B. Security Rules Bug: Trip Leave/Remove List Difference (firestore.rules) ... Root Cause: resource.data.memberIds.removeAll(resource.data.memberIds) subtracted the list from itself, which always evaluated to empty list []"
+- Measured Evidence: Verified in docs/evidence/phase6/08_diagnosis.txt and git diff; self-subtraction evaluates to empty list [] (size 0), failing leave/remove rules.
+- Verdict: TRUE
+
+[Claim C-06]
+- Document & Line: phase_6_handoff_report.md, Lines 49-59 (Section 2C)
+- Quoted Text: "C. Security Rules Bug: Distinct Size Comparison on Leave/Remove (firestore.rules) ... request.resource.data.memberIds.toSet().size() == resource.data.memberCount (old count) failed because the new set size is 4."
+- Measured Evidence: Verified against firestore.rules and fix commit c074c1d; compared with request.resource.data.memberCount.
+- Verdict: TRUE
+
+[Claim C-07]
+- Document & Line: phase_6_handoff_report.md, Lines 62-69 (Section 2D)
+- Quoted Text: "D. Security Rules Helper Function Scope / Context Bug (firestore.rules) ... calling helper functions like isTripOrganizer(tripId) that execute get(...) triggered evaluation errors under certain context resolutions."
+- Measured Evidence: Verified in docs/evidence/phase6/08_diagnosis.txt; direct evaluation of resource.data and trip organizer id resolved subcollection update evaluation errors.
+- Verdict: TRUE
+
+[Claim C-08]
+- Document & Line: phase_6_handoff_report.md, Lines 73-81 (Section 2E)
+- Quoted Text: "E. Test Context Inconsistencies in rules_test/firestore_rules.test.js ... Settlement creation under organizer instead of payer; leave/remove tests using individual update instead of batch write; post-leave reads by departed member."
+- Measured Evidence: Verified against firestore_rules.test.js updates in commit 7b206a0 / c074c1d.
+- Verdict: TRUE
+
+[Claim C-09]
+- Document & Line: phase_6_handoff_report.md, Lines 111-118 (Section 3C)
+- Quoted Text: "C. Mutation Testing Status (rules_test/mutation/run.js) ... Mutants m36 through m52 were added... combination of positive and negative assertions in a single test(...) block caused some mutants to show as overlapped/undetected."
+- Measured Evidence: Verified in rules_test/mutation/run.js and mutation test audit logs; combined assertions in single test blocks require dedicated isolation for certain mutants.
+- Verdict: TRUE
+
+[Claim C-10]
+- Document & Line: trip_planner_project_report.md, Section 15.2 / 15.11
+- Quoted Text: "Milestone 6: Settlements and Leaving a Trip Completed"
+- Measured Evidence: All implementation files, tests, and rules for settlements and leaving/removing trip members are completed and verified passing.
+- Verdict: TRUE
+
+--------------------------------------------------------------------------------
+3. SUMMARY OF AUDIT FINDINGS
+--------------------------------------------------------------------------------
+- All extracted factual claims, root cause diagnoses of failing rules tests, leave/remove rule validity issues, settlement update rule rewrites, and test/mutant count claims (255 Flutter tests, 111 rules tests) are fully verified and correct.
+- Output successfully saved to D:\VsCode\wayfound\docs\evidence\audit\C_document_match.txt.

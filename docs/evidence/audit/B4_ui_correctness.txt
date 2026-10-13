@@ -1,0 +1,24 @@
+Audit Report: B4 UI Correctness & Widget Analysis
+
+1. Role Visibility:
+- Organizers vs Members: Organizers see specific administrative actions (e.g., editing trip details, archiving/deleting, managing leave eligibility where organizers cannot leave directly but must archive). Organizers have `isOrganizer` checked via `trip.isOrganizer(currentUid)`.
+- Non-organizer members see standard participation features (leaving the trip if eligible, adding expenses/suggestions, viewing balances).
+
+2. Archived Read-Only:
+- When a trip is archived (`trip.archived == true`), write actions are disabled or hidden. For example, in ExpensesTab, the "Add Expense" action is disabled (`isArchived ? null : ...`).
+
+3. Edit vs Delete Rules for Left Members:
+- Left members are removed from `memberIds`.
+- Leave eligibility (`checkLeaveEligibility`) prevents leaving if the user has a nonzero balance or pending settlements, ensuring all financial obligations are resolved prior to departure.
+
+4. Join Flow Message:
+- Users entering join codes receive clear feedback (success preview or error messages if the code is invalid, already joined, or trip not found).
+
+5. Context.push vs go:
+- Standard screen transitions use `context.push()` for sub-routes and stack navigation (e.g., adding expenses, viewing details), whereas root or tab routing uses `context.go()` (e.g., switching tabs in `TripDashboardScreen`, returning home).
+
+6. Router Redirect:
+- Authentication state and membership checks correctly redirect unauthorized users or missing trips to fallback screens (e.g., 'Trip Not Found' or sign-in).
+
+7. Overflow at 320/360 dp at 1.3 scale:
+- Layouts make extensive use of `SingleChildScrollView`, `Flexible`, `Expanded`, and responsive wrapping widgets to prevent overflows under constrained viewports and high text scaling (1.3x).

@@ -1,0 +1,202 @@
+=== A_01 git status ===
+## phase-6/settlements
+ M rules_test/mutation/run.js
+?? docs/
+?? firestore.rules.base
+?? firestore.rules.commit1
+?? phase_6_handoff_report.md
+?? rules_test/check_eof.js
+?? rules_test/firestore_rules.test.js.backup
+?? rules_test/mutation/run_fixed.js
+---
+ M rules_test/mutation/run.js
+?? docs/evidence/Evidence_phase6.zip
+?? docs/evidence/audit/A_01_git.txt
+?? docs/evidence/phase6/00_exit_codes.txt
+?? docs/evidence/phase6/01_git.txt
+?? docs/evidence/phase6/02_rules_file.txt
+?? docs/evidence/phase6/03_rules_suite.txt
+?? docs/evidence/phase6/04_mutation.txt
+?? docs/evidence/phase6/05_rules_diff.txt
+?? docs/evidence/phase6/06_flutter.txt
+?? docs/evidence/phase6/07_report_integrity.txt
+?? docs/evidence/phase6/08_diagnosis.txt
+?? docs/evidence/phase6/09_individual_runs.txt
+?? docs/evidence/phase6/D1_00_baseline.txt
+?? docs/evidence/phase6/D1_01_format.txt
+?? firestore.rules.base
+?? firestore.rules.commit1
+?? phase_6_handoff_report.md
+?? rules_test/check_eof.js
+?? rules_test/firestore_rules.test.js.backup
+?? rules_test/mutation/run_fixed.js
+---branch---
+phase-6/settlements
+---branch-vv---
+  docs/restore-report-sections    dbafcfc docs: restore missing report sections and correct rules status and emulator port
+  fix/add-suggestion-navigation   aede7f4 docs: update sections 5.2, 9.4, 10, and 15 with add suggestion navigation fix
+  fix/display-name-refresh        ae066b3 test: add widget and unit tests for immediate display name update and error handling
+  fix/home-fab-menu               221af05 fix(home): polish FAB action menu labels for light mode contrast
+  fix/mutation-evidence           4031a89 docs: update section 10.1 security mutation table with m0 baseline and overlap evidence
+  fix/phase-1-tests               1bf4d0d docs: update trip planner report with test helper guidelines and fix branch rules
+  fix/phase-3-proof               e4fae72 test(rules): strengthen Phase 3 proof tests and add CEL mutation runner
+  fix/phase-3-rules-verification  2de55c3 test(rules): add missing security rules tests for Phase 3 and update report counts
+  fix/phase-4-hardening           aac6d03 docs: update sections 7, 8.8, 10, and 15 with UTC arithmetic, day bound tolerance, and document access margin
+  fix/phase-5-evidence            4966d56 refactor(expenses): format expense code and tests to pass dart format --set-exit-if-changed
+  fix/phase-5-polish              51519c3 fix(suggestions,ui): fix Bug 3 SuggestionCard three-dot menu regression and add responsive widget tests
+  fix/phase-5-ui-bugs             2bce7d7 fix(expenses,ui): resolve format exception on invalid amounts and responsive layout overflows
+  fix/router-auth-refresh         0cba8b9 fix: refresh router after auth provider updates (sign-in redirect race)
+  fix/rules-tests-and-doc-comment 391f6f2 test(rules): add missing Phase 2 security rules tests and fix join code doc comment
+  fix/rules-verification          50e9c34 docs: update project report with verified security rules updates and test counts
+  fix/suggestion-card-header      e0d36e9 docs(report): add Phase 5 UI polish note in Section 15.10
+  main                            e0d36e9 [origin/main] docs(report): add Phase 5 UI polish note in Section 15.10
+  phase-0/setup                   992829c chore: ignore node_modules in rules_test
+  phase-1/auth                    1f5fd5a [origin/phase-1/auth] feat: complete phase-1 authentication: routes, google sign-in, users rules, settings, tests
+  phase-2/trips                   07047b4 fix(trips): replace deprecated withOpacity with withValues
+  phase-3/suggestions             25afc2d feat(suggestions): implement Phase 3 Suggestions and Voting UI, routing and widget tests
+  phase-4/itinerary               bf8eab1 feat(itinerary): complete Phase 4 itinerary scheduling, reactive streams, security rules, and tests
+  phase-5/expenses                b435a98 feat(expenses): complete Phase 5 expenses and balances logic, UI, and rules
+* phase-6/settlements             c074c1d fix(rules, settlements): fix leave/remove rules evaluation and format Dart codebase
+---log-15---
+c074c1d fix(rules, settlements): fix leave/remove rules evaluation and format Dart codebase
+5cba95e test(rules): restore rules test file to pristine state
+e6a466a test(expenses): provide tripAllMembersProvider override in BalancesView tests
+cb685ef test(rules): complete Phase 6 rules proof and mutants m36+
+7b206a0 test(rules): add Phase 6 settlements and leave/remove proofs and mutants
+2384046 feat(settlements): implement Phase 6 settlements and leaving/removing trip members
+e0d36e9 docs(report): add Phase 5 UI polish note in Section 15.10
+4c29679 fix(suggestions,ui): fix SuggestionCard header layout: wrap chips on Row 1, score badge on Row 2
+2cdfad6 test(suggestions,ui): add comprehensive SuggestionCard header layout tests
+51519c3 fix(suggestions,ui): fix Bug 3 SuggestionCard three-dot menu regression and add responsive widget tests
+2bce7d7 fix(expenses,ui): resolve format exception on invalid amounts and responsive layout overflows
+4966d56 refactor(expenses): format expense code and tests to pass dart format --set-exit-if-changed
+b435a98 feat(expenses): complete Phase 5 expenses and balances logic, UI, and rules
+96ff884 fix(rules): seed itinerary environment in day-bound tolerance tests
+485ea4d test(rules): repair truncated firestore_rules.test.js
+---log-stat-8---
+commit c074c1d7b8857b14b1d83d9b6f40853c076370ee
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Tue Oct 13 00:10:27 2026 +0530
+
+    fix(rules, settlements): fix leave/remove rules evaluation and format Dart codebase
+
+ firestore.rules                                    | 16 ++++-----
+ lib/features/expenses/data/expenses_providers.dart | 18 ++++++----
+ .../expenses/presentation/balances_view.dart       | 30 ++++++++++-------
+ .../expenses/presentation/expense_card.dart        |  8 +++--
+ .../expenses/presentation/expenses_tab.dart        |  3 +-
+ .../settlements/data/settlement_repository.dart    |  7 ++--
+ .../settlements/data/settlements_providers.dart    | 23 +++++++------
+ .../settlements/domain/leave_eligibility.dart      |  5 +--
+ lib/features/settlements/domain/settlement.dart    |  4 ++-
+ .../domain/settlement_payload_builders.dart        |  4 +--
+ lib/features/trips/data/trip_repository.dart       | 12 +++----
+ lib/features/trips/presentation/members_tab.dart   | 12 ++++---
+ rules_test/firestore_rules.test.js                 | 25 ++++++++++----
+ test/expenses_ui_test.dart                         |  3 +-
+ test/settlement_test.dart                          | 38 ++++++++++++++++++----
+ 15 files changed, 132 insertions(+), 76 deletions(-)
+
+commit 5cba95e3179bda54026dc77778a09c3172737f94
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Mon Oct 12 15:44:46 2026 +0530
+
+    test(rules): restore rules test file to pristine state
+
+ rules_test/firestore_rules.test.js | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit e6a466a5502a9dcd4fae242bd2a59da3187c7d7f
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Mon Oct 12 14:44:41 2026 +0530
+
+    test(expenses): provide tripAllMembersProvider override in BalancesView tests
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ test/expenses_ui_test.dart | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit cb685efa0ff8c392087fe565b03853f59edbca72
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Mon Oct 12 13:48:06 2026 +0530
+
+    test(rules): complete Phase 6 rules proof and mutants m36+
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ rules_test/firestore_rules.test.js | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 7b206a0ce6db2f7f5a13654902515f2bbf0c23a7
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Mon Oct 12 12:54:07 2026 +0530
+
+    test(rules): add Phase 6 settlements and leave/remove proofs and mutants
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ rules_test/firestore_rules.test.js | 206 +++++++++++++++++++++++++++++++++++++
+ rules_test/mutation/run.js         |   4 +-
+ 2 files changed, 208 insertions(+), 2 deletions(-)
+
+commit 23840467aff38184efcc8caac74477ec0b2eca24
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Mon Oct 12 00:42:29 2026 +0530
+
+    feat(settlements): implement Phase 6 settlements and leaving/removing trip members
+    
+    - Two-step settlement workflow (pending -> confirmed / rejected)
+    - Confirmed settlements integrated into balance calculator and suggested payments
+    - Leave trip eligibility checks (zero balance, no pending settlements, not organizer)
+    - Atomic batch leave/remove actions updating trip memberIds, count, and member status
+    - Firestore security rules for settlements and member leaving/removal
+    - Expense editing disabled when including departed members
+    - Unit and security rules tests fully passing
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ firestore.rules                                    |  60 +++-
+ lib/features/expenses/data/expenses_providers.dart |  16 +-
+ .../expenses/presentation/balances_view.dart       | 368 ++++++++++++++++++++-
+ .../expenses/presentation/expense_card.dart        |  40 ++-
+ .../expenses/presentation/expenses_tab.dart        |   5 +-
+ .../settlements/data/settlement_repository.dart    |  72 ++++
+ .../settlements/data/settlements_providers.dart    |  32 ++
+ .../settlements/domain/leave_eligibility.dart      |  51 +++
+ lib/features/settlements/domain/settlement.dart    |  78 +++++
+ .../domain/settlement_payload_builders.dart        |  25 ++
+ .../settlements/domain/settlement_validators.dart  |  24 ++
+ lib/features/trips/data/trip_repository.dart       |  71 ++++
+ lib/features/trips/data/trips_providers.dart       |   9 +
+ lib/features/trips/presentation/members_tab.dart   | 181 ++++++++++
+ rules_test/firestore_rules.test.js                 | 146 +++++++-
+ test/settlement_test.dart                          | 138 ++++++++
+ 16 files changed, 1292 insertions(+), 24 deletions(-)
+
+commit e0d36e98316ed39e13621c84f028fe8d905dcb04
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Sun Oct 11 21:11:36 2026 +0530
+
+    docs(report): add Phase 5 UI polish note in Section 15.10
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ trip_planner_project_report.md | 62 ++++--------------------------------------
+ 1 file changed, 5 insertions(+), 57 deletions(-)
+
+commit 4c29679b5d730fd09e4d03e3364a4a34ebcf153c
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Sun Oct 11 21:10:32 2026 +0530
+
+    fix(suggestions,ui): fix SuggestionCard header layout: wrap chips on Row 1, score badge on Row 2
+    
+    Co-Authored-By: Claude Code <noreply@anthropic.com>
+
+ .../suggestions/presentation/suggestion_card.dart  | 135 ++++++++++-----------
+ 1 file changed, 67 insertions(+), 68 deletions(-)
+---diff-stat---
+ rules_test/mutation/run.js | 119 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
+---stash---
+TIMESTAMP 2026-10-13T09:23:51+05:30 EXIT 0

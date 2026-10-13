@@ -1,0 +1,93 @@
+=== 1. FILES UNDER lib/features/settlements/, lib/features/trips/, lib/features/expenses/ ===
+
+--- lib/features/settlements/ ---
+lib\features\settlements\data\settlement_repository.dart: 1963 bytes
+lib\features\settlements\data\settlements_providers.dart: 1060 bytes
+lib\features\settlements\domain\leave_eligibility.dart: 1494 bytes
+lib\features\settlements\domain\settlement.dart: 2138 bytes
+lib\features\settlements\domain\settlement_payload_builders.dart: 567 bytes
+lib\features\settlements\domain\settlement_validators.dart: 599 bytes
+
+--- lib/features/trips/ ---
+lib\features\trips\data\trip_repository.dart: 9059 bytes
+lib\features\trips\data\trips_providers.dart: 1472 bytes
+lib\features\trips\domain\currencies.dart: 2265 bytes
+lib\features\trips\domain\join_code.dart: 1096 bytes
+lib\features\trips\domain\join_preview.dart: 1367 bytes
+lib\features\trips\domain\member.dart: 1187 bytes
+lib\features\trips\domain\trip.dart: 2679 bytes
+lib\features\trips\domain\trip_payload_builders.dart: 2655 bytes
+lib\features\trips\domain\trip_validators.dart: 1594 bytes
+lib\features\trips\presentation\create_trip_screen.dart: 11140 bytes
+lib\features\trips\presentation\home_screen.dart: 10104 bytes
+lib\features\trips\presentation\join_trip_screen.dart: 15610 bytes
+lib\features\trips\presentation\members_tab.dart: 14000 bytes
+lib\features\trips\presentation\trip_card.dart: 5417 bytes
+lib\features\trips\presentation\trip_dashboard_screen.dart: 5804 bytes
+
+--- lib/features/expenses/ ---
+lib\features\expenses\data\expense_repository.dart: 2911 bytes
+lib\features\expenses\data\expenses_providers.dart: 2447 bytes
+lib\features\expenses\domain\balance_calculator.dart: 5119 bytes
+lib\features\expenses\domain\expense.dart: 2513 bytes
+lib\features\expenses\domain\expense_payload_builders.dart: 1657 bytes
+lib\features\expenses\domain\expense_validators.dart: 2682 bytes
+lib\features\expenses\domain\split_logic.dart: 842 bytes
+lib\features\expenses\presentation\add_edit_expense_screen.dart: 20050 bytes
+lib\features\expenses\presentation\balances_view.dart: 23880 bytes
+lib\features\expenses\presentation\expense_card.dart: 7843 bytes
+lib\features\expenses\presentation\expense_split_sheet.dart: 4358 bytes
+lib\features\expenses\presentation\expenses_tab.dart: 6787 bytes
+
+
+=== 2. TEST FILES UNDER test/ WITH TEST CASE COUNTS ===
+
+test\add_suggestion_navigation_test.dart: 7 tests (0 test, 7 testWidgets)
+test\app_shell_test.dart: 3 tests (0 test, 3 testWidgets)
+test\app_user_test.dart: 3 tests (3 test, 0 testWidgets)
+test\auth_provider_test.dart: 2 tests (2 test, 0 testWidgets)
+test\auth_repository_test.dart: 10 tests (10 test, 0 testWidgets)
+test\auth_validators_test.dart: 19 tests (19 test, 0 testWidgets)
+test\avatar_fallback_test.dart: 2 tests (0 test, 2 testWidgets)
+test\create_trip_screen_test.dart: 3 tests (0 test, 3 testWidgets)
+test\expense_repository_test.dart: 4 tests (4 test, 0 testWidgets)
+test\expenses_logic_test.dart: 13 tests (13 test, 0 testWidgets)
+test\expenses_ui_test.dart: 13 tests (0 test, 13 testWidgets)
+test\helpers\pump_app.dart: 0 tests (0 test, 0 testWidgets)
+test\home_screen_test.dart: 11 tests (0 test, 11 testWidgets)
+test\itinerary_domain_test.dart: 16 tests (16 test, 0 testWidgets)
+test\itinerary_repository_test.dart: 4 tests (4 test, 0 testWidgets)
+test\itinerary_ui_test.dart: 5 tests (0 test, 5 testWidgets)
+test\join_code_test.dart: 5 tests (5 test, 0 testWidgets)
+test\join_trip_screen_test.dart: 3 tests (0 test, 3 testWidgets)
+test\members_tab_test.dart: 2 tests (0 test, 2 testWidgets)
+test\money_test.dart: 5 tests (5 test, 0 testWidgets)
+test\router_test.dart: 3 tests (0 test, 3 testWidgets)
+test\settings_screen_test.dart: 6 tests (0 test, 6 testWidgets)
+test\settlement_test.dart: 7 tests (7 test, 0 testWidgets)
+test\sign_in_screen_test.dart: 4 tests (0 test, 4 testWidgets)
+test\sign_up_screen_test.dart: 3 tests (0 test, 3 testWidgets)
+test\suggestion_card_menu_test.dart: 1 tests (0 test, 1 testWidgets)
+test\suggestion_card_overflow_test.dart: 2 tests (0 test, 2 testWidgets)
+test\suggestion_domain_test.dart: 6 tests (6 test, 0 testWidgets)
+test\suggestion_repository_test.dart: 5 tests (5 test, 0 testWidgets)
+test\suggestions_ui_test.dart: 7 tests (0 test, 7 testWidgets)
+test\theme_test.dart: 4 tests (4 test, 0 testWidgets)
+test\trip_dashboard_screen_test.dart: 3 tests (0 test, 3 testWidgets)
+test\trip_days_test.dart: 20 tests (20 test, 0 testWidgets)
+test\trip_domain_test.dart: 6 tests (6 test, 0 testWidgets)
+test\trip_payload_builders_test.dart: 6 tests (6 test, 0 testWidgets)
+test\trip_repository_test.dart: 7 tests (7 test, 0 testWidgets)
+test\trip_validators_test.dart: 11 tests (11 test, 0 testWidgets)
+test\welcome_screen_test.dart: 2 tests (0 test, 2 testWidgets)
+test\widgets\add_edit_expense_screen_test.dart: 3 tests (0 test, 3 testWidgets)
+test\widgets_test.dart: 4 tests (0 test, 4 testWidgets)
+
+
+=== 3. TEST FILES MENTIONING settlement, leave, Leave, remove ===
+
+test\expense_repository_test.dart
+test\expenses_logic_test.dart
+test\join_code_test.dart
+test\settlement_test.dart
+test\suggestion_repository_test.dart

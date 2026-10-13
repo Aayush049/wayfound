@@ -1,0 +1,15 @@
+## phase-6/settlements
+ M rules_test/mutation/run.js
+?? docs/
+?? phase_6_handoff_report.md
+?? rules_test/check_eof.js
+?? rules_test/mutation/run_fixed.js
+phase-6/settlements
+c074c1d fix(rules, settlements): fix leave/remove rules evaluation and format Dart codebase
+5cba95e test(rules): restore rules test file to pristine state
+e6a466a test(expenses): provide tripAllMembersProvider override in BalancesView tests
+cb685ef test(rules): complete Phase 6 rules proof and mutants m36+
+7b206a0 test(rules): add Phase 6 settlements and leave/remove proofs and mutants
+2384046 feat(settlements): implement Phase 6 settlements and leaving/removing trip members
+ rules_test/mutation/run.js | 119 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)

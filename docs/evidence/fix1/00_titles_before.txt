@@ -1,0 +1,124 @@
+Cannot change other trip fields during leave/remove
+Cannot leave/remove from archived trip
+Cannot remove the organizer (including organizer leaving)
+Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied
+Create denied for extra key or missing key
+Create denied for invalid amount (0, negative, float, string, over cap)
+Create denied for invalid description (empty, >100 chars, non-string)
+Create denied for invalid paidBy (not a member, non-string)
+Create denied for invalid participantIds (empty, 16 elements, non-member, duplicates, non-list, non-strings)
+Create denied for signed out and non-member
+Create denied on archived trip
+Create denied when createdBy is not the caller
+Create denied when date is not a timestamp or createdAt is a client date
+DESCRIBE: Phase 3 proof tests
+DESCRIBE: Phase 3: Suggestions & Votes Security Rules
+DESCRIBE: Phase 4 itinerary rules
+DESCRIBE: Phase 5 expense rules
+DESCRIBE: Phase 6: Settlements & Leaving a Trip Security Rules
+DESCRIBE: Read & Query Permissions
+DESCRIBE: Trip Join Boundary & Security Tests
+DESCRIBE: Trips & Join Security Rules
+DESCRIBE: Users Collection Security Rules
+Day bound tolerance: diff 0 (1-day trip) allows dayIndex 0, denies 1
+Day bound tolerance: diff 30 days allows 30, denies 31
+Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3
+Day bound tolerance: diff 49 hours (fall-back) allows 2, denies 3
+Day bound tolerance: diff exactly 2 days allows 2, denies 3
+Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied
+Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+Denied suggestion create for invalid fields, authorId, counters, status, dayIndex, client date, cost
+Denied trip create when createdAt is not request.time
+Denied trip create when end date is before start date
+Denied trip create when joinCode does not match joinCodes document tripId
+Denied trip create when memberCount is not 1
+Denied trip create when memberIds is not [auth.uid]
+Denied trip create when members doc or joinCodes doc is missing from batch
+Denied trip create when name is empty or too long
+Denied trip create when organizerId is wrong
+Denied trip create with extra or missing keys
+Denied trip create with invalid currency
+Denied trip create with invalid joinCode format or duplicate join code
+Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys
+Existing content-update and counter branches cannot set scheduling fields, and vote transaction works on scheduled item
+Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C])
+Join DENIED when new memberIds drops an existing member while adding caller (count +1)
+Join DENIED when one old member is replaced by caller and memberCount is unchanged
+Join DENIED when removing one member and adding caller plus another uid (memberCount +1)
+Join SUCCEEDS for normal case at count 1 (1 to 2) and count 14 (14 to 15)
+Join fails when adding another user uid or adding two uids or changing other fields
+Join fails when caller is already a member
+Join fails when member doc is missing or role is organizer or displayName is spoofed
+Join fails when memberCount increases by +2
+Join fails when memberIds.length and memberCount are inconsistent
+Join fails when trip is archived
+Marking status "left" WITHOUT removing uid from memberIds is denied
+Member can read trip and list members
+Member leaves successfully (batch update + member status left)
+My Trips array-contains query succeeds for member and list without filter fails
+Non-member cannot leave/remove
+Non-member cannot read trip or members subcollection
+Organizer removes member successfully
+Organizer reorders, moves day, and unschedules
+Organizer schedules pending suggestion to scheduled (day 0 and last day)
+Other user cannot read or update another user document
+Owner can create user document with valid fields
+Owner can get own user document
+Owner can update displayName and photoUrl
+Owner cannot create user document with extra keys
+Owner cannot create user document with missing required keys
+Owner cannot create user document with wrong email
+Owner cannot create user document with wrong uid in path
+Owner list and delete operations are denied
+Owner update fails if attempting to change forbidden fields
+Padding attack denial - cannot add uid while removing
+Padding attack denial - removing two uids at once
+Payer can cancel pending settlement via delete
+Plain member cannot remove another member
+Proof 1: Signed-out and non-member vote write denied
+Proof 2: Vote value 2 and 0 denied on create with unchanged counters
+Proof 3: Re-vote with same value denied
+Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied
+Proof 5: Signed-out, non-member and other-member reads of vote document denied
+Proof 6a: Content update changing createdAt denied
+Proof 6b: Content update changing authorId denied
+Proof 6c: Content update changing status denied
+Proof 6d: Content update changing dayIndex denied
+Proof 6e: Content update changing order denied
+Proof 7: Suggestion delete denied for non-member and signed-out user
+Proof 8a: Plain suggestion counter update with NO vote change denied
+Proof 8b: Vote write with NO matching counter change denied
+Read: member succeeds; non-member and signed out denied
+Removing uid from memberIds WITHOUT marking status "left" is denied
+Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip
+Sequential boundary test: succeeds at 14 to 15, fails at 15 to 16
+Settlement resolve succeeds for receiver or organizer (non-payer), fails for unauthorized or self-confirm by organizer
+Signed-out and non-member are denied reading or writing suggestions and votes
+Signed-out user cannot leave/remove
+Signed-out user cannot read or write trips or joinCodes
+Signed-out user cannot read or write user documents
+Suggestion delete: author and organizer succeed, other member denied
+Trip members can read settlements, non-members cannot
+Update denied for invalid resulting values (amount, description, paidBy, participantIds, date)
+Update denied on archived trip
+Update denied when changing createdBy or createdAt
+Update: creator and organizer succeed; other member and non-member denied
+Valid create: payer is creator, payer is another member, subset, all 15 participants
+Valid join batch succeeds (memberCount 1 to 2)
+Valid member suggestion create succeeds
+Valid settlement create succeeds by payer, fails for invalid fields, amounts, or non-members
+Valid trip create atomic batch succeeds
+Vote transactions & counter coupling: all 6 vote transitions succeed with matching counters
+Votes read permissions: owner can read own vote, other member cannot read owner vote
+a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)
+b) [A,B]->[A,A], count 2->1, B leaves (denied)
+c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)
+d) [A,B,C]->[A,C], count 2 (valid, allowed - positive control)
+joinCodes single get allowed for signed-in user, list denied
+joinCodes update fails if not matching trip memberCount or deleting
+memberCount must decrease by exactly 1
+members subcollection update and delete operations are denied
+members/{uid} updates changing keys other than status are denied
+users create DENIED when createdAt is a client Date (not request.time)
+users create SUCCEEDS with serverTimestamp
+users update DENIED when createdAt is changed

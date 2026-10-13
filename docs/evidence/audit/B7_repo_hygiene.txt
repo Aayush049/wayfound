@@ -1,0 +1,60 @@
+# Phase 6 Audit Report: Repository Hygiene & Commit History Inspection (Task B7)
+
+## 1. Executive Summary
+This audit inspects the last 12 commits of the repository leading up to Phase 6 (`phase-6/settlements`), specifically investigating:
+- Commit history and mixed concerns.
+- Commit message mismatches.
+- File deletions and severe truncations (specifically checking `trip_planner_project_report.md`).
+- Line counts of `rules_test/firestore_rules.test.js` and `trip_planner_project_report.md` across the examined commit history.
+
+The audit findings and evidence have been compiled and saved to `docs/evidence/audit/B7_repo_hygiene.txt`.
+
+---
+
+## 2. Examination of the Last 12 Commits
+
+| Commit | Date | Author | Subject | Primary Changes & Notes |
+|---|---|---|---|---|
+| `c074c1d` | 2026-10-13 | Aayush049 | `fix(rules, settlements): fix leave/remove rules evaluation and format Dart codebase` | Fixed Firestore rules for leave/remove evaluation and formatted Dart codebase across 15 files. |
+| `5cba95e` | 2026-10-12 | Aayush049 | `test(rules): restore rules test file to pristine state` | Minor cleanup in `rules_test/firestore_rules.test.js` (-1 line). |
+| `e6a466a` | 2026-10-12 | Aayush049 | `test(expenses): provide tripAllMembersProvider override in BalancesView tests` | Added provider override in `test/expenses_ui_test.dart`. |
+| `cb685ef` | 2026-10-12 | Aayush049 | `test(rules): complete Phase 6 rules proof and mutants m36+` | Added closing bracket in `rules_test/firestore_rules.test.js`. |
+| `7b206a0` | 2026-10-12 | Aayush049 | `test(rules): add Phase 6 settlements and leave/remove proofs and mutants` | Added comprehensive Phase 6 leave/remove security rules tests (+206 lines in test file). |
+| `2384046` | 2026-10-12 | Aayush049 | `feat(settlements): implement Phase 6 settlements and leaving/removing trip members` | Major feature commit: two-step settlements, leave eligibility, security rules, and UI components (+1292 lines). |
+| `e0d36e9` | 2026-10-11 | Aayush049 | `docs(report): add Phase 5 UI polish note in Section 15.10` | **CRITICAL INCIDENT**: Although the commit message stated an addition to Section 15.10, this commit severely truncated `trip_planner_project_report.md` (removing 57 lines, wiping out sections 10.1 table, derived colors table, and Milestone 1 status). |
+| `4c29679` | 2026-10-11 | Aayush049 | `fix(suggestions,ui): fix SuggestionCard header layout: wrap chips on Row 1, score badge on Row 2` | Suggestion card header layout adjustments. |
+| `2cdfad6` | 2026-10-11 | Aayush049 | `test(suggestions,ui): add comprehensive SuggestionCard header layout tests` | Updated suggestion card menu unit/widget tests. |
+| `51519c3` | 2026-10-11 | Aayush049 | `fix(suggestions,ui): fix Bug 3 SuggestionCard three-dot menu regression and add responsive widget tests` | Three-dot menu regression fix and responsive widget tests. |
+| `2bce7d7` | 2026-10-11 | Aayush049 | `fix(expenses,ui): resolve format exception on invalid amounts and responsive layout overflows` | Amount validation and layout overflow fixes across expenses and suggestions. |
+| `4966d56` | 2026-10-11 | Aayush049 | `refactor(expenses): format expense code and tests to pass dart format --set-exit-if-changed` | Expense code formatting pass. |
+
+---
+
+## 3. Specific Findings & Audit Categories
+
+### A. Mixed Concerns
+- **Commit `c074c1d`**: Combines security rules fix (`firestore.rules` and `rules_test/firestore_rules.test.js`) with Dart codebase formatting across 15 files (`expenses`, `settlements`, `trips`). While convenient, it mixes rule evaluation logic fixes with code formatting.
+- **Commit `2384046`**: A massive atomic feature commit (`feat(settlements)`) that implements backend models, repositories, providers, domain validation, security rules, UI presentation screens (`members_tab.dart`, `balances_view.dart`, `expense_card.dart`), and unit tests all in a single commit (+1292 / -24 lines across 16 files). Although large, it represents a coherent milestone feature drop.
+
+### B. Commit Message Mismatches & Documentation Truncation
+- **Commit `e0d36e9` (`docs(report): add Phase 5 UI polish note in Section 15.10`)**:
+  - **Mismatch**: The commit message implies a targeted documentation addition (`add Phase 5 UI polish note in Section 15.10`).
+  - **Truncation / Data Loss**: In reality, this commit replaced almost the entire contents of `trip_planner_project_report.md`, deleting 57 lines including the mutation testing results table (Section 10.1), derived colors table (Section 14.5), project identity details (Section 15.1-15.2), and Milestone 1 status (Section 15.3). This represents a severe documentation truncation masked by a benign commit message.
+
+### C. Line Counts of Key Audit Files across Last 12 Commits
+1. **`rules_test/firestore_rules.test.js`**:
+   - Commit `2384046` (Phase 6 implementation): **3,373 lines**
+   - Commit `7b206a0` (Add Phase 6 proofs): **3,579 lines**
+   - Commit `cb685ef` (Fix bracket): **3,580 lines**
+   - Commit `5cba95e` (Restore pristine state): **3,579 lines**
+   - Commit `c074c1d` (Rules fix & format): **3,590 lines**
+
+2. **`trip_planner_project_report.md`**:
+   - Prior to commit `e0d36e9`: ~564 lines.
+   - Post commit `e0d36e9` (`docs(report): add Phase 5 UI polish note`): **507 lines** (due to the accidental truncation of 57 lines described above).
+
+---
+
+## 4. Recommendations
+1. **Doc Hygiene**: Restore the truncated sections of `trip_planner_project_report.md` (mutation testing table, color derivation table, milestone logs) from git history (`git show HEAD~11:trip_planner_project_report.md`) if required for project completeness.
+2. **Commit Granularity**: Separate formatting changes from logic/rule fixes in future commits to maintain clean diffs and trace-ability.

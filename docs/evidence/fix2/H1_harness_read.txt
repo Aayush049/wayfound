@@ -1,0 +1,22 @@
+Command: H1 Mutation Harness Code Defect Audit
+Timestamp: 2026-10-13 18:30:00
+----------------------------------------
+
+### 1. Harness Workflow Overview
+- **Mutant Definitions:** Array of mutant objects defining `name`, `description`, `relevantTarget`, `find`, `replace`, or `custom` transformer function.
+- **Rule File Duplication:** Reads `firestore.rules`, applies replacement/custom transform, writes to `rules_test/mutation/<name>.rules`, and passes it via `RULES_PATH` environment variable to `firebase emulators:exec`.
+- **Test Execution:** Runs `firebase emulators:exec ... "npm --prefix rules_test test"`.
+- **Pass/Fail Detection:** Parses stdout/stderr for failed test titles (`● ` or `✕ `).
+- **Exit Code Logic:** Exits 1 if baseline `m0` fails or if any relevant/unexpected mutant survives; otherwise exits 0.
+
+### 2. Documented Defects in Existing Harness (`rules_test/mutation/run.js`)
+1. **False Kill on Suite Crash/Compilation Error:** If the emulator or test suite crashes or fails to compile rules, `parseFailedTests` might not correctly distinguish test failure from infrastructure error (or treats any non-zero exit / failure as a kill).
+2. **`find` String Uniqueness Validation:** While there is a simple check (`count !== 1`), it only checks non-custom mutants and can fail or be bypassed if multiple or zero matches occur without strict validation.
+3. **Missing Assertion on Mutated Copy vs Original:** Only checked for `mutantRules === originalRules`, but lacked thorough structural validation.
+4. **No Syntax/Compile Check Prior to Execution:** Mutated rules files were not compiled/validated for syntax errors in the emulator prior to running the full test suite.
+5. **No Expected Killer Attribution (`expectedKillers`):** Mutants did not specify exact expected test titles that must fail; any failing test counted as a kill.
+6. **Surviving Mutants Exit Logic:** Surviving mutants (except baseline) did not strictly enforce allowlists for equivalent mutants or proper exit codes.
+7. **Equivalent / Overlap Mutants Unproven:** Overlapping mutants lacked formal proof or explicit allowlist categorization.
+8. **Real `firestore.rules` Hash Integrity:** The SHA-256 hash of the real `firestore.rules` file was not verified before and after the mutation run to guarantee zero modifications to production rules.
+
+EXIT 0

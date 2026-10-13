@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const net = require('net');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
 
 const rootDir = path.join(__dirname, '..', '..');
@@ -11,528 +11,545 @@ if (!fs.existsSync(outDir)) {
   fs.mkdirSync(outDir, { recursive: true });
 }
 
-// Normalize CRLF to LF for reliable substring matching
+function getFileSha256(filePath) {
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash('sha256').update(content).digest('hex');
+}
+
+const initialRulesHash = getFileSha256(originalRulesPath);
 const originalRules = fs.readFileSync(originalRulesPath, 'utf8').replace(/\r\n/g, '\n');
 
-const mutations = [
+const mutants = [
   {
-    name: 'm0',
+    id: 'm0',
     description: 'BASELINE CONTROL (unchanged firestore.rules)',
     isBaseline: true,
-    relevantTarget: 'Yes (0 failures expected)',
+    expectedKillers: [],
     custom: (rules) => rules,
   },
   {
-    name: 'm1',
+    id: 'm1',
     description: 'member/signed-in checks on vote writes',
-    relevantTarget: 'No (Overlaps with suggestion member check; proven by m1all)',
     find: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
     replace: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid`,
+    expectedKillers: ['Proof 1: Signed-out and non-member vote write denied'],
   },
   {
-    name: 'm1all',
-    description: 'member checks on vote writes AND suggestion updates together',
-    relevantTarget: 'Yes (Proof 1: Signed-out and non-member vote write denied)',
-    custom: (rules) => {
-      let r = rules;
-      const t1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`;
-      const r1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid`;
-      const t2 = `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
-      const r2 = `        allow update: if isSignedIn()\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
-
-      if (r.split(t1).length - 1 !== 1) throw new Error('m1all t1 not found exactly once');
-      if (r.split(t2).length - 1 !== 1) throw new Error('m1all t2 not found exactly once');
-
-      return r.replace(t1, r1).replace(t2, r2);
-    }
-  },
-  {
-    name: 'm2',
+    id: 'm2',
     description: 'value in {1,-1}',
-    relevantTarget: 'Yes (Proof 2 & Denied vote transactions)',
     find: `\n            && (request.resource.data.value == 1 || request.resource.data.value == -1)`,
     replace: ``,
+    expectedKillers: ['Proof 2: Vote value 2 and 0 denied on create with unchanged counters', 'Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys'],
   },
   {
-    name: 'm3',
+    id: 'm3',
     description: 'value != previous value',
-    relevantTarget: 'Yes (Proof 3 & Denied vote transactions)',
     find: `\n            && (request.method == 'create' || request.resource.data.value != resource.data.value)`,
     replace: ``,
+    expectedKillers: ['Proof 3: Re-vote with same value denied', 'Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys'],
   },
   {
-    name: 'm4a',
+    id: 'm4a',
     description: 'archived check on vote create/update',
-    relevantTarget: 'No (Overlaps with suggestion archived check; proven by m4all)',
     find: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`,
     replace: `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
+    expectedKillers: ['Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied'],
   },
   {
-    name: 'm4b',
+    id: 'm4b',
     description: 'archived check on vote delete',
-    relevantTarget: 'No (Overlaps with suggestion archived check; proven by m4all)',
     find: `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`,
     replace: `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`,
+    expectedKillers: ['Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied'],
   },
   {
-    name: 'm4c',
+    id: 'm4c',
     description: 'archived check on suggestion counter update',
-    relevantTarget: 'No (Overlaps with vote archived check; proven by m4all)',
     find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`,
     replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`,
+    expectedKillers: ['Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied'],
   },
   {
-    name: 'm4all',
-    description: 'all three archived checks together',
-    relevantTarget: 'Yes (Proof 4: Vote create, vote delete, and suggestion counter update on archived trip denied)',
-    custom: (rules) => {
-      let r = rules;
-      const t1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`;
-      const r1 = `          allow create, update: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`;
-      const t2 = `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)\n            && isTripNotArchived(tripId)`;
-      const r2 = `          allow delete: if isSignedIn()\n            && uid == request.auth.uid\n            && isTripMember(tripId)`;
-      const t3 = `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
-      const r3 = `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])`;
-
-      if (r.split(t1).length - 1 !== 1) throw new Error('m4all t1 not found exactly once');
-      if (r.split(t2).length - 1 !== 1) throw new Error('m4all t2 not found exactly once');
-      if (r.split(t3).length - 1 !== 1) throw new Error('m4all t3 not found exactly once');
-
-      return r.replace(t1, r1).replace(t2, r2).replace(t3, r3);
-    }
-  },
-  {
-    name: 'm5',
+    id: 'm5',
     description: 'vote read owner check (uid == auth uid)',
-    relevantTarget: 'Yes (Votes read permissions & Proof 5)',
     find: `allow get, list: if isSignedIn() && uid == request.auth.uid && isTripMember(tripId);`,
     replace: `allow get, list: if isSignedIn() && isTripMember(tripId);`,
+    expectedKillers: ['Votes read permissions: owner can read own vote, other member cannot read owner vote', 'Proof 5: Signed-out, non-member and other-member reads of vote document denied'],
   },
   {
-    name: 'm5b',
+    id: 'm5b',
     description: 'vote read member check',
-    relevantTarget: 'Yes (Proof 5: Signed-out, non-member and other-member reads of vote document denied)',
     find: `allow get, list: if isSignedIn() && uid == request.auth.uid && isTripMember(tripId);`,
     replace: `allow get, list: if isSignedIn() && uid == request.auth.uid;`,
+    expectedKillers: ['Proof 5: Signed-out, non-member and other-member reads of vote document denied'],
   },
   {
-    name: 'm6',
+    id: 'm6',
     description: 'content-update hasOnly key restriction',
-    relevantTarget: 'Yes (Proof 6a-6e & Content edit)',
     find: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'note', 'estimatedCost', 'category'])`,
     replace: ``,
+    expectedKillers: ['Proof 6a: Content update changing createdAt denied', 'Proof 6b: Content update changing authorId denied', 'Proof 6c: Content update changing status denied', 'Proof 6d: Content update changing dayIndex denied', 'Proof 6e: Content update changing order denied', 'Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied'],
   },
   {
-    name: 'm7a',
+    id: 'm7a',
     description: 'delete author-or-organizer check',
-    relevantTarget: 'Yes (Suggestion delete: author and organizer succeed, other member denied)',
     find: `\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `;`,
+    expectedKillers: ['Suggestion delete: author and organizer succeed, other member denied'],
   },
   {
-    name: 'm7b',
+    id: 'm7b',
     description: 'delete member check',
-    relevantTarget: 'Yes (Proof 7: Suggestion delete denied for non-member and signed-out user)',
     find: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `        allow delete: if isSignedIn()\n          && isTripNotArchived(tripId)\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));`,
+    expectedKillers: ['Proof 7: Suggestion delete denied for non-member and signed-out user'],
   },
   {
-    name: 'm8a',
+    id: 'm8a',
     description: 'suggestion-side before != after and delta lines together',
-    relevantTarget: 'Yes (Proof 8a: Plain suggestion counter update with NO vote change denied)',
     find: `\n          && getVoteBeforeVal(database, tripId, sid, request.auth.uid) != getVoteAfterVal(database, tripId, sid, request.auth.uid)\n          && request.resource.data.upCount == resource.data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid))\n          && request.resource.data.downCount == resource.data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, request.auth.uid), getVoteAfterVal(database, tripId, sid, request.auth.uid));`,
     replace: `;`,
+    expectedKillers: ['Proof 8a: Plain suggestion counter update with NO vote change denied'],
   },
   {
-    name: 'm8b',
+    id: 'm8b',
     description: 'vote-side mirror delta lines together',
-    relevantTarget: 'Yes (Proof 8b: Vote write with NO matching counter change denied)',
     find: `\n            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount + getUpDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value)\n            && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.downCount + getDownDelta(getVoteBeforeVal(database, tripId, sid, uid), request.resource.data.value);`,
     replace: `;`,
+    expectedKillers: ['Proof 8b: Vote write with NO matching counter change denied'],
   },
   {
-    name: 'm9',
+    id: 'm9',
     description: 'hasAll(resource.data.memberIds) check on trip join',
-    relevantTarget: 'Yes (Join DENIED duplicate member padding)',
     find: `\n        && request.resource.data.memberIds.hasAll(resource.data.memberIds)`,
     replace: ``,
+    expectedKillers: ['Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C])'],
   },
   {
-    name: 'm10',
+    id: 'm10',
     description: 'users createdAt == request.time',
-    relevantTarget: 'Yes (users create DENIED when createdAt is a client Date)',
     find: `\n        && request.resource.data.createdAt == request.time;`,
     replace: `;`,
+    expectedKillers: ['users create DENIED when createdAt is a client Date (not request.time)'],
   },
   {
-    name: 'm11',
+    id: 'm11',
     description: 'organizer check on scheduling branch',
-    relevantTarget: 'Yes (Scheduling denied for plain member)',
     find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
     replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+    expectedKillers: ['Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip'],
   },
   {
-    name: 'm12',
+    id: 'm12',
     description: 'archived check on scheduling',
-    relevantTarget: 'Yes (Scheduling denied for archived trip)',
     find: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
     replace: `        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripOrganizer(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
+    expectedKillers: ['Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip'],
   },
   {
-    name: 'm13',
+    id: 'm13',
     description: 'dayIndex upper bound',
-    relevantTarget: 'Yes (Denied scheduling for dayIndex beyond last day)',
     find: `\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`,
     replace: ``,
+    expectedKillers: ['Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys'],
   },
   {
-    name: 'm14',
+    id: 'm14',
     description: 'status/dayIndex/order coherence',
-    relevantTarget: 'Yes (Denied scheduling for status pending with dayIndex or order)',
     find: `\n          && (\n            (request.resource.data.status == 'pending' && request.resource.data.dayIndex == null && request.resource.data.order == null)\n            ||\n            (\n              request.resource.data.status == 'scheduled'\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000\n              && request.resource.data.order is int\n              && request.resource.data.order >= 0\n              && request.resource.data.order <= 10000\n            )\n          );`,
     replace: `;`,
+    expectedKillers: ['Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys'],
   },
   {
-    name: 'm15',
+    id: 'm15',
     description: 'hasOnly key restriction on scheduling',
-    relevantTarget: 'Yes (Denied scheduling for extra/mixed keys)',
     find: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])`,
     replace: ``,
+    expectedKillers: ['Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys'],
   },
   {
-    name: 'm16',
+    id: 'm16',
     description: 'integer type checks',
-    relevantTarget: 'Yes (Denied scheduling for dayIndex float or order float)',
     find: `\n              && request.resource.data.dayIndex is int\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000\n              && request.resource.data.order is int`,
     replace: `\n              && request.resource.data.dayIndex >= 0\n              && request.resource.data.dayIndex <= (get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`,
+    expectedKillers: ['Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys'],
   },
   {
-    name: 'm17',
+    id: 'm17',
     description: 'day bound without tolerance (+43200000)',
-    relevantTarget: 'Yes (Day bound tolerance tests would fail without tolerance)',
     custom: (rules) => {
-      // Restore the old expression without tolerance for the dayIndex upper bound
-      // The new expression is: (end - start + 43200000) / 86400000
-      // The old expression is: (end - start) / 86400000
       const newExpr = `(get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis() + 43200000) / 86400000`;
       const oldExpr = `(get(/databases/$(database)/documents/trips/$(tripId)).data.endDate.toMillis() - get(/databases/$(database)/documents/trips/$(tripId)).data.startDate.toMillis()) / 86400000`;
-
       if (rules.split(newExpr).length - 1 !== 1) {
-        throw new Error('m17: new expression (with tolerance) not found exactly once');
+        throw new Error('m17: new expression not found exactly once');
       }
       return rules.replace(newExpr, oldExpr);
     },
+    expectedKillers: ['Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3', 'Day bound tolerance: diff 49 hours (fall-back) allows 2, denies 3'],
   },
   {
-    name: 'm18',
+    id: 'm18',
     description: 'expense read member check',
-    relevantTarget: 'Yes (Expense read denied for non-member and signed-out user)',
     find: `      match /expenses/{expenseId} {\n        allow get, list: if isSignedIn() && isTripMember(tripId);`,
     replace: `      match /expenses/{expenseId} {\n        allow get, list: if isSignedIn();`,
+    expectedKillers: ['Read: member succeeds; non-member and signed out denied'],
   },
   {
-    name: 'm19',
-    description: 'expense create member check',
-    relevantTarget: 'No (Overlaps with paidBy and participantIds member check)',
-    find: `        allow create: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.keys().hasAll(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])`,
-    replace: `        allow create: if isSignedIn()\n          && isTripNotArchived(tripId)\n          && request.resource.data.keys().hasAll(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])`,
-  },
-  {
-    name: 'm20',
+    id: 'm20',
     description: 'expense createdBy == caller check',
-    relevantTarget: 'Yes (Expense create denied when createdBy is spoofed)',
     find: `\n          && request.resource.data.createdBy == request.auth.uid`,
     replace: ``,
+    expectedKillers: ['Create denied when createdBy is not the caller'],
   },
   {
-    name: 'm21',
+    id: 'm21',
     description: 'expense create exact key sets (hasAll & hasOnly)',
-    relevantTarget: 'Yes (Expense create denied for missing key or extra key)',
     find: `\n          && request.resource.data.keys().hasAll(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])\n          && request.resource.data.keys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])`,
     replace: ``,
+    expectedKillers: ['Create denied for extra key or missing key'],
   },
   {
-    name: 'm22',
+    id: 'm22',
     description: 'expense create amount validation',
-    relevantTarget: 'Yes (Expense create denied for amount 0, negative, float, string, over cap)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000`,
     replace: `request.resource.data.createdBy == request.auth.uid`,
+    expectedKillers: ['Create denied for invalid amount (0, negative, float, string, over cap)'],
   },
   {
-    name: 'm23',
+    id: 'm23',
     description: 'expense create description validation',
-    relevantTarget: 'Yes (Expense create denied for empty description, >100 chars, non-string)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100`,
     replace: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000`,
+    expectedKillers: ['Create denied for invalid description (empty, >100 chars, non-string)'],
   },
   {
-    name: 'm24',
+    id: 'm24',
     description: 'expense create paidBy member check',
-    relevantTarget: 'Yes (Expense create denied for non-member paidBy or non-string paidBy)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)`,
     replace: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100`,
+    expectedKillers: ['Create denied for invalid paidBy (not a member, non-string)'],
   },
   {
-    name: 'm25',
+    id: 'm25',
     description: 'expense create participantIds member subset check',
-    relevantTarget: 'Yes (Expense create denied for participantIds containing non-member)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15\n          && get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds.hasAll(request.resource.data.participantIds)`,
     replace: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15`,
+    expectedKillers: ['Create denied for invalid participantIds (empty, 16 elements, non-member, duplicates, non-list, non-strings)'],
   },
   {
-    name: 'm26',
+    id: 'm26',
     description: 'expense create participantIds distinct check',
-    relevantTarget: 'Yes (Expense create denied for duplicate participantIds)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15\n          && get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds.hasAll(request.resource.data.participantIds)\n          && request.resource.data.participantIds.toSet().size() == request.resource.data.participantIds.size()`,
     replace: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15\n          && get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds.hasAll(request.resource.data.participantIds)`,
+    expectedKillers: ['Create denied for invalid participantIds (empty, 16 elements, non-member, duplicates, non-list, non-strings)'],
   },
   {
-    name: 'm27',
+    id: 'm27',
     description: 'expense create participantIds size bounds (1 to 15)',
-    relevantTarget: 'Yes (Expense create denied for empty participantIds or 16 elements)',
     find: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15`,
     replace: `request.resource.data.createdBy == request.auth.uid\n          && request.resource.data.amount is int && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000000000\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)\n          && request.resource.data.participantIds is list`,
+    expectedKillers: ['Create denied for invalid participantIds (empty, 16 elements, non-member, duplicates, non-list, non-strings)'],
   },
   {
-    name: 'm28',
+    id: 'm28',
     description: 'expense update creator-or-organizer check',
-    relevantTarget: 'Yes (Expense update denied for non-creator member)',
     find: `\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])`,
     replace: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])`,
+    expectedKillers: ['Update: creator and organizer succeed; other member and non-member denied'],
   },
   {
-    name: 'm29',
+    id: 'm29',
     description: 'expense delete creator-or-organizer check',
-    relevantTarget: 'Yes (Expense delete denied for non-creator member)',
     find: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId);`,
+    expectedKillers: ['Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied'],
   },
   {
-    name: 'm30',
+    id: 'm30',
     description: 'expense create archived check',
-    relevantTarget: 'Yes (Expense create denied on archived trip)',
     find: `match /expenses/{expenseId} {\n        allow get, list: if isSignedIn() && isTripMember(tripId);\n\n        allow create: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)`,
     replace: `match /expenses/{expenseId} {\n        allow get, list: if isSignedIn() && isTripMember(tripId);\n\n        allow create: if isSignedIn()\n          && isTripMember(tripId)`,
+    expectedKillers: ['Create denied on archived trip'],
   },
   {
-    name: 'm31',
+    id: 'm31',
     description: 'expense update archived check',
-    relevantTarget: 'Yes (Expense update denied on archived trip)',
     find: `allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])`,
     replace: `allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])`,
+    expectedKillers: ['Update denied on archived trip'],
   },
   {
-    name: 'm32',
+    id: 'm32',
     description: 'expense delete archived check',
-    relevantTarget: 'Yes (Expense delete denied on archived trip)',
     find: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));`,
     replace: `        allow delete: if isSignedIn()\n          && isTripMember(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));`,
+    expectedKillers: ['Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied'],
   },
   {
-    name: 'm33',
+    id: 'm33',
     description: 'expense update affectedKeys hasOnly restriction',
-    relevantTarget: 'Yes (Expense update denied when changing createdBy or createdAt or adding extra keys)',
     find: `\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])\n          && request.resource.data.amount is int`,
     replace: `\n          && request.resource.data.amount is int`,
+    expectedKillers: ['Update denied when changing createdBy or createdAt'],
   },
   {
-    name: 'm34',
+    id: 'm34',
     description: 'expense create createdAt == request.time check',
-    relevantTarget: 'Yes (Expense create denied when createdAt is client Date)',
     find: `\n          && request.resource.data.date is timestamp\n          && request.resource.data.createdAt == request.time;`,
     replace: `\n          && request.resource.data.date is timestamp;`,
+    expectedKillers: ['Create denied when date is not a timestamp or createdAt is a client date'],
   },
   {
-    name: 'm35',
+    id: 'm35',
     description: 'expense create date timestamp type check',
-    relevantTarget: 'Yes (Expense create denied when date is string)',
     find: `\n          && request.resource.data.date is timestamp\n          && request.resource.data.createdAt == request.time;`,
     replace: `\n          && request.resource.data.createdAt == request.time;`,
+    expectedKillers: ['Create denied when date is not a timestamp or createdAt is a client date'],
+  },
+  // Phase 6 specific mutants m53..m61
+  {
+    id: 'm53',
+    description: 'leave rule drop memberIds.size() == memberCount check',
+    find: `\n        && request.resource.data.memberIds.size() == request.resource.data.memberCount\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount`,
+    replace: `\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount`,
+    expectedKillers: ['memberCount unchanged while dropping UID denied', 'memberCount decreased by 2 while dropping 1 UID denied'],
+  },
+  {
+    id: 'm54',
+    description: 'leave rule drop memberIds.toSet().size() == memberCount check',
+    find: `\n        && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount\n        && resource.data.archived == false`,
+    replace: `\n        && resource.data.archived == false`,
+    expectedKillers: ['a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)', 'c) [A,B,C]->[A,C,C], count 3->2, B removed by organizer (denied)'],
+  },
+  {
+    id: 'm55',
+    description: 'drop status == active from join update rule',
+    find: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid)).data.status == 'active';`,
+    replace: `;`,
+    expectedKillers: ['Rejoin by previously left member denied directly through memberIds update'],
+  },
+  {
+    id: 'm56',
+    description: 'settlement update allows payer to confirm own settlement',
+    find: `\n          && (request.auth.uid == resource.data.toUid || (isTripOrganizer(tripId) && resource.data.fromUid != request.auth.uid));`,
+    replace: `\n          && (request.auth.uid == resource.data.toUid || request.auth.uid == resource.data.fromUid || (isTripOrganizer(tripId) && resource.data.fromUid != request.auth.uid));`,
+    expectedKillers: ['Settlement update: payer confirming own settlement denied'],
+  },
+  {
+    id: 'm57',
+    description: 'settlement delete allows non-payer',
+    find: `\n          && request.auth.uid == resource.data.fromUid`,
+    replace: ``,
+    expectedKillers: ['Settlement delete: receiver delete denied', 'Settlement delete: organizer delete denied', 'Settlement delete: non-member delete denied'],
+  },
+  {
+    id: 'm58',
+    description: 'leave rule drops archived == false',
+    find: `\n        && resource.data.archived == false\n        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))`,
+    replace: `\n        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))`,
+    expectedKillers: ['Cannot leave/remove from archived trip'],
+  },
+  {
+    id: 'm59',
+    description: 'leave rule drops existsAfter member doc check',
+    find: `\n        && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'`,
+    replace: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'`,
+    expectedKillers: ['Batch missing members status doc write denied'],
+  },
+  {
+    id: 'm60',
+    description: 'leave rule drops status == left check',
+    find: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);`,
+    replace: `\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);`,
+    expectedKillers: ['Member status updated to something other than left denied'],
+  },
+  {
+    id: 'm61',
+    description: 'leave rule drops organizer self-removal protection',
+    find: `\n        && !(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == resource.data.organizerId && resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid)`,
+    replace: ``,
+    expectedKillers: ['Cannot remove the organizer (including organizer leaving)'],
   }
 ];
 
-function freePort8092() {
-  try {
-    const out = execSync('netstat -ano | findstr 8092', { encoding: 'utf8' });
-    const lines = out.split(/\r?\n/);
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/);
-      const pid = parts[parts.length - 1];
-      if (pid && /^\d+$/.test(pid) && pid !== '0') {
-        try {
-          execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
-        } catch (_) {}
-      }
-    }
-  } catch (_) {}
-}
-
-function waitForPortFree(port, maxWaitMs = 10000) {
-  return new Promise((resolve) => {
-    const start = Date.now();
-    const check = () => {
-      const socket = new net.Socket();
-      socket.setTimeout(300);
-      socket.on('connect', () => {
-        socket.destroy();
-        if (Date.now() - start > maxWaitMs) {
-          freePort8092();
-          return resolve(false);
-        }
-        setTimeout(check, 500);
-      });
-      socket.on('error', () => {
-        socket.destroy();
-        resolve(true);
-      });
-      socket.on('timeout', () => {
-        socket.destroy();
-        resolve(true);
-      });
-      socket.connect(port, '127.0.0.1');
-    };
-    check();
-  });
-}
-
-function parseFailedTests(output) {
-  const cleanOutput = (output || '').replace(/\u001b\[[0-9;]*m/g, '');
-  const failed = new Set();
-  const lines = cleanOutput.split(/\r?\n/);
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('● ')) {
-      const parts = trimmed.substring(2).split('›');
-      const testName = parts[parts.length - 1].trim();
-      if (testName && !testName.includes('beforeAll hook') && !testName.includes('afterAll hook')) {
-        failed.add(testName);
-      }
-    } else if (trimmed.startsWith('✕ ') || trimmed.startsWith('× ')) {
-      const testName = trimmed.replace(/^[✕×]\s+/, '').replace(/\s+\(\d+\s*ms\)$/, '').trim();
-      if (testName && !testName.includes('beforeAll hook') && !testName.includes('afterAll hook')) {
-        failed.add(testName);
-      }
-    }
-  }
-  return Array.from(failed);
-}
-
-async function main() {
+function main() {
   const results = [];
-  let anyUnexpectedUndetected = false;
   let baselineFailed = false;
+  let anyError = false;
+  let anyUnexpected = false;
+  let anyUnallowlistedSurvivor = false;
 
-  console.log('Starting Security Rules Mutation Runner...\n');
+  console.log('Starting Mutation Runner against ambient emulator...\n');
 
-  // Verification pass
-  for (const mut of mutations) {
+  for (const mut of mutants) {
+    if (mut.isBaseline) continue;
     if (!mut.custom) {
       const count = originalRules.split(mut.find).length - 1;
       if (count !== 1) {
-        console.error(`ERROR: Mutation ${mut.name} target substring found ${count} times (expected exactly 1).`);
-        process.exit(1);
+        console.error(`INVALID: Mutant ${mut.id} (${mut.description}) find string matches ${count} times (expected exactly 1).`);
+        anyError = true;
       }
     }
   }
+  if (anyError) {
+    console.error('Aborting due to INVALID mutant definitions.');
+    process.exit(1);
+  }
 
-  for (const mut of mutations) {
-    freePort8092();
-    await waitForPortFree(8092);
-    await new Promise((r) => setTimeout(r, 1000));
-
+  for (const mut of mutants) {
     let mutantRules;
-    if (mut.custom) {
-      mutantRules = mut.custom(originalRules);
-    } else {
-      mutantRules = originalRules.replace(mut.find, mut.replace);
+    try {
+      if (mut.custom) {
+        mutantRules = mut.custom(originalRules);
+      } else {
+        mutantRules = originalRules.replace(mut.find, mut.replace);
+      }
+    } catch (e) {
+      console.error(`ERROR: Mutant ${mut.id} generation failed: ${e.message}`);
+      results.push({ id: mut.id, description: mut.description, status: 'ERROR', killedBy: '-', collateral: '-' });
+      anyError = true;
+      continue;
     }
 
     if (!mut.isBaseline && mutantRules === originalRules) {
-      console.error(`ERROR: Mutant ${mut.name} is identical to original rules!`);
-      process.exit(1);
+      console.error(`ERROR: Mutant ${mut.id} is identical to original rules.`);
+      results.push({ id: mut.id, description: mut.description, status: 'ERROR', killedBy: '-', collateral: '-' });
+      anyError = true;
+      continue;
     }
 
-    const mutantPath = path.resolve(outDir, `${mut.name}.rules`);
+    const mutantPath = path.resolve(outDir, `${mut.id}.rules`);
     fs.writeFileSync(mutantPath, mutantRules, 'utf8');
 
-    console.log(`Running mutant [${mut.name}]: ${mut.description}...`);
+    console.log(`Running mutant [${mut.id}]: ${mut.description}...`);
 
-    let output = '';
+    let suiteJson = null;
+    let suiteError = false;
+
     try {
-      output = execSync(
-        `npx firebase-tools emulators:exec --config firebase.json --only firestore "npm --prefix rules_test test"`,
+      execSync(
+        `node node_modules/jest/bin/jest.js firestore_rules.test.js --forceExit --json --outputFile=mutation_run.json`,
         {
-          cwd: rootDir,
+          cwd: path.join(rootDir, 'rules_test'),
           env: { ...process.env, RULES_PATH: mutantPath },
           encoding: 'utf8',
+          stdio: 'ignore',
         }
       );
     } catch (err) {
-      const stdout = err.stdout ? err.stdout.toString() : '';
-      const stderr = err.stderr ? err.stderr.toString() : '';
-      output = stdout + '\n' + stderr;
+      // test failures cause jest exit != 0, which is expected when mutants are killed
     }
 
-    freePort8092();
+    const jsonResultPath = path.join(rootDir, 'rules_test', 'mutation_run.json');
+    if (fs.existsSync(jsonResultPath)) {
+      try {
+        suiteJson = JSON.parse(fs.readFileSync(jsonResultPath, 'utf8'));
+      } catch (e) {
+        suiteError = true;
+      }
+    } else {
+      suiteError = true;
+    }
 
-    const failedTests = parseFailedTests(output);
-    const detected = failedTests.length > 0;
+    if (suiteError || !suiteJson) {
+      console.error(`  -> ERROR: Test suite crashed or failed to compile for mutant ${mut.id}.`);
+      results.push({ id: mut.id, description: mut.description, status: 'ERROR', killedBy: 'Suite Crash / Compile Error', collateral: '-' });
+      anyError = true;
+      continue;
+    }
+
+    const failedTitles = [];
+    suiteJson.testResults.forEach(tr => {
+      tr.assertionResults.forEach(ar => {
+        if (ar.status === 'failed') {
+          failedTitles.push(ar.title);
+        }
+      });
+    });
 
     if (mut.isBaseline) {
-      if (detected) {
+      if (failedTitles.length > 0) {
         baselineFailed = true;
-        console.error(`  -> ERROR: BASELINE CONTROL (m0) FAILED! (${failedTests.length} failing tests: ${failedTests.join('; ')})`);
+        console.error(`  -> ERROR: BASELINE CONTROL (m0) FAILED! (${failedTitles.length} failures)`);
+        results.push({ id: mut.id, description: mut.description, status: 'BASELINE_FAILED', killedBy: '-', collateral: '-' });
       } else {
-        console.log(`  -> BASELINE CONTROL PASSED (0 failing tests).`);
+        console.log(`  -> BASELINE CONTROL PASSED (0 failures).`);
+        results.push({ id: mut.id, description: mut.description, status: 'PASSED', killedBy: '-', collateral: '-' });
       }
-      results.push({
-        mutant: mut.name,
-        removed: mut.description,
-        failedTests: ['0 failing tests (PASSED)'],
-        relevant: mut.relevantTarget,
-        detected: true,
-      });
-    } else {
-      results.push({
-        mutant: mut.name,
-        removed: mut.description,
-        failedTests: detected ? failedTests : ['NONE = UNDETECTED (Overlapped)'],
-        relevant: mut.relevantTarget,
-        detected,
-      });
-
-      if (!detected) {
-        if (mut.relevantTarget.startsWith('No')) {
-          console.log(`  -> UNDETECTED (Expected overlap: ${mut.relevantTarget})`);
-        } else {
-          console.log(`  -> UNDETECTED! (UNEXPECTED)`);
-          anyUnexpectedUndetected = true;
-        }
-      } else {
-        console.log(`  -> Detected by ${failedTests.length} test(s): ${failedTests.join('; ')}`);
-      }
+      continue;
     }
+
+    const expectedSet = new Set(mut.expectedKillers || []);
+    const actualKillers = failedTitles.filter(t => expectedSet.has(t));
+    const collateral = failedTitles.filter(t => !expectedSet.has(t));
+
+    let status = 'SURVIVED';
+    let killedByStr = '-';
+    let collateralStr = '-';
+
+    if (actualKillers.length > 0) {
+      status = 'KILLED';
+      killedByStr = actualKillers.join('; ');
+      if (collateral.length > 0) {
+        collateralStr = collateral.join('; ');
+      }
+      console.log(`  -> KILLED by expected test(s): ${actualKillers.join(', ')}`);
+    } else if (collateral.length > 0) {
+      status = 'UNEXPECTED';
+      collateralStr = collateral.join('; ');
+      console.log(`  -> UNEXPECTED FAILURE: ${collateral.join(', ')}`);
+      anyUnexpected = true;
+    } else {
+      status = 'SURVIVED (UNALLOWLISTED)';
+      console.log(`  -> SURVIVED (UNALLOWLISTED)!`);
+      anyUnallowlistedSurvivor = true;
+    }
+
+    results.push({
+      id: mut.id,
+      description: mut.description,
+      status,
+      killedBy: killedByStr,
+      collateral: collateralStr,
+    });
   }
 
-  console.log('\n================================ MUTATION RESULTS TABLE ================================');
-  console.log('| Mutant | What was removed | Exact Failed Tests | Relevant? |');
-  console.log('|---|---|---|---|');
+  const finalRulesHash = getFileSha256(originalRulesPath);
+  if (initialRulesHash !== finalRulesHash) {
+    console.error('FATAL: firestore.rules hash changed during mutation run!');
+    process.exit(1);
+  }
+
+  if (baselineFailed) {
+    console.error('FATAL: Baseline m0 failed.');
+    process.exit(1);
+  }
+
+  console.log('\n================================ MUTATION SUMMARY TABLE ================================');
+  console.log('| ID | Description | Status | Killed-By | Collateral |');
+  console.log('|---|---|---|---|---|');
   for (const r of results) {
-    console.log(`| ${r.mutant} | ${r.removed} | ${r.failedTests.join(', ')} | ${r.relevant} |`);
+    console.log(`| ${r.id} | ${r.description} | ${r.status} | ${r.killedBy} | ${r.collateral} |`);
   }
   console.log('=======================================================================================\n');
 
-  if (baselineFailed) {
-    console.error('FATAL: Baseline control m0 failed! Exiting non-zero.');
-    process.exit(1);
-  }
+  const total = results.filter(r => r.id !== 'm0').length;
+  const killed = results.filter(r => r.status === 'KILLED').length;
+  const survivedUnallowlisted = results.filter(r => r.status.includes('UNALLOWLISTED')).length;
+  const invalid = results.filter(r => r.status === 'INVALID').length;
+  const errorCount = results.filter(r => r.status === 'ERROR').length;
+  const unexpected = results.filter(r => r.status === 'UNEXPECTED').length;
 
-  if (anyUnexpectedUndetected) {
-    console.error('WARNING: Unexpected undetected mutants found!');
-    process.exit(1);
-  } else {
-    console.log('SUCCESS: All mutations verified! Baseline m0 passed with 0 failures, all individual/combined protections verified.');
-  }
+  console.log(`Total Mutants: ${total}`);
+  console.log(`Killed: ${killed}`);
+  console.log(`Survived (Unallowlisted): ${survivedUnallowlisted}`);
+  console.log(`Invalid: ${invalid}`);
+  console.log(`Error: ${errorCount}`);
+  console.log(`Unexpected: ${unexpected}`);
+
+  const finalExit = (baselineFailed || anyError || anyUnexpected || anyUnallowlistedSurvivor || survivedUnallowlisted > 0) ? 1 : 0;
+  console.log(`EXIT CODE: ${finalExit}`);
+  process.exit(finalExit);
 }
 
 main();
