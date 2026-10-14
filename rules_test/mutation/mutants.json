@@ -113,8 +113,7 @@
     "find": "        allow delete: if isSignedIn()\r\n          && isTripMember(tripId)\r\n          && isTripNotArchived(tripId)\r\n          && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));",
     "replace": "        allow delete: if isSignedIn()\r\n          && isTripMember(tripId)\r\n          && isTripNotArchived(tripId);",
     "expectedKillers": [
-      "Proof 7: Suggestion delete denied for non-member and signed-out user",
-      "Organizer reorders, moves day, and unschedules"
+      "Suggestion delete: author and organizer succeed, other member denied"
     ],
     "reconstructed": true
   },
@@ -657,7 +656,9 @@
     "find": "\r\n        && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'",
     "replace": "",
     "expectedKillers": [
-      "Member status updated to something other than left denied"
+      "Plain member cannot remove another member",
+      "memberCount must decrease by exactly 1",
+      "Batch missing members status doc write denied"
     ],
     "reconstructed": false
   },
