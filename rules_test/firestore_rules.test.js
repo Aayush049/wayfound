@@ -734,8 +734,9 @@ describe('Trips & Join Security Rules', () => {
 
     await assertFails(batch.commit());
   });
+});
 
-  describe('Trip Join Boundary & Security Tests', () => {
+describe('Trip Join Boundary & Security Tests', () => {
     const member2Uid = 'member_2';
     const member2Name = 'Bob Member';
 
@@ -1990,8 +1991,9 @@ describe('Trips & Join Security Rules', () => {
       });
       await assertSucceeds(suggRefOrganizer.delete());
     });
+  });
 
-  describe('Phase 3 proof tests', () => {
+describe('Phase 3 proof tests', () => {
     const proofOrganizerUid = 'proof_organizer';
     const proofMember1Uid = 'proof_member_1';
     const proofMember2Uid = 'proof_member_2';
@@ -2402,8 +2404,6 @@ describe('Trips & Join Security Rules', () => {
       await assertSucceeds(batchValid.commit());
     });
   });
-});
-});
 
 describe('Phase 4 itinerary rules', () => {
     const tripId = 'trip_itinerary_1';
