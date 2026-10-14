@@ -737,8 +737,15 @@ describe('Trips & Join Security Rules', () => {
 });
 
 describe('Trip Join Boundary & Security Tests', () => {
-    const member2Uid = 'member_2';
-    const member2Name = 'Bob Member';
+  const userId = 'organizer_1';
+  const userEmail = 'org@example.com';
+  const displayName = 'Alice Organizer';
+  const joinCode = 'ABC234';
+  const tripId = 'trip_100';
+  const startDate = new Date('2026-11-01T00:00:00Z');
+  const endDate = new Date('2026-11-05T00:00:00Z');
+  const member2Uid = 'member_2';
+  const member2Name = 'Bob Member';
 
     beforeEach(async () => {
       await seedUser(userId, displayName);
@@ -1455,6 +1462,14 @@ describe('Trip Join Boundary & Security Tests', () => {
   });
 
   describe('Read & Query Permissions', () => {
+    const userId = 'organizer_1';
+    const userEmail = 'org@example.com';
+    const displayName = 'Alice Organizer';
+    const joinCode = 'ABC234';
+    const tripId = 'trip_100';
+    const startDate = new Date('2026-11-01T00:00:00Z');
+    const endDate = new Date('2026-11-05T00:00:00Z');
+
     beforeEach(async () => {
       await seedUser(userId, displayName);
       await seedUser('non_member', 'Stranger');
