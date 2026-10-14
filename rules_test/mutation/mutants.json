@@ -277,8 +277,8 @@
   {
     "id": "m22",
     "description": "expense amount lower bound",
-    "find": "\n          && request.resource.data.amount >= 1",
-    "replace": "",
+    "find": "request.resource.data.amount >= 1",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid amount"
     ],
@@ -287,8 +287,8 @@
   {
     "id": "m23",
     "description": "expense amount upper bound",
-    "find": "\n          && request.resource.data.amount <= 100000000000",
-    "replace": "",
+    "find": "request.resource.data.amount <= 100000000000",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid amount"
     ],
@@ -297,8 +297,8 @@
   {
     "id": "m24",
     "description": "expense description string and size check",
-    "find": "\n          && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100",
-    "replace": "",
+    "find": "request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 100",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid description"
     ],
@@ -307,8 +307,8 @@
   {
     "id": "m25",
     "description": "expense paidBy member check",
-    "find": "\n          && request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)",
-    "replace": "",
+    "find": "request.resource.data.paidBy is string && (request.resource.data.paidBy in get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid paidBy"
     ],
@@ -317,8 +317,8 @@
   {
     "id": "m26",
     "description": "expense participantIds list check",
-    "find": "\n          && request.resource.data.participantIds is list",
-    "replace": "",
+    "find": "request.resource.data.participantIds is list",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid participantIds"
     ],
@@ -327,8 +327,8 @@
   {
     "id": "m27",
     "description": "expense participantIds size bounds",
-    "find": "\n          && request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15",
-    "replace": "",
+    "find": "request.resource.data.participantIds.size() >= 1 && request.resource.data.participantIds.size() <= 15",
+    "replace": "true",
     "expectedKillers": [
       "Create denied for invalid participantIds size"
     ],
@@ -337,8 +337,8 @@
   {
     "id": "m28",
     "description": "expense update creator-or-organizer check",
-    "find": "\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])",
-    "replace": "\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])",
+    "find": "        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])",
+    "replace": "        allow update: if isSignedIn()\n          && isTripMember(tripId)\n          && isTripNotArchived(tripId)\n          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])",
     "expectedKillers": [
       "Update: creator and organizer succeed; other member and non-member denied",
       "Update denied when changing createdBy or createdAt"
@@ -410,8 +410,8 @@
   {
     "id": "m35",
     "description": "settlement create amount int check",
-    "find": "\n          && request.resource.data.amount is int",
-    "replace": "",
+    "find": "request.resource.data.amount is int",
+    "replace": "true",
     "expectedKillers": [
       "Settlement create: invalid amount denied"
     ],
@@ -440,8 +440,8 @@
   {
     "id": "m38",
     "description": "settlement create status pending check",
-    "find": "\n          && request.resource.data.status == 'pending'",
-    "replace": "",
+    "find": "request.resource.data.status == 'pending'",
+    "replace": "true",
     "expectedKillers": [
       "Settlement create: invalid status denied"
     ],
@@ -450,8 +450,8 @@
   {
     "id": "m39",
     "description": "settlement create createdAt request.time check",
-    "find": "\n          && request.resource.data.createdAt == request.time",
-    "replace": "",
+    "find": "request.resource.data.createdAt == request.time",
+    "replace": "true",
     "expectedKillers": [
       "Settlement create: invalid createdAt denied"
     ],
@@ -470,8 +470,8 @@
   {
     "id": "m41",
     "description": "settlement update pending resource status check",
-    "find": "\n          && resource.data.status == 'pending'",
-    "replace": "",
+    "find": "resource.data.status == 'pending'",
+    "replace": "true",
     "expectedKillers": [
       "Settlement update: already confirmed denied"
     ],
@@ -571,8 +571,8 @@
   {
     "id": "m51",
     "description": "joinCodes create memberCount 1 check",
-    "find": "\n        && request.resource.data.memberCount == 1",
-    "replace": "",
+    "find": "request.resource.data.memberCount == 1",
+    "replace": "true",
     "expectedKillers": [
       "Denied trip create when memberCount is not 1"
     ],
@@ -645,8 +645,8 @@
   {
     "id": "m58",
     "description": "join update archived check",
-    "find": "\n        && resource.data.archived == false",
-    "replace": "",
+    "find": "resource.data.archived == false",
+    "replace": "true",
     "expectedKillers": [
       "Join fails when trip is archived"
     ],
@@ -655,8 +655,8 @@
   {
     "id": "m59",
     "description": "users update displayName size min check",
-    "find": "\n        && request.resource.data.displayName.size() >= 1",
-    "replace": "",
+    "find": "request.resource.data.displayName.size() >= 1",
+    "replace": "true",
     "expectedKillers": [
       "Owner update fails if attempting to change forbidden fields"
     ],
@@ -665,8 +665,8 @@
   {
     "id": "m60",
     "description": "users update displayName size max check",
-    "find": "\n        && request.resource.data.displayName.size() <= 50",
-    "replace": "",
+    "find": "request.resource.data.displayName.size() <= 50",
+    "replace": "true",
     "expectedKillers": [
       "Owner update fails if attempting to change forbidden fields"
     ],
