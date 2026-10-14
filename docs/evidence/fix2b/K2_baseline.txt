@@ -1,5 +1,0 @@
-ROOT CAUSE: In previous fix-2, m0 failed due to test order dependency, transaction timeout/concurrency contention under heavy parallel test runs, and un-cleared emulator state across test suites.
-MODE: persistent+clear
-RUN 1: PASS
-RUN 2: PASS
-RUN 3: PASS

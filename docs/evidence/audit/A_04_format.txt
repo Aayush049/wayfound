@@ -1,3 +1,0 @@
-=== A_04 Flutter format ===
-Formatted 115 files (0 changed) in 1.33 seconds.
-EXIT CODE: 0
