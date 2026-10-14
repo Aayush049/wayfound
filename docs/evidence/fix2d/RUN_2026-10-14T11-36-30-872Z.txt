@@ -1,0 +1,38 @@
+HARNESS FILE SHA256 (LF-normalised) = c0038609499539d09b37e79b2ba04e971cff79c5fa47c9699670beda08114ead
+RULES SHA256 BEFORE = fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
+node v24.19.0 | started 2026-10-14T11:36:30.875Z
+INVALID m1: find occurs 0 times (must be exactly 1)
+INVALID m4a: find occurs 0 times (must be exactly 1)
+INVALID m4b: find occurs 0 times (must be exactly 1)
+INVALID m4c: find occurs 0 times (must be exactly 1)
+INVALID m5b: find occurs 0 times (must be exactly 1)
+INVALID m7b: find occurs 0 times (must be exactly 1)
+INVALID m11: find occurs 0 times (must be exactly 1)
+INVALID m12: find occurs 0 times (must be exactly 1)
+INVALID m18: find occurs 0 times (must be exactly 1)
+INVALID m21: find occurs 0 times (must be exactly 1)
+INVALID m22: find occurs 3 times (must be exactly 1)
+INVALID m23: find occurs 3 times (must be exactly 1)
+INVALID m24: find occurs 2 times (must be exactly 1)
+INVALID m25: find occurs 2 times (must be exactly 1)
+INVALID m26: find occurs 2 times (must be exactly 1)
+INVALID m27: find occurs 2 times (must be exactly 1)
+INVALID m28: find occurs 0 times (must be exactly 1)
+INVALID m29: find occurs 0 times (must be exactly 1)
+INVALID m30: find occurs 0 times (must be exactly 1)
+INVALID m31: find occurs 0 times (must be exactly 1)
+INVALID m35: find occurs 3 times (must be exactly 1)
+INVALID m38: find occurs 3 times (must be exactly 1)
+INVALID m39: find occurs 5 times (must be exactly 1)
+INVALID m41: find occurs 5 times (must be exactly 1)
+INVALID m51: find occurs 2 times (must be exactly 1)
+INVALID m52: find occurs 0 times (must be exactly 1)
+INVALID m53: find occurs 0 times (must be exactly 1)
+INVALID m58: find occurs 3 times (must be exactly 1)
+INVALID m59: find occurs 2 times (must be exactly 1)
+INVALID m60: find occurs 2 times (must be exactly 1)
+required ids = 65 | defined = 65 | missing required = none | duplicates = none
+BASELINE m0a: total=0 passed=0 failed=0 exit=1
+FATAL: baseline m0a is not fully green. Failing: 
+RULES SHA256 AFTER  = fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
+HARNESS EXIT 1
