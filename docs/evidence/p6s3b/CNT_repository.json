@@ -1,0 +1,24 @@
+﻿{"protocolVersion":"0.1.1","runnerVersion":null,"pid":25068,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading D:/VsCode/wayfound/test/settlements_repository_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}
+{"count":1,"time":5,"type":"allSuites"}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":2853}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":2855}
+{"group":{"id":3,"suiteID":0,"parentID":2,"name":"Repository & Domain Tests (R1 - R7)","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":16,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"group","time":2856}
+{"test":{"id":4,"name":"Repository & Domain Tests (R1 - R7) R1: createSettlement writes exactly required keys with status pending and minor units amount","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":27,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":2856}
+{"testID":4,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2993}
+{"test":{"id":5,"name":"Repository & Domain Tests (R1 - R7) R2: confirm/reject writes only status and resolvedAt; transitions only from pending","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":79,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":2993}
+{"testID":5,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3001}
+{"test":{"id":6,"name":"Repository & Domain Tests (R1 - R7) R3: payer can delete a pending settlement; deletion refused/unavailable for confirmed","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":140,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":3001}
+{"testID":6,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3007}
+{"test":{"id":7,"name":"Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":177,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":3007}
+{"testID":7,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3015}
+{"test":{"id":8,"name":"Repository & Domain Tests (R1 - R7) R5: removeMember by organizer removes uid and sets status to left, allowed at nonzero balance","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":263,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":3015}
+{"testID":8,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3023}
+{"test":{"id":9,"name":"Repository & Domain Tests (R1 - R7) R6: join batch payload sets status active; joinTrip error presents exact message","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":296,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":3023}
+{"testID":9,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3031}
+{"test":{"id":10,"name":"Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":339,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":3031}
+{"testID":10,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3040}
+{"success":true,"type":"done","time":3072}

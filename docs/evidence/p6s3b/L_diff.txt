@@ -1,0 +1,33 @@
+﻿diff --git a/lib/features/expenses/presentation/balances_view.dart b/lib/features/expenses/presentation/balances_view.dart
+index 7531c22..7f1d01c 100644
+--- a/lib/features/expenses/presentation/balances_view.dart
++++ b/lib/features/expenses/presentation/balances_view.dart
+@@ -419,7 +419,11 @@ class BalancesView extends ConsumerWidget {
+                           ],
+                         ),
+                         const SizedBox(height: 6),
+-                        Row(
++                        Wrap(
++                          alignment: WrapAlignment.spaceBetween,
++                          crossAxisAlignment: WrapCrossAlignment.center,
++                          spacing: 8,
++                          runSpacing: 8,
+                           children: [
+                             Container(
+                               padding: const EdgeInsets.symmetric(
+@@ -438,7 +442,6 @@ class BalancesView extends ConsumerWidget {
+                                 ),
+                               ),
+                             ),
+-                            const Spacer(),
+                             if (canActOnPending && isMyPayment)
+                               TextButton.icon(
+                                 onPressed: () async {
+@@ -474,7 +477,6 @@ class BalancesView extends ConsumerWidget {
+                                   ),
+                                 ),
+                               ),
+-                              const SizedBox(width: 4),
+                               FilledButton(
+                                 onPressed: () async {
+                                   await ref

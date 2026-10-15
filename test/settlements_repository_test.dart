@@ -1,14 +1,17 @@
-// fake_cloud_firestore does not enforce Firestore security rules
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wayfound/features/expenses/data/expenses_providers.dart';
 import 'package:wayfound/features/expenses/domain/balance_calculator.dart';
 import 'package:wayfound/features/expenses/domain/expense.dart';
 import 'package:wayfound/features/settlements/data/settlement_repository.dart';
+import 'package:wayfound/features/settlements/data/settlements_providers.dart';
 import 'package:wayfound/features/settlements/domain/leave_eligibility.dart';
 import 'package:wayfound/features/settlements/domain/settlement.dart';
 import 'package:wayfound/features/settlements/domain/settlement_payload_builders.dart';
 import 'package:wayfound/features/trips/data/trip_repository.dart';
+import 'package:wayfound/features/trips/data/trips_providers.dart';
 import 'package:wayfound/features/trips/domain/member.dart';
 import 'package:wayfound/features/trips/domain/trip_payload_builders.dart';
 
@@ -189,7 +192,10 @@ void main() {
         currencyCode: 'USD',
       );
       expect(orgEligibility.allowed, isFalse);
-      expect(orgEligibility.reason, "Organizers can't leave a trip in this version.");
+      expect(
+        orgEligibility.reason,
+        "Organizers can't leave a trip in this version.",
+      );
 
       // 2. Eligibility check: nonzero balance refuses leave
       final nonzeroEligibility = checkLeaveEligibility(
@@ -336,37 +342,40 @@ void main() {
       // In join_trip_screen: 'Could not join trip. Please verify the code and try again.'
     });
 
-    test('R6b: repository maps permission-denied to rejoin refusal message', () async {
-      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
-      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
-        'tripId': 'trip_rej',
-        'tripName': 'Rejoin Trip',
-        'destination': 'Rome',
-        'startDate': Timestamp.now(),
-        'endDate': Timestamp.now(),
-        'memberCount': 2,
-      });
-      final repo = TripRepository(firestore: throwingFirestore);
+    test(
+      'R6b: repository maps permission-denied to rejoin refusal message',
+      () async {
+        final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+        await throwingFirestore.collection('joinCodes').doc('REJ234').set({
+          'tripId': 'trip_rej',
+          'tripName': 'Rejoin Trip',
+          'destination': 'Rome',
+          'startDate': Timestamp.now(),
+          'endDate': Timestamp.now(),
+          'memberCount': 2,
+        });
+        final repo = TripRepository(firestore: throwingFirestore);
 
-      expect(
-        () => repo.joinTrip(
-          code: 'REJ234',
-          tripId: 'trip_rej',
-          userUid: 'u_left',
-          displayName: 'Left User',
-          currentMemberCount: 2,
-        ),
-        throwsA(
-          predicate(
-            (e) =>
-                e is Exception &&
-                e.toString().contains(
-                  "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
-                ),
+        expect(
+          () => repo.joinTrip(
+            code: 'REJ234',
+            tripId: 'trip_rej',
+            userUid: 'u_left',
+            displayName: 'Left User',
+            currentMemberCount: 2,
           ),
-        ),
-      );
-    });
+          throwsA(
+            predicate(
+              (e) =>
+                  e is Exception &&
+                  e.toString().contains(
+                    "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+                  ),
+            ),
+          ),
+        );
+      },
+    );
 
     test('R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0', () {
       final now = DateTime.now();
@@ -427,6 +436,33 @@ void main() {
       expect(updatedBalances['u3'], -1000);
       expect(updatedBalances.values.reduce((a, b) => a + b), 0);
       expect(updatedBalances.values, isA<Iterable<int>>());
+
+      // Verify via provider: pending settlements do not alter balances
+      final container = ProviderContainer(
+        overrides: [
+          expensesStreamProvider('trip_r7')
+              .overrideWithValue(AsyncData(expenses)),
+          tripAllMembersProvider('trip_r7')
+              .overrideWithValue(AsyncData(members)),
+          settlementsStreamProvider('trip_r7').overrideWithValue(
+            AsyncData([
+              Settlement(
+                id: 's_pending',
+                fromUid: 'u2',
+                toUid: 'u1',
+                amount: 1000,
+                status: SettlementStatus.pending,
+                createdAt: now,
+              ),
+            ]),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final providerBalances = container.read(tripBalancesProvider('trip_r7'));
+      expect(providerBalances['u1'], 2000);
+      expect(providerBalances['u2'], -1000);
+      expect(providerBalances['u3'], -1000);
     });
   });
 }
@@ -460,4 +496,3 @@ class _ThrowingPermissionDeniedBatch implements WriteBatch {
   void update<T>(DocumentReference<T> document, T data) =>
       _inner.update<T>(document, data);
 }
-

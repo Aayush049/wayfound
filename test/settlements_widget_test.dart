@@ -742,47 +742,48 @@ void main() {
       );
     });
 
-    testWidgets('W10b Join screen displays rejoin refusal message on permission-denied', (tester) async {
-      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
-      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
-        'tripId': 'trip_rejoin',
-        'tripName': 'Rome Adventure',
-        'destination': 'Rome',
-        'startDate': Timestamp.now(),
-        'endDate': Timestamp.now(),
-        'memberCount': 2,
-      });
-      final repo = TripRepository(firestore: throwingFirestore);
+    testWidgets(
+      'W10b Join screen displays rejoin refusal message on permission-denied',
+      (tester) async {
+        final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+        await throwingFirestore.collection('joinCodes').doc('REJ234').set({
+          'tripId': 'trip_rejoin',
+          'tripName': 'Rome Adventure',
+          'destination': 'Rome',
+          'startDate': Timestamp.now(),
+          'endDate': Timestamp.now(),
+          'memberCount': 2,
+        });
+        final repo = TripRepository(firestore: throwingFirestore);
 
-      await tester.pumpApp(
-        const JoinTripScreen(),
-        authUserValue: AsyncData(
-          MockUser(
-            uid: 'u_left',
-            email: 'left@example.com',
-            displayName: 'Left User',
+        await tester.pumpApp(
+          const JoinTripScreen(),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'u_left',
+              email: 'left@example.com',
+              displayName: 'Left User',
+            ),
           ),
-        ),
-        overrides: [
-          tripRepositoryProvider.overrideWithValue(repo),
-        ],
-      );
+          overrides: [tripRepositoryProvider.overrideWithValue(repo)],
+        );
 
-      await tester.enterText(find.byType(TextFormField), 'REJ234');
-      await tester.tap(find.byIcon(Icons.search));
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextFormField), 'REJ234');
+        await tester.tap(find.byIcon(Icons.search));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Rome Adventure'), findsOneWidget);
-      await tester.tap(find.widgetWithText(FilledButton, 'Join Trip'));
-      await tester.pumpAndSettle();
+        expect(find.text('Rome Adventure'), findsOneWidget);
+        await tester.tap(find.widgetWithText(FilledButton, 'Join Trip'));
+        await tester.pumpAndSettle();
 
-      expect(
-        find.text(
-          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
-        ),
-        findsOneWidget,
-      );
-    });
+        expect(
+          find.text(
+            "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+          ),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }
 
@@ -815,4 +816,3 @@ class _ThrowingPermissionDeniedBatch implements WriteBatch {
   void update<T>(DocumentReference<T> document, T data) =>
       _inner.update<T>(document, data);
 }
-

@@ -1,0 +1,21 @@
+﻿00:00 +0: loading D:/VsCode/wayfound/test/settlements_repository_test.dart
+00:00 +0: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R1: createSettlement writes exactly required keys with status pending and minor units amount
+00:00 +1: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R2: confirm/reject writes only status and resolvedAt; transitions only from pending
+00:00 +2: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R3: payer can delete a pending settlement; deletion refused/unavailable for confirmed
+00:00 +3: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending
+00:00 +4: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R5: removeMember by organizer removes uid and sets status to left, allowed at nonzero balance
+00:00 +5: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R6: join batch payload sets status active; joinTrip error presents exact message
+00:00 +6: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R6b: repository maps permission-denied to rejoin refusal message
+00:00 +7: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0
+00:00 +8: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove
+00:01 +9: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W2 Mark-as-paid sheet: input validation, error text asserted, submit disabled/blocked
+00:01 +10: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W3 Status chips show text labels (Confirmed, Rejected, Awaiting confirmation) asserted via find.text
+00:01 +11: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W4 Action visibility on pending vs confirmed/rejected settlements
+00:02 +12: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:02 +13: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:02 +14: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W7 "(left)" label appears for left member in balances, and not for active members
+00:02 +15: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:02 +16: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W9 Archived trip: all settlement/leave/remove/add actions absent or disabled; read content visible
+00:02 +17: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W10 Join error message displayed on failure
+00:02 +18: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W10b Join screen displays rejoin refusal message on permission-denied
+00:03 +19: All tests passed!

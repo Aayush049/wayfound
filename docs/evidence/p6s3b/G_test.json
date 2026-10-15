@@ -1,0 +1,959 @@
+﻿{"protocolVersion":"0.1.1","runnerVersion":null,"pid":30832,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2}
+{"suite":{"id":2,"platform":"vm","path":"D:/VsCode/wayfound/test/app_shell_test.dart"},"type":"suite","time":9}
+{"test":{"id":3,"name":"loading D:/VsCode/wayfound/test/app_shell_test.dart","suiteID":2,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9}
+{"suite":{"id":4,"platform":"vm","path":"D:/VsCode/wayfound/test/app_user_test.dart"},"type":"suite","time":9}
+{"test":{"id":5,"name":"loading D:/VsCode/wayfound/test/app_user_test.dart","suiteID":4,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9}
+{"suite":{"id":6,"platform":"vm","path":"D:/VsCode/wayfound/test/auth_provider_test.dart"},"type":"suite","time":10}
+{"test":{"id":7,"name":"loading D:/VsCode/wayfound/test/auth_provider_test.dart","suiteID":6,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10}
+{"suite":{"id":8,"platform":"vm","path":"D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"suite","time":10}
+{"test":{"id":9,"name":"loading D:/VsCode/wayfound/test/auth_repository_test.dart","suiteID":8,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10}
+{"suite":{"id":10,"platform":"vm","path":"D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"suite","time":10}
+{"test":{"id":11,"name":"loading D:/VsCode/wayfound/test/auth_validators_test.dart","suiteID":10,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10}
+{"suite":{"id":12,"platform":"vm","path":"D:/VsCode/wayfound/test/avatar_fallback_test.dart"},"type":"suite","time":10}
+{"test":{"id":13,"name":"loading D:/VsCode/wayfound/test/avatar_fallback_test.dart","suiteID":12,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10}
+{"suite":{"id":14,"platform":"vm","path":"D:/VsCode/wayfound/test/create_trip_screen_test.dart"},"type":"suite","time":11}
+{"test":{"id":15,"name":"loading D:/VsCode/wayfound/test/create_trip_screen_test.dart","suiteID":14,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":11}
+{"count":43,"time":13,"type":"allSuites"}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3157}
+{"group":{"id":16,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":3159}
+{"group":{"id":17,"suiteID":0,"parentID":16,"name":"Add & Edit Suggestion Navigation Tests (Real Router)","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":59,"column":3,"url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"group","time":3160}
+{"test":{"id":18,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":60,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":3160}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":3,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3294}
+{"group":{"id":19,"suiteID":2,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":3295}
+{"group":{"id":20,"suiteID":2,"parentID":19,"name":"App Shell & Router Tests","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":15,"column":3,"url":"file:///D:/VsCode/wayfound/test/app_shell_test.dart"},"type":"group","time":3295}
+{"test":{"id":21,"name":"App Shell & Router Tests App shell builds and starts on Welcome Screen","suiteID":2,"groupIDs":[19,20],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":42,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/app_shell_test.dart"},"type":"testStart","time":3295}
+{"testID":5,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3391}
+{"group":{"id":22,"suiteID":4,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":3391}
+{"group":{"id":23,"suiteID":4,"parentID":22,"name":"AppUser","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":7,"column":3,"url":"file:///D:/VsCode/wayfound/test/app_user_test.dart"},"type":"group","time":3392}
+{"test":{"id":24,"name":"AppUser toFirestoreCreate contains required fields without extra keys","suiteID":4,"groupIDs":[22,23],"metadata":{"skip":false,"skipReason":null},"line":8,"column":5,"url":"file:///D:/VsCode/wayfound/test/app_user_test.dart"},"type":"testStart","time":3392}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":24,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3429}
+{"test":{"id":25,"name":"AppUser toFirestoreUpdate contains only displayName and photoUrl","suiteID":4,"groupIDs":[22,23],"metadata":{"skip":false,"skipReason":null},"line":27,"column":5,"url":"file:///D:/VsCode/wayfound/test/app_user_test.dart"},"type":"testStart","time":3430}
+{"testID":25,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3438}
+{"test":{"id":26,"name":"AppUser fromFirestore parses DocumentSnapshot correctly","suiteID":4,"groupIDs":[22,23],"metadata":{"skip":false,"skipReason":null},"line":41,"column":5,"url":"file:///D:/VsCode/wayfound/test/app_user_test.dart"},"type":"testStart","time":3439}
+{"testID":7,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3554}
+{"group":{"id":27,"suiteID":6,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":3555}
+{"group":{"id":28,"suiteID":6,"parentID":27,"name":"AuthNotifier","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":7,"column":3,"url":"file:///D:/VsCode/wayfound/test/auth_provider_test.dart"},"type":"group","time":3555}
+{"test":{"id":29,"name":"AuthNotifier isSignedInProvider returns false when signed out","suiteID":6,"groupIDs":[27,28],"metadata":{"skip":false,"skipReason":null},"line":8,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_provider_test.dart"},"type":"testStart","time":3555}
+{"testID":26,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3584}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"suite":{"id":30,"platform":"vm","path":"D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"suite","time":3636}
+{"test":{"id":31,"name":"loading D:/VsCode/wayfound/test/expenses_logic_test.dart","suiteID":30,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":3636}
+{"testID":29,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3658}
+{"test":{"id":32,"name":"AuthNotifier isSignedInProvider returns true when signed in","suiteID":6,"groupIDs":[27,28],"metadata":{"skip":false,"skipReason":null},"line":17,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_provider_test.dart"},"type":"testStart","time":3659}
+{"testID":32,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3665}
+{"suite":{"id":33,"platform":"vm","path":"D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"suite","time":3698}
+{"test":{"id":34,"name":"loading D:/VsCode/wayfound/test/expenses_ui_test.dart","suiteID":33,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":3699}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":9,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3803}
+{"group":{"id":35,"suiteID":8,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":10,"line":null,"column":null,"url":null},"type":"group","time":3804}
+{"group":{"id":36,"suiteID":8,"parentID":35,"name":"AuthRepository","metadata":{"skip":false,"skipReason":null},"testCount":10,"line":9,"column":3,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":3804}
+{"group":{"id":37,"suiteID":8,"parentID":36,"name":"AuthRepository currentUser","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":26,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":3804}
+{"test":{"id":38,"name":"AuthRepository currentUser returns null when no user is signed in","suiteID":8,"groupIDs":[35,36,37],"metadata":{"skip":false,"skipReason":null},"line":27,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":3805}
+{"testID":38,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3943}
+{"test":{"id":39,"name":"AuthRepository currentUser returns user when signed in","suiteID":8,"groupIDs":[35,36,37],"metadata":{"skip":false,"skipReason":null},"line":31,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":3944}
+{"testID":39,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3955}
+{"group":{"id":40,"suiteID":8,"parentID":36,"name":"AuthRepository createOnceUserDoc","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":45,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":3955}
+{"test":{"id":41,"name":"AuthRepository createOnceUserDoc creates user document on first call with correct fields","suiteID":8,"groupIDs":[35,36,40],"metadata":{"skip":false,"skipReason":null},"line":46,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":3955}
+{"testID":11,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3984}
+{"group":{"id":42,"suiteID":10,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":19,"line":null,"column":null,"url":null},"type":"group","time":3984}
+{"group":{"id":43,"suiteID":10,"parentID":42,"name":"AuthValidators","metadata":{"skip":false,"skipReason":null},"testCount":19,"line":5,"column":3,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":3985}
+{"group":{"id":44,"suiteID":10,"parentID":43,"name":"AuthValidators validateDisplayName","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":6,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":3985}
+{"test":{"id":45,"name":"AuthValidators validateDisplayName returns error when null or empty","suiteID":10,"groupIDs":[42,43,44],"metadata":{"skip":false,"skipReason":null},"line":7,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":3985}
+{"testID":41,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":3987}
+{"test":{"id":46,"name":"AuthRepository createOnceUserDoc does not overwrite existing user document on second call","suiteID":8,"groupIDs":[35,36,40],"metadata":{"skip":false,"skipReason":null},"line":67,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":3988}
+{"testID":46,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4004}
+{"group":{"id":47,"suiteID":8,"parentID":36,"name":"AuthRepository getUserDoc","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":92,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":4005}
+{"test":{"id":48,"name":"AuthRepository getUserDoc returns null when document does not exist","suiteID":8,"groupIDs":[35,36,47],"metadata":{"skip":false,"skipReason":null},"line":93,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4005}
+{"testID":48,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4013}
+{"test":{"id":49,"name":"AuthRepository getUserDoc returns document data when exists","suiteID":8,"groupIDs":[35,36,47],"metadata":{"skip":false,"skipReason":null},"line":98,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4013}
+{"testID":45,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4015}
+{"test":{"id":50,"name":"AuthValidators validateDisplayName returns error when longer than 50 characters","suiteID":10,"groupIDs":[42,43,44],"metadata":{"skip":false,"skipReason":null},"line":13,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4016}
+{"testID":49,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4023}
+{"group":{"id":51,"suiteID":8,"parentID":36,"name":"AuthRepository userStream","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":111,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":4024}
+{"test":{"id":52,"name":"AuthRepository userStream emits AppUser when user document exists in Firestore","suiteID":8,"groupIDs":[35,36,51],"metadata":{"skip":false,"skipReason":null},"line":112,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4024}
+{"testID":50,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4025}
+{"test":{"id":53,"name":"AuthValidators validateDisplayName returns null for valid display names","suiteID":10,"groupIDs":[42,43,44],"metadata":{"skip":false,"skipReason":null},"line":18,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4026}
+{"testID":53,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4032}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"group":{"id":54,"suiteID":10,"parentID":43,"name":"AuthValidators validateEmail","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":24,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":4035}
+{"test":{"id":55,"name":"AuthValidators validateEmail returns error when null or empty","suiteID":10,"groupIDs":[42,43,54],"metadata":{"skip":false,"skipReason":null},"line":25,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4035}
+{"testID":55,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4048}
+{"test":{"id":56,"name":"AuthValidators validateEmail returns error for invalid email formats","suiteID":10,"groupIDs":[42,43,54],"metadata":{"skip":false,"skipReason":null},"line":30,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4049}
+{"testID":56,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4052}
+{"test":{"id":57,"name":"AuthValidators validateEmail returns null for valid email address","suiteID":10,"groupIDs":[42,43,54],"metadata":{"skip":false,"skipReason":null},"line":36,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4053}
+{"testID":52,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4055}
+{"test":{"id":58,"name":"AuthRepository userStream falls back to auth user when user document does not exist","suiteID":8,"groupIDs":[35,36,51],"metadata":{"skip":false,"skipReason":null},"line":139,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4056}
+{"testID":57,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4057}
+{"group":{"id":59,"suiteID":10,"parentID":43,"name":"AuthValidators validatePassword","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":47,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":4057}
+{"test":{"id":60,"name":"AuthValidators validatePassword returns error when null or empty","suiteID":10,"groupIDs":[42,43,59],"metadata":{"skip":false,"skipReason":null},"line":48,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4057}
+{"testID":60,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4062}
+{"test":{"id":61,"name":"AuthValidators validatePassword returns error when password is less than 8 chars","suiteID":10,"groupIDs":[42,43,59],"metadata":{"skip":false,"skipReason":null},"line":53,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4062}
+{"testID":58,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4065}
+{"group":{"id":62,"suiteID":8,"parentID":36,"name":"AuthRepository updateDisplayName","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":167,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":4066}
+{"test":{"id":63,"name":"AuthRepository updateDisplayName updates display name in both FirebaseAuth and Firestore","suiteID":8,"groupIDs":[35,36,62],"metadata":{"skip":false,"skipReason":null},"line":168,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4066}
+{"testID":61,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4067}
+{"test":{"id":64,"name":"AuthValidators validatePassword returns null when password is 8 or more chars","suiteID":10,"groupIDs":[42,43,59],"metadata":{"skip":false,"skipReason":null},"line":57,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4067}
+{"testID":64,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4071}
+{"group":{"id":65,"suiteID":10,"parentID":43,"name":"AuthValidators validateConfirmPassword","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":63,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":4072}
+{"test":{"id":66,"name":"AuthValidators validateConfirmPassword returns error when null or empty","suiteID":10,"groupIDs":[42,43,65],"metadata":{"skip":false,"skipReason":null},"line":64,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4072}
+{"testID":63,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4073}
+{"group":{"id":67,"suiteID":8,"parentID":36,"name":"AuthRepository signOut","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":194,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"group","time":4074}
+{"test":{"id":68,"name":"AuthRepository signOut signs out from providers without errors","suiteID":8,"groupIDs":[35,36,67],"metadata":{"skip":false,"skipReason":null},"line":195,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_repository_test.dart"},"type":"testStart","time":4074}
+{"testID":66,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4075}
+{"test":{"id":69,"name":"AuthValidators validateConfirmPassword returns error when passwords do not match","suiteID":10,"groupIDs":[42,43,65],"metadata":{"skip":false,"skipReason":null},"line":75,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4076}
+{"testID":69,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4078}
+{"test":{"id":70,"name":"AuthValidators validateConfirmPassword returns null when passwords match","suiteID":10,"groupIDs":[42,43,65],"metadata":{"skip":false,"skipReason":null},"line":82,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4079}
+{"testID":68,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4080}
+{"testID":70,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4083}
+{"group":{"id":71,"suiteID":10,"parentID":43,"name":"AuthValidators formatAuthError","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":90,"column":5,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"group","time":4083}
+{"test":{"id":72,"name":"AuthValidators formatAuthError returns empty string for null error","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":91,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4083}
+{"testID":72,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4089}
+{"test":{"id":73,"name":"AuthValidators formatAuthError maps user-not-found to friendly message","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":95,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4089}
+{"testID":73,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4094}
+{"test":{"id":74,"name":"AuthValidators formatAuthError maps wrong-password to friendly message","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":102,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4095}
+{"testID":74,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4100}
+{"test":{"id":75,"name":"AuthValidators formatAuthError maps email-already-in-use to friendly message","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":109,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4100}
+{"testID":75,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4104}
+{"test":{"id":76,"name":"AuthValidators formatAuthError maps weak-password to friendly message","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":116,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4104}
+{"suite":{"id":77,"platform":"vm","path":"D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"suite","time":4116}
+{"test":{"id":78,"name":"loading D:/VsCode/wayfound/test/expense_repository_test.dart","suiteID":77,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":4116}
+{"testID":76,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4124}
+{"test":{"id":79,"name":"AuthValidators formatAuthError maps cancelled Google sign-in to empty string","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":123,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4124}
+{"testID":79,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4129}
+{"test":{"id":80,"name":"AuthValidators formatAuthError maps user-doc-creation-failed to friendly message","suiteID":10,"groupIDs":[42,43,71],"metadata":{"skip":false,"skipReason":null},"line":131,"column":7,"url":"file:///D:/VsCode/wayfound/test/auth_validators_test.dart"},"type":"testStart","time":4130}
+{"testID":80,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4135}
+{"suite":{"id":81,"platform":"vm","path":"D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"suite","time":4168}
+{"test":{"id":82,"name":"loading D:/VsCode/wayfound/test/home_screen_test.dart","suiteID":81,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":4168}
+{"testID":13,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4171}
+{"group":{"id":83,"suiteID":12,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":4171}
+{"group":{"id":84,"suiteID":12,"parentID":83,"name":"Empty photoURL fallback","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":18,"column":3,"url":"file:///D:/VsCode/wayfound/test/avatar_fallback_test.dart"},"type":"group","time":4171}
+{"test":{"id":85,"name":"Empty photoURL fallback SettingsScreen uses initials when photoURL is empty","suiteID":12,"groupIDs":[83,84],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":19,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/avatar_fallback_test.dart"},"type":"testStart","time":4172}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":31,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4393}
+{"group":{"id":86,"suiteID":30,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":13,"line":null,"column":null,"url":null},"type":"group","time":4393}
+{"group":{"id":87,"suiteID":30,"parentID":86,"name":"Expense Domain Logic - splitEqually","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":10,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"group","time":4393}
+{"test":{"id":88,"name":"Expense Domain Logic - splitEqually splits 1000 among 3 participants with remainder given to first","suiteID":30,"groupIDs":[86,87],"metadata":{"skip":false,"skipReason":null},"line":11,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4393}
+{"testID":15,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4396}
+{"group":{"id":89,"suiteID":14,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":4397}
+{"group":{"id":90,"suiteID":14,"parentID":89,"name":"CreateTripScreen","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":14,"column":3,"url":"file:///D:/VsCode/wayfound/test/create_trip_screen_test.dart"},"type":"group","time":4397}
+{"test":{"id":91,"name":"CreateTripScreen renders all form fields and submit button","suiteID":14,"groupIDs":[89,90],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":29,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/create_trip_screen_test.dart"},"type":"testStart","time":4397}
+{"testID":88,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4424}
+{"test":{"id":92,"name":"Expense Domain Logic - splitEqually handles n = 1 participant","suiteID":30,"groupIDs":[86,87],"metadata":{"skip":false,"skipReason":null},"line":20,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4425}
+{"testID":92,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4430}
+{"test":{"id":93,"name":"Expense Domain Logic - splitEqually handles n = 15 participants","suiteID":30,"groupIDs":[86,87],"metadata":{"skip":false,"skipReason":null},"line":25,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4431}
+{"testID":93,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4436}
+{"test":{"id":94,"name":"Expense Domain Logic - splitEqually handles amount smaller than n (some shares 0)","suiteID":30,"groupIDs":[86,87],"metadata":{"skip":false,"skipReason":null},"line":38,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4436}
+{"testID":94,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4439}
+{"test":{"id":95,"name":"Expense Domain Logic - splitEqually empty participant list returns empty map","suiteID":30,"groupIDs":[86,87],"metadata":{"skip":false,"skipReason":null},"line":49,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4440}
+{"testID":95,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4444}
+{"group":{"id":96,"suiteID":30,"parentID":86,"name":"Expense Domain Logic - computeBalances & suggestSettlements","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":55,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"group","time":4445}
+{"test":{"id":97,"name":"Expense Domain Logic - computeBalances & suggestSettlements Report 8.5 Worked Example: Dinner 900 by Asha, Cab 300 by Ravi","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":83,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4445}
+{"testID":97,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4454}
+{"test":{"id":98,"name":"Expense Domain Logic - computeBalances & suggestSettlements Payer who is NOT a participant","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":135,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4454}
+{"testID":98,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4460}
+{"test":{"id":99,"name":"Expense Domain Logic - computeBalances & suggestSettlements Payer who IS a participant in single-person expense","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":155,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4461}
+{"testID":99,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4466}
+{"test":{"id":100,"name":"Expense Domain Logic - computeBalances & suggestSettlements Confirmed settlements reduce balances","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4467}
+{"testID":100,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4473}
+{"test":{"id":101,"name":"Expense Domain Logic - computeBalances & suggestSettlements Partial settlement scenario","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":210,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4474}
+{"testID":101,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4480}
+{"test":{"id":102,"name":"Expense Domain Logic - computeBalances & suggestSettlements Empty expenses list returns zero balances","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":260,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4481}
+{"testID":21,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4483}
+{"test":{"id":103,"name":"App Shell & Router Tests Router navigates from Welcome to Sign In","suiteID":2,"groupIDs":[19,20],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":59,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/app_shell_test.dart"},"type":"testStart","time":4484}
+{"testID":102,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4486}
+{"test":{"id":104,"name":"Expense Domain Logic - computeBalances & suggestSettlements One member trip returns zero balances","suiteID":30,"groupIDs":[86,96],"metadata":{"skip":false,"skipReason":null},"line":268,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4486}
+{"testID":104,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4492}
+{"group":{"id":105,"suiteID":30,"parentID":86,"name":"Expense Domain Logic - Seeded Random Property Tests (200 cases)","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":286,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"group","time":4492}
+{"test":{"id":106,"name":"Expense Domain Logic - Seeded Random Property Tests (200 cases) 200 random property test iterations for split, balances and settlements","suiteID":30,"groupIDs":[86,105],"metadata":{"skip":false,"skipReason":null},"line":287,"column":5,"url":"file:///D:/VsCode/wayfound/test/expenses_logic_test.dart"},"type":"testStart","time":4492}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":106,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4559}
+{"suite":{"id":107,"platform":"vm","path":"D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"suite","time":4584}
+{"test":{"id":108,"name":"loading D:/VsCode/wayfound/test/itinerary_domain_test.dart","suiteID":107,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":4584}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":34,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4860}
+{"group":{"id":109,"suiteID":33,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":13,"line":null,"column":null,"url":null},"type":"group","time":4860}
+{"group":{"id":110,"suiteID":33,"parentID":109,"name":"ExpenseCard & ExpenseSplitSheet Widget Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":137,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"group","time":4860}
+{"test":{"id":111,"name":"ExpenseCard & ExpenseSplitSheet Widget Tests ExpenseCard renders description, amount, payer, and count","suiteID":33,"groupIDs":[109,110],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":138,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":4860}
+{"testID":78,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4982}
+{"group":{"id":112,"suiteID":77,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":4982}
+{"group":{"id":113,"suiteID":77,"parentID":112,"name":"ExpenseRepository Unit Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":20,"column":3,"url":"file:///D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"group","time":4982}
+{"test":{"id":114,"name":"ExpenseRepository Unit Tests createExpense adds a document with exact payload keys","suiteID":77,"groupIDs":[112,113],"metadata":{"skip":false,"skipReason":null},"line":21,"column":5,"url":"file:///D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"testStart","time":4982}
+{"testID":114,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5139}
+{"test":{"id":115,"name":"ExpenseRepository Unit Tests updateExpense modifies allowed fields","suiteID":77,"groupIDs":[112,113],"metadata":{"skip":false,"skipReason":null},"line":62,"column":5,"url":"file:///D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"testStart","time":5140}
+{"testID":115,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5149}
+{"test":{"id":116,"name":"ExpenseRepository Unit Tests deleteExpense removes document from Firestore","suiteID":77,"groupIDs":[112,113],"metadata":{"skip":false,"skipReason":null},"line":99,"column":5,"url":"file:///D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"testStart","time":5149}
+{"testID":116,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5155}
+{"test":{"id":117,"name":"ExpenseRepository Unit Tests watchExpenses streams and sorts expenses by date DESC, then createdAt DESC","suiteID":77,"groupIDs":[112,113],"metadata":{"skip":false,"skipReason":null},"line":114,"column":5,"url":"file:///D:/VsCode/wayfound/test/expense_repository_test.dart"},"type":"testStart","time":5156}
+{"testID":117,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5176}
+{"suite":{"id":118,"platform":"vm","path":"D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"suite","time":5208}
+{"test":{"id":119,"name":"loading D:/VsCode/wayfound/test/itinerary_repository_test.dart","suiteID":118,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":5209}
+{"testID":103,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5231}
+{"test":{"id":120,"name":"App Shell & Router Tests Home theme toggle button flips theme mode","suiteID":2,"groupIDs":[19,20],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":71,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/app_shell_test.dart"},"type":"testStart","time":5231}
+{"testID":82,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":5254}
+{"group":{"id":121,"suiteID":81,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":null,"column":null,"url":null},"type":"group","time":5254}
+{"group":{"id":122,"suiteID":81,"parentID":121,"name":"HomeScreen","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":17,"column":3,"url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"group","time":5254}
+{"test":{"id":123,"name":"HomeScreen renders loading state when myTripsProvider is loading","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":59,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":5254}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":85,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5441}
+{"test":{"id":124,"name":"Empty photoURL fallback HomeScreen uses initials when photoURL is empty","suiteID":12,"groupIDs":[83,84],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":40,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/avatar_fallback_test.dart"},"type":"testStart","time":5441}
+{"testID":18,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5455}
+{"test":{"id":125,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Tapping empty-state action opens AddEditSuggestionScreen","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":109,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":5456}
+{"testID":108,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":5481}
+{"group":{"id":126,"suiteID":107,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":16,"line":null,"column":null,"url":null},"type":"group","time":5481}
+{"group":{"id":127,"suiteID":107,"parentID":126,"name":"Trip Days Pure Logic Tests","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":8,"column":3,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"group","time":5481}
+{"test":{"id":128,"name":"Trip Days Pure Logic Tests tripDays returns 1 for same start and end date","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":9,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5481}
+{"testID":128,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5502}
+{"test":{"id":129,"name":"Trip Days Pure Logic Tests tripDays calculates inclusive days correctly","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":15,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5503}
+{"testID":129,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5506}
+{"test":{"id":130,"name":"Trip Days Pure Logic Tests tripDays handles end date before start date gracefully","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":21,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5507}
+{"testID":130,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5511}
+{"test":{"id":131,"name":"Trip Days Pure Logic Tests tripDays handles month and year boundaries","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":27,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5511}
+{"testID":131,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5517}
+{"test":{"id":132,"name":"Trip Days Pure Logic Tests dayDate calculates date for given index","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":34,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5517}
+{"testID":132,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5521}
+{"test":{"id":133,"name":"Trip Days Pure Logic Tests formatDayHeader produces formatted string","suiteID":107,"groupIDs":[126,127],"metadata":{"skip":false,"skipReason":null},"line":40,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5522}
+{"testID":133,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5535}
+{"group":{"id":134,"suiteID":107,"parentID":126,"name":"Itinerary Logic Grouping & Ordering Tests","metadata":{"skip":false,"skipReason":null},"testCount":8,"line":50,"column":3,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"group","time":5535}
+{"test":{"id":135,"name":"Itinerary Logic Grouping & Ordering Tests groupByDay filters scheduled items and groups by dayIndex","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":112,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5535}
+{"testID":135,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5544}
+{"test":{"id":136,"name":"Itinerary Logic Grouping & Ordering Tests groupByDay resolves order ties by createdAt then id","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":126,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5545}
+{"testID":136,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5550}
+{"test":{"id":137,"name":"Itinerary Logic Grouping & Ordering Tests nextOrderForDay calculates next order index","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":161,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5551}
+{"testID":137,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5555}
+{"test":{"id":138,"name":"Itinerary Logic Grouping & Ordering Tests planReorder generates minimal updates when moving item down","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":167,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5556}
+{"testID":138,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5561}
+{"test":{"id":139,"name":"Itinerary Logic Grouping & Ordering Tests planReorder generates minimal updates when moving item up","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":186,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5561}
+{"testID":139,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5565}
+{"test":{"id":140,"name":"Itinerary Logic Grouping & Ordering Tests planReorder returns empty list for same index move or invalid bounds","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":205,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5566}
+{"testID":140,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5571}
+{"test":{"id":141,"name":"Itinerary Logic Grouping & Ordering Tests planMoveToDay plans schedule update to end of target day","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":218,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5571}
+{"testID":124,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5572}
+{"testID":141,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5577}
+{"test":{"id":142,"name":"Itinerary Logic Grouping & Ordering Tests planUnschedule plans unscheduling suggestion back to pending","suiteID":107,"groupIDs":[126,134],"metadata":{"skip":false,"skipReason":null},"line":233,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5578}
+{"testID":142,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5582}
+{"group":{"id":143,"suiteID":107,"parentID":126,"name":"Itinerary Payload Builders Tests","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":249,"column":3,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"group","time":5583}
+{"test":{"id":144,"name":"Itinerary Payload Builders Tests buildSchedulePayload produces exact key set","suiteID":107,"groupIDs":[126,143],"metadata":{"skip":false,"skipReason":null},"line":250,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5583}
+{"testID":144,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5588}
+{"test":{"id":145,"name":"Itinerary Payload Builders Tests buildUnschedulePayload produces exact key set","suiteID":107,"groupIDs":[126,143],"metadata":{"skip":false,"skipReason":null},"line":261,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_domain_test.dart"},"type":"testStart","time":5589}
+{"testID":145,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5594}
+{"suite":{"id":146,"platform":"vm","path":"D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"suite","time":5612}
+{"test":{"id":147,"name":"loading D:/VsCode/wayfound/test/itinerary_ui_test.dart","suiteID":146,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":5612}
+{"testID":120,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5619}
+{"suite":{"id":148,"platform":"vm","path":"D:/VsCode/wayfound/test/join_code_test.dart"},"type":"suite","time":5630}
+{"test":{"id":149,"name":"loading D:/VsCode/wayfound/test/join_code_test.dart","suiteID":148,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":5631}
+{"suite":{"id":150,"platform":"vm","path":"D:/VsCode/wayfound/test/join_trip_screen_test.dart"},"type":"suite","time":5669}
+{"test":{"id":151,"name":"loading D:/VsCode/wayfound/test/join_trip_screen_test.dart","suiteID":150,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":5669}
+{"testID":91,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5782}
+{"test":{"id":152,"name":"CreateTripScreen shows validation errors when fields are empty","suiteID":14,"groupIDs":[89,90],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":47,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/create_trip_screen_test.dart"},"type":"testStart","time":5783}
+{"testID":125,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5823}
+{"test":{"id":153,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":146,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":5823}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":111,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5939}
+{"test":{"id":154,"name":"ExpenseCard & ExpenseSplitSheet Widget Tests ExpenseCard hides overflow popup menu when canManage is false","suiteID":33,"groupIDs":[109,110],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":160,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":5940}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":154,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6003}
+{"test":{"id":155,"name":"ExpenseCard & ExpenseSplitSheet Widget Tests Tapping ExpenseCard opens ExpenseSplitSheet with per-participant shares","suiteID":33,"groupIDs":[109,110],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":181,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":6003}
+{"testID":119,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":6109}
+{"group":{"id":156,"suiteID":118,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":6109}
+{"group":{"id":157,"suiteID":118,"parentID":156,"name":"ItineraryRepository Unit Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":19,"column":3,"url":"file:///D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"group","time":6109}
+{"test":{"id":158,"name":"ItineraryRepository Unit Tests scheduleSuggestion updates status, dayIndex, order","suiteID":118,"groupIDs":[156,157],"metadata":{"skip":false,"skipReason":null},"line":20,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"testStart","time":6110}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":152,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6252}
+{"test":{"id":159,"name":"CreateTripScreen successfully submits valid trip creation form","suiteID":14,"groupIDs":[89,90],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":66,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/create_trip_screen_test.dart"},"type":"testStart","time":6252}
+{"testID":158,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6291}
+{"test":{"id":160,"name":"ItineraryRepository Unit Tests moveToDay updates target dayIndex and order","suiteID":118,"groupIDs":[156,157],"metadata":{"skip":false,"skipReason":null},"line":49,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"testStart","time":6292}
+{"testID":160,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6301}
+{"test":{"id":161,"name":"ItineraryRepository Unit Tests reorderDay performs batched write for updated orders","suiteID":118,"groupIDs":[156,157],"metadata":{"skip":false,"skipReason":null},"line":77,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"testStart","time":6301}
+{"testID":161,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6310}
+{"test":{"id":162,"name":"ItineraryRepository Unit Tests unschedule updates status to pending and resets dayIndex and order","suiteID":118,"groupIDs":[156,157],"metadata":{"skip":false,"skipReason":null},"line":110,"column":5,"url":"file:///D:/VsCode/wayfound/test/itinerary_repository_test.dart"},"type":"testStart","time":6311}
+{"testID":162,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6318}
+{"suite":{"id":163,"platform":"vm","path":"D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"suite","time":6354}
+{"test":{"id":164,"name":"loading D:/VsCode/wayfound/test/leave_router_test.dart","suiteID":163,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":6355}
+{"testID":123,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6356}
+{"test":{"id":165,"name":"HomeScreen a. empty state shows \"Create a Trip\" and \"Join with Code\"","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":74,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":6363}
+{"testID":155,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6447}
+{"test":{"id":166,"name":"ExpenseCard & ExpenseSplitSheet Widget Tests Delete option in ExpenseCard shows confirmation dialog","suiteID":33,"groupIDs":[109,110],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":210,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":6448}
+{"testID":153,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6552}
+{"test":{"id":167,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Back button returns to Suggestions tab with dashboard still mounted","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":198,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":6553}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":165,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6569}
+{"test":{"id":168,"name":"HomeScreen b. empty-state \"Join with Code\" opens existing Join Trip screen","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":87,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":6570}
+{"testID":149,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":6602}
+{"group":{"id":169,"suiteID":148,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":null,"column":null,"url":null},"type":"group","time":6602}
+{"group":{"id":170,"suiteID":148,"parentID":169,"name":"JoinCode","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":5,"column":3,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"group","time":6602}
+{"group":{"id":171,"suiteID":148,"parentID":170,"name":"JoinCode generateJoinCode","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":6,"column":5,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"group","time":6602}
+{"test":{"id":172,"name":"JoinCode generateJoinCode generates a 6-character code matching alphabet","suiteID":148,"groupIDs":[169,170,171],"metadata":{"skip":false,"skipReason":null},"line":7,"column":7,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"testStart","time":6602}
+{"testID":172,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6628}
+{"test":{"id":173,"name":"JoinCode generateJoinCode does not include ambiguous characters (0, O, 1, I, L)","suiteID":148,"groupIDs":[169,170,171],"metadata":{"skip":false,"skipReason":null},"line":13,"column":7,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"testStart","time":6629}
+{"testID":147,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":6639}
+{"group":{"id":174,"suiteID":146,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":null,"column":null,"url":null},"type":"group","time":6640}
+{"group":{"id":175,"suiteID":146,"parentID":174,"name":"Itinerary UI Components Widget Tests","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":46,"column":3,"url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"group","time":6640}
+{"test":{"id":176,"name":"Itinerary UI Components Widget Tests ItineraryItemTile renders suggestion content correctly","suiteID":146,"groupIDs":[174,175],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":47,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"testStart","time":6640}
+{"testID":173,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6641}
+{"group":{"id":177,"suiteID":148,"parentID":170,"name":"JoinCode normalizeJoinCode","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":25,"column":5,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"group","time":6642}
+{"test":{"id":178,"name":"JoinCode normalizeJoinCode trims whitespace, converts to uppercase, removes spaces and hyphens","suiteID":148,"groupIDs":[169,170,177],"metadata":{"skip":false,"skipReason":null},"line":26,"column":7,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"testStart","time":6642}
+{"testID":178,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6647}
+{"group":{"id":179,"suiteID":148,"parentID":170,"name":"JoinCode isValidJoinCode","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":35,"column":5,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"group","time":6647}
+{"test":{"id":180,"name":"JoinCode isValidJoinCode returns true for valid 6-char uppercase allowed codes","suiteID":148,"groupIDs":[169,170,179],"metadata":{"skip":false,"skipReason":null},"line":36,"column":7,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"testStart","time":6647}
+{"testID":180,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6652}
+{"test":{"id":181,"name":"JoinCode isValidJoinCode returns false for codes of wrong length or containing invalid chars","suiteID":148,"groupIDs":[169,170,179],"metadata":{"skip":false,"skipReason":null},"line":41,"column":7,"url":"file:///D:/VsCode/wayfound/test/join_code_test.dart"},"type":"testStart","time":6652}
+{"testID":181,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6657}
+{"suite":{"id":182,"platform":"vm","path":"D:/VsCode/wayfound/test/members_tab_test.dart"},"type":"suite","time":6684}
+{"test":{"id":183,"name":"loading D:/VsCode/wayfound/test/members_tab_test.dart","suiteID":182,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":6684}
+{"testID":168,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6853}
+{"test":{"id":184,"name":"HomeScreen c. empty-state \"Create a Trip\" opens existing Create Trip screen","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":102,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":6854}
+{"testID":166,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6859}
+{"group":{"id":185,"suiteID":33,"parentID":109,"name":"BalancesView Widget Tests","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":252,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"group","time":6860}
+{"test":{"id":186,"name":"BalancesView Widget Tests BalancesView displays total spent, net balances with words, and suggested payments","suiteID":33,"groupIDs":[109,185],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":253,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":6860}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":167,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6938}
+{"test":{"id":187,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Overflow Edit action opens Edit form with prefilled data and returns correctly","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":237,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":6939}
+{"testID":184,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6972}
+{"test":{"id":188,"name":"HomeScreen d. empty-state buttons are absent when trips exist, and absent during loading and error states","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":117,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":6972}
+{"testID":151,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":7020}
+{"group":{"id":189,"suiteID":150,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":7020}
+{"group":{"id":190,"suiteID":150,"parentID":189,"name":"JoinTripScreen","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":14,"column":3,"url":"file:///D:/VsCode/wayfound/test/join_trip_screen_test.dart"},"type":"group","time":7021}
+{"test":{"id":191,"name":"JoinTripScreen shows error when invalid join code format is searched","suiteID":150,"groupIDs":[189,190],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":29,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/join_trip_screen_test.dart"},"type":"testStart","time":7021}
+{"testID":186,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7198}
+{"test":{"id":192,"name":"BalancesView Widget Tests BalancesView shows All Settled state when expenses are empty","suiteID":33,"groupIDs":[109,185],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":300,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":7199}
+{"testID":192,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7298}
+{"group":{"id":193,"suiteID":33,"parentID":109,"name":"ExpensesTab Widget Tests","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":327,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"group","time":7298}
+{"test":{"id":194,"name":"ExpensesTab Widget Tests ExpensesTab empty state shows Add Expense action","suiteID":33,"groupIDs":[109,193],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":328,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":7298}
+{"testID":188,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7335}
+{"test":{"id":195,"name":"HomeScreen e. FAB expands to show \"Create Trip\" and \"Join Trip\"","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":163,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":7336}
+{"testID":164,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":7356}
+{"group":{"id":196,"suiteID":163,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":7357}
+{"group":{"id":197,"suiteID":163,"parentID":196,"name":"Leave Router Navigation Tests (G1)","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":56,"column":3,"url":"file:///D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"group","time":7357}
+{"test":{"id":198,"name":"Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect","suiteID":163,"groupIDs":[196,197],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":57,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"testStart","time":7357}
+{"testID":194,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7479}
+{"test":{"id":199,"name":"ExpensesTab Widget Tests ExpensesTab on archived trip hides FAB and empty state action","suiteID":33,"groupIDs":[109,193],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":352,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":7479}
+{"testID":195,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7553}
+{"test":{"id":200,"name":"HomeScreen f. FAB Create Trip opens create flow and menu closes; FAB Join Trip opens join flow","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":186,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":7554}
+{"testID":199,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7579}
+{"test":{"id":201,"name":"ExpensesTab Widget Tests ExpensesTab toggles between Expenses and Balances views","suiteID":33,"groupIDs":[109,193],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":375,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":7580}
+{"testID":187,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7593}
+{"test":{"id":202,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Members and Itinerary tabs still switch correctly","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":296,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":7593}
+{"testID":183,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":7712}
+{"group":{"id":203,"suiteID":182,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":7713}
+{"group":{"id":204,"suiteID":182,"parentID":203,"name":"MembersTab","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":12,"column":3,"url":"file:///D:/VsCode/wayfound/test/members_tab_test.dart"},"type":"group","time":7714}
+{"test":{"id":205,"name":"MembersTab renders invite code header and members list with organizer badge","suiteID":182,"groupIDs":[203,204],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":43,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/members_tab_test.dart"},"type":"testStart","time":7714}
+{"testID":176,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7844}
+{"test":{"id":206,"name":"Itinerary UI Components Widget Tests ItineraryItemTile hides options menu when non-organizer","suiteID":146,"groupIDs":[174,175],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":78,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"testStart","time":7844}
+{"testID":206,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7908}
+{"test":{"id":207,"name":"Itinerary UI Components Widget Tests DayPickerSheet lists all trip days and allows selecting one","suiteID":146,"groupIDs":[174,175],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":106,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"testStart","time":7909}
+{"testID":201,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7921}
+{"group":{"id":208,"suiteID":33,"parentID":109,"name":"AddEditExpenseScreen Widget Tests & Live Share Preview","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":405,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"group","time":7921}
+{"test":{"id":209,"name":"AddEditExpenseScreen Widget Tests & Live Share Preview AddEditExpenseScreen shows live share preview as amount changes","suiteID":33,"groupIDs":[109,208],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":406,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":7922}
+{"testID":159,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7991}
+{"testID":200,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7995}
+{"test":{"id":210,"name":"HomeScreen g. tapping outside the menu (scrim) closes it","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":219,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":7995}
+{"suite":{"id":211,"platform":"vm","path":"D:/VsCode/wayfound/test/money_test.dart"},"type":"suite","time":8048}
+{"test":{"id":212,"name":"loading D:/VsCode/wayfound/test/money_test.dart","suiteID":211,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":8048}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":210,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8214}
+{"test":{"id":213,"name":"HomeScreen h. QR icon is no longer present in the Home app bar","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":240,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":8214}
+{"testID":213,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8299}
+{"test":{"id":214,"name":"HomeScreen i. semantic labels and tooltips exist","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":251,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":8300}
+{"testID":202,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8400}
+{"test":{"id":215,"name":"Add & Edit Suggestion Navigation Tests (Real Router) Tab listener does not navigate when a form is pushed on top","suiteID":0,"groupIDs":[16,17],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":342,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart"},"type":"testStart","time":8401}
+{"testID":214,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8439}
+{"test":{"id":216,"name":"HomeScreen toggles theme when theme toggle button is tapped","suiteID":81,"groupIDs":[121,122],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":285,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/home_screen_test.dart"},"type":"testStart","time":8440}
+{"testID":207,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8445}
+{"test":{"id":217,"name":"Itinerary UI Components Widget Tests ItineraryDaySection renders header and items","suiteID":146,"groupIDs":[174,175],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":137,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"testStart","time":8445}
+{"testID":217,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8536}
+{"test":{"id":218,"name":"Itinerary UI Components Widget Tests ItineraryTab renders day sections and empty state","suiteID":146,"groupIDs":[174,175],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":171,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/itinerary_ui_test.dart"},"type":"testStart","time":8537}
+{"testID":216,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8555}
+{"suite":{"id":219,"platform":"vm","path":"D:/VsCode/wayfound/test/router_test.dart"},"type":"suite","time":8595}
+{"test":{"id":220,"name":"loading D:/VsCode/wayfound/test/router_test.dart","suiteID":219,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":8596}
+{"testID":215,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8691}
+{"testID":209,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8714}
+{"test":{"id":221,"name":"AddEditExpenseScreen Widget Tests & Live Share Preview AddEditExpenseScreen shows validation errors for invalid input","suiteID":33,"groupIDs":[109,208],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":447,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":8715}
+{"suite":{"id":222,"platform":"vm","path":"D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"suite","time":8756}
+{"test":{"id":223,"name":"loading D:/VsCode/wayfound/test/settings_screen_test.dart","suiteID":222,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":8756}
+{"testID":218,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8808}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":212,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":8827}
+{"group":{"id":224,"suiteID":211,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":null,"column":null,"url":null},"type":"group","time":8828}
+{"group":{"id":225,"suiteID":211,"parentID":224,"name":"Money Utilities Tests","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":6,"column":3,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"group","time":8828}
+{"test":{"id":226,"name":"Money Utilities Tests getMinorUnitDigits returns 0 for JPY and 2 for other currencies","suiteID":211,"groupIDs":[224,225],"metadata":{"skip":false,"skipReason":null},"line":7,"column":5,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"testStart","time":8828}
+{"suite":{"id":227,"platform":"vm","path":"D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"suite","time":8851}
+{"test":{"id":228,"name":"loading D:/VsCode/wayfound/test/settlements_overflow_test.dart","suiteID":227,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":8851}
+{"testID":226,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8860}
+{"test":{"id":229,"name":"Money Utilities Tests parseMinorUnits parses valid inputs correctly for 2-decimal currencies","suiteID":211,"groupIDs":[224,225],"metadata":{"skip":false,"skipReason":null},"line":15,"column":5,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"testStart","time":8860}
+{"testID":229,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8866}
+{"test":{"id":230,"name":"Money Utilities Tests parseMinorUnits parses valid inputs correctly for 0-decimal currency (JPY)","suiteID":211,"groupIDs":[224,225],"metadata":{"skip":false,"skipReason":null},"line":29,"column":5,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"testStart","time":8867}
+{"testID":230,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8872}
+{"test":{"id":231,"name":"Money Utilities Tests parseMinorUnits throws FormatException on invalid, negative, decimal JPY, or too many decimal inputs","suiteID":211,"groupIDs":[224,225],"metadata":{"skip":false,"skipReason":null},"line":36,"column":5,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"testStart","time":8873}
+{"testID":231,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8884}
+{"test":{"id":232,"name":"Money Utilities Tests formatMinorUnits formats currency values correctly using intl","suiteID":211,"groupIDs":[224,225],"metadata":{"skip":false,"skipReason":null},"line":56,"column":5,"url":"file:///D:/VsCode/wayfound/test/money_test.dart"},"type":"testStart","time":8884}
+{"testID":232,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8907}
+{"suite":{"id":233,"platform":"vm","path":"D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"suite","time":8934}
+{"test":{"id":234,"name":"loading D:/VsCode/wayfound/test/settlements_repository_test.dart","suiteID":233,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":8935}
+{"testID":191,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8988}
+{"test":{"id":235,"name":"JoinTripScreen shows trip preview when valid join code is searched","suiteID":150,"groupIDs":[189,190],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":56,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/join_trip_screen_test.dart"},"type":"testStart","time":8989}
+{"testID":221,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9026}
+{"test":{"id":236,"name":"AddEditExpenseScreen Widget Tests & Live Share Preview JPY trip formats amounts with zero decimal places","suiteID":33,"groupIDs":[109,208],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":477,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":9027}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":205,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9179}
+{"test":{"id":237,"name":"MembersTab copies invite code to clipboard when Copy is tapped","suiteID":182,"groupIDs":[203,204],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":67,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/members_tab_test.dart"},"type":"testStart","time":9179}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":235,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9343}
+{"test":{"id":238,"name":"JoinTripScreen joins trip successfully when Join Trip button is tapped","suiteID":150,"groupIDs":[189,190],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":91,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/join_trip_screen_test.dart"},"type":"testStart","time":9344}
+{"testID":236,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9345}
+{"group":{"id":239,"suiteID":33,"parentID":109,"name":"Light and Dark Theme Smoke Test","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":509,"column":3,"url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"group","time":9346}
+{"test":{"id":240,"name":"Light and Dark Theme Smoke Test ExpensesTab renders cleanly in both Light and Dark mode","suiteID":33,"groupIDs":[109,239],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":510,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/expenses_ui_test.dart"},"type":"testStart","time":9346}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":240,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9642}
+{"suite":{"id":241,"platform":"vm","path":"D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"suite","time":9706}
+{"test":{"id":242,"name":"loading D:/VsCode/wayfound/test/settlements_widget_test.dart","suiteID":241,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9707}
+{"testID":238,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9725}
+{"testID":237,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":9728}
+{"testID":220,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":9733}
+{"group":{"id":243,"suiteID":219,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":9734}
+{"group":{"id":244,"suiteID":219,"parentID":243,"name":"App Router Redirects","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":13,"column":3,"url":"file:///D:/VsCode/wayfound/test/router_test.dart"},"type":"group","time":9734}
+{"test":{"id":245,"name":"App Router Redirects Signed out user navigating to protected route is redirected to Welcome","suiteID":219,"groupIDs":[243,244],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":14,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/router_test.dart"},"type":"testStart","time":9734}
+{"suite":{"id":246,"platform":"vm","path":"D:/VsCode/wayfound/test/settlement_test.dart"},"type":"suite","time":9770}
+{"test":{"id":247,"name":"loading D:/VsCode/wayfound/test/settlement_test.dart","suiteID":246,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9771}
+{"suite":{"id":248,"platform":"vm","path":"D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"suite","time":9781}
+{"test":{"id":249,"name":"loading D:/VsCode/wayfound/test/sign_in_screen_test.dart","suiteID":248,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":9781}
+{"testID":223,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":9967}
+{"group":{"id":250,"suiteID":222,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":null,"column":null,"url":null},"type":"group","time":9968}
+{"group":{"id":251,"suiteID":222,"parentID":250,"name":"SettingsScreen","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":48,"column":3,"url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"group","time":9968}
+{"test":{"id":252,"name":"SettingsScreen renders user profile details and appearance controls","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":49,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":9968}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":198,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10016}
+{"suite":{"id":253,"platform":"vm","path":"D:/VsCode/wayfound/test/sign_up_screen_test.dart"},"type":"suite","time":10057}
+{"test":{"id":254,"name":"loading D:/VsCode/wayfound/test/sign_up_screen_test.dart","suiteID":253,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10057}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":228,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":10235}
+{"group":{"id":255,"suiteID":227,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":31,"line":null,"column":null,"url":null},"type":"group","time":10235}
+{"group":{"id":256,"suiteID":227,"parentID":255,"name":"Settlements Overflow Matrix Tests (O1)","metadata":{"skip":false,"skipReason":null},"testCount":31,"line":323,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"group","time":10235}
+{"test":{"id":257,"name":"Settlements Overflow Matrix Tests (O1) O1.1 BalancesView (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":325,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":10235}
+{"testID":234,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":10264}
+{"group":{"id":258,"suiteID":233,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":8,"line":null,"column":null,"url":null},"type":"group","time":10264}
+{"group":{"id":259,"suiteID":233,"parentID":258,"name":"Repository & Domain Tests (R1 - R7)","metadata":{"skip":false,"skipReason":null},"testCount":8,"line":19,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"group","time":10264}
+{"test":{"id":260,"name":"Repository & Domain Tests (R1 - R7) R1: createSettlement writes exactly required keys with status pending and minor units amount","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":30,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10264}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":260,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10434}
+{"test":{"id":261,"name":"Repository & Domain Tests (R1 - R7) R2: confirm/reject writes only status and resolvedAt; transitions only from pending","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":82,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10435}
+{"testID":261,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10445}
+{"test":{"id":262,"name":"Repository & Domain Tests (R1 - R7) R3: payer can delete a pending settlement; deletion refused/unavailable for confirmed","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":143,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10446}
+{"testID":262,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10455}
+{"test":{"id":263,"name":"Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":180,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10456}
+{"testID":263,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10469}
+{"test":{"id":264,"name":"Repository & Domain Tests (R1 - R7) R5: removeMember by organizer removes uid and sets status to left, allowed at nonzero balance","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":269,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10469}
+{"testID":264,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10480}
+{"test":{"id":265,"name":"Repository & Domain Tests (R1 - R7) R6: join batch payload sets status active; joinTrip error presents exact message","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":302,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10481}
+{"testID":265,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10499}
+{"test":{"id":266,"name":"Repository & Domain Tests (R1 - R7) R6b: repository maps permission-denied to rejoin refusal message","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":345,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10499}
+{"testID":266,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10512}
+{"test":{"id":267,"name":"Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0","suiteID":233,"groupIDs":[258,259],"metadata":{"skip":false,"skipReason":null},"line":380,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlements_repository_test.dart"},"type":"testStart","time":10513}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":267,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10597}
+{"suite":{"id":268,"platform":"vm","path":"D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"suite","time":10629}
+{"test":{"id":269,"name":"loading D:/VsCode/wayfound/test/suggestions_ui_test.dart","suiteID":268,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10629}
+{"testID":247,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":10699}
+{"group":{"id":270,"suiteID":246,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":10699}
+{"group":{"id":271,"suiteID":246,"parentID":270,"name":"Settlement Validators Tests","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":11,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"group","time":10700}
+{"test":{"id":272,"name":"Settlement Validators Tests validateSettlementAmount validates correct amounts and errors","suiteID":246,"groupIDs":[270,271],"metadata":{"skip":false,"skipReason":null},"line":12,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10700}
+{"testID":272,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10730}
+{"test":{"id":273,"name":"Settlement Validators Tests tryParseMinorUnits parses currency amounts correctly","suiteID":246,"groupIDs":[270,271],"metadata":{"skip":false,"skipReason":null},"line":40,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10730}
+{"testID":273,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10734}
+{"group":{"id":274,"suiteID":246,"parentID":270,"name":"Leave Eligibility Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":54,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"group","time":10734}
+{"test":{"id":275,"name":"Leave Eligibility Tests Organizer cannot leave","suiteID":246,"groupIDs":[270,274],"metadata":{"skip":false,"skipReason":null},"line":55,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10734}
+{"testID":275,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10739}
+{"test":{"id":276,"name":"Leave Eligibility Tests Member with nonzero balance cannot leave","suiteID":246,"groupIDs":[270,274],"metadata":{"skip":false,"skipReason":null},"line":67,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10739}
+{"testID":276,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10744}
+{"test":{"id":277,"name":"Leave Eligibility Tests Member with pending settlements cannot leave","suiteID":246,"groupIDs":[270,274],"metadata":{"skip":false,"skipReason":null},"line":79,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10745}
+{"testID":277,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10753}
+{"test":{"id":278,"name":"Leave Eligibility Tests Member with zero balance and no pending settlements can leave","suiteID":246,"groupIDs":[270,274],"metadata":{"skip":false,"skipReason":null},"line":100,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10754}
+{"testID":278,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10757}
+{"group":{"id":279,"suiteID":246,"parentID":270,"name":"Balances with Confirmed Settlements Tests","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":113,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"group","time":10758}
+{"test":{"id":280,"name":"Balances with Confirmed Settlements Tests Confirmed settlements reduce net debt balances","suiteID":246,"groupIDs":[270,279],"metadata":{"skip":false,"skipReason":null},"line":114,"column":5,"url":"file:///D:/VsCode/wayfound/test/settlement_test.dart"},"type":"testStart","time":10758}
+{"testID":280,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10767}
+{"suite":{"id":281,"platform":"vm","path":"D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"suite","time":10797}
+{"test":{"id":282,"name":"loading D:/VsCode/wayfound/test/suggestion_card_menu_test.dart","suiteID":281,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10797}
+{"testID":242,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":10818}
+{"group":{"id":283,"suiteID":241,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":null,"column":null,"url":null},"type":"group","time":10818}
+{"group":{"id":284,"suiteID":241,"parentID":283,"name":"Widget Tests (W1 - W10)","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":77,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"group","time":10819}
+{"test":{"id":285,"name":"Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":78,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":10819}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":245,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10965}
+{"test":{"id":286,"name":"App Router Redirects Signed in user navigating to welcome is redirected to Home","suiteID":219,"groupIDs":[243,244],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":42,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/router_test.dart"},"type":"testStart","time":10965}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":249,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":11125}
+{"group":{"id":287,"suiteID":248,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":11125}
+{"group":{"id":288,"suiteID":248,"parentID":287,"name":"SignInScreen","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":32,"column":3,"url":"file:///D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"group","time":11125}
+{"test":{"id":289,"name":"SignInScreen renders fields and buttons in Light mode","suiteID":248,"groupIDs":[287,288],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":33,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"testStart","time":11125}
+{"testID":286,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11268}
+{"test":{"id":290,"name":"App Router Redirects Stream auth state change dynamically triggers redirect to Home","suiteID":219,"groupIDs":[243,244],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":76,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/router_test.dart"},"type":"testStart","time":11269}
+{"testID":254,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":11303}
+{"group":{"id":291,"suiteID":253,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":11303}
+{"group":{"id":292,"suiteID":253,"parentID":291,"name":"SignUpScreen","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":32,"column":3,"url":"file:///D:/VsCode/wayfound/test/sign_up_screen_test.dart"},"type":"group","time":11303}
+{"test":{"id":293,"name":"SignUpScreen renders display name, email, password, confirm password fields","suiteID":253,"groupIDs":[291,292],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":33,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_up_screen_test.dart"},"type":"testStart","time":11303}
+{"testID":290,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11484}
+{"testID":257,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11502}
+{"test":{"id":294,"name":"Settlements Overflow Matrix Tests (O1) O1.2 BalancesView (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":333,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":11502}
+{"testID":252,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11522}
+{"test":{"id":295,"name":"SettingsScreen shows edit display name dialog on tap","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":67,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":11522}
+{"suite":{"id":296,"platform":"vm","path":"D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart"},"type":"suite","time":11537}
+{"test":{"id":297,"name":"loading D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart","suiteID":296,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":11537}
+{"testID":269,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":11618}
+{"group":{"id":298,"suiteID":268,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":11619}
+{"group":{"id":299,"suiteID":268,"parentID":298,"name":"Suggestions UI Widget Tests","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":66,"column":3,"url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"group","time":11619}
+{"test":{"id":300,"name":"Suggestions UI Widget Tests SuggestionsTab renders empty state when suggestions list is empty","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":67,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":11619}
+{"testID":294,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11692}
+{"test":{"id":301,"name":"Settlements Overflow Matrix Tests (O1) O1.3 BalancesView (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":339,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":11692}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":282,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":11826}
+{"group":{"id":302,"suiteID":281,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":16,"line":null,"column":null,"url":null},"type":"group","time":11827}
+{"group":{"id":303,"suiteID":281,"parentID":302,"name":"SuggestionCard header layout and positioning tests","metadata":{"skip":false,"skipReason":null},"testCount":16,"line":9,"column":3,"url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"group","time":11827}
+{"test":{"id":304,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":11827}
+{"testID":301,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11845}
+{"test":{"id":305,"name":"Settlements Overflow Matrix Tests (O1) O1.4 BalancesView (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":347,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":11846}
+{"testID":305,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":11964}
+{"test":{"id":306,"name":"Settlements Overflow Matrix Tests (O1) O1.5 MembersTab as organizer (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":354,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":11965}
+{"testID":285,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12151}
+{"test":{"id":307,"name":"Widget Tests (W1 - W10) W2 Mark-as-paid sheet: input validation, error text asserted, submit disabled/blocked","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":132,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":12151}
+{"testID":306,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12175}
+{"test":{"id":308,"name":"Settlements Overflow Matrix Tests (O1) O1.6 MembersTab as organizer (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":368,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12176}
+{"testID":295,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12214}
+{"test":{"id":309,"name":"SettingsScreen shows sign out confirmation dialog on tap","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":86,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":12215}
+{"testID":308,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12284}
+{"test":{"id":310,"name":"Settlements Overflow Matrix Tests (O1) O1.7 MembersTab as organizer (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":382,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12285}
+{"testID":310,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12379}
+{"test":{"id":311,"name":"Settlements Overflow Matrix Tests (O1) O1.8 MembersTab as organizer (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":396,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12380}
+{"testID":297,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":12425}
+{"group":{"id":312,"suiteID":296,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":12425}
+{"test":{"id":313,"name":"SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3","suiteID":296,"groupIDs":[312],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":10,"root_column":3,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart"},"type":"testStart","time":12426}
+{"testID":309,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12435}
+{"test":{"id":314,"name":"SettingsScreen theme selector segment button updates theme state","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":102,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":12435}
+{"testID":311,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12471}
+{"test":{"id":315,"name":"Settlements Overflow Matrix Tests (O1) O1.9 MembersTab as plain member (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":411,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12471}
+{"testID":300,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12505}
+{"test":{"id":316,"name":"Suggestions UI Widget Tests SuggestionCard renders title, category, cost, and vote controls","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":90,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":12505}
+{"testID":315,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12579}
+{"test":{"id":317,"name":"Settlements Overflow Matrix Tests (O1) O1.10 MembersTab as plain member (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":425,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12580}
+{"testID":317,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12669}
+{"test":{"id":318,"name":"Settlements Overflow Matrix Tests (O1) O1.11 MembersTab as plain member (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":439,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12669}
+{"testID":314,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12683}
+{"test":{"id":319,"name":"SettingsScreen editing display name updates SettingsScreen and HomeScreen immediately without restart","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":130,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":12684}
+{"testID":289,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12741}
+{"test":{"id":320,"name":"SignInScreen renders correctly in Dark mode","suiteID":248,"groupIDs":[287,288],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":47,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"testStart","time":12742}
+{"testID":318,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12767}
+{"test":{"id":321,"name":"Settlements Overflow Matrix Tests (O1) O1.12 MembersTab as plain member (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":454,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12767}
+{"testID":307,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12870}
+{"test":{"id":322,"name":"Widget Tests (W1 - W10) W3 Status chips show text labels (Confirmed, Rejected, Awaiting confirmation) asserted via find.text","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":194,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":12870}
+{"testID":321,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12871}
+{"test":{"id":323,"name":"Settlements Overflow Matrix Tests (O1) O1.13 MarkAsPaidSheet (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":469,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":12872}
+{"testID":316,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12930}
+{"test":{"id":324,"name":"Suggestions UI Widget Tests SuggestionCard hides overflow menu for non-author non-organizer member","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":118,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":12931}
+{"testID":293,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12963}
+{"test":{"id":325,"name":"SignUpScreen shows validation error when passwords do not match","suiteID":253,"groupIDs":[291,292],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":48,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_up_screen_test.dart"},"type":"testStart","time":12964}
+{"testID":320,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12996}
+{"test":{"id":326,"name":"SignInScreen shows validation errors when fields are empty","suiteID":248,"groupIDs":[287,288],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":60,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"testStart","time":12997}
+{"testID":323,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13009}
+{"test":{"id":327,"name":"Settlements Overflow Matrix Tests (O1) O1.14 MarkAsPaidSheet (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":477,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13010}
+{"testID":324,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13017}
+{"test":{"id":328,"name":"Suggestions UI Widget Tests Tapping vote button calls repository and renders vote highlights","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":144,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":13018}
+{"testID":322,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13062}
+{"test":{"id":329,"name":"Widget Tests (W1 - W10) W4 Action visibility on pending vs confirmed/rejected settlements","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":256,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":13062}
+{"testID":327,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13077}
+{"test":{"id":330,"name":"Settlements Overflow Matrix Tests (O1) O1.15 MarkAsPaidSheet (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":485,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13077}
+{"testID":304,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13107}
+{"test":{"id":331,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13108}
+{"testID":330,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13147}
+{"test":{"id":332,"name":"Settlements Overflow Matrix Tests (O1) O1.16 MarkAsPaidSheet (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":493,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13147}
+{"testID":332,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13226}
+{"test":{"id":333,"name":"Settlements Overflow Matrix Tests (O1) O1.17 Leave dialog blocked (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":502,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13227}
+{"testID":331,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13289}
+{"test":{"id":334,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:360.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13290}
+{"testID":329,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13345}
+{"test":{"id":335,"name":"Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":392,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":13345}
+{"testID":319,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13349}
+{"test":{"id":336,"name":"SettingsScreen failed display name edit shows error snackbar and retains old name","suiteID":222,"groupIDs":[250,251],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":193,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settings_screen_test.dart"},"type":"testStart","time":13349}
+{"testID":328,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13398}
+{"test":{"id":337,"name":"Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":199,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":13399}
+{"testID":334,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13410}
+{"test":{"id":338,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:360.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13410}
+{"testID":326,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13424}
+{"test":{"id":339,"name":"SignInScreen shows validation error for invalid email and short password","suiteID":248,"groupIDs":[287,288],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":78,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_in_screen_test.dart"},"type":"testStart","time":13425}
+{"testID":338,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13517}
+{"test":{"id":340,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:false, width:320.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13517}
+{"testID":333,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13564}
+{"test":{"id":341,"name":"Settlements Overflow Matrix Tests (O1) O1.18 Leave dialog blocked (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":510,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13564}
+{"testID":340,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13616}
+{"test":{"id":342,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:false, width:320.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13616}
+{"testID":342,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13717}
+{"test":{"id":343,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:false, width:360.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13717}
+{"testID":341,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13730}
+{"test":{"id":344,"name":"Settlements Overflow Matrix Tests (O1) O1.19 Leave dialog blocked (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":518,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13731}
+{"testID":335,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13742}
+{"test":{"id":345,"name":"Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":468,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":13742}
+{"testID":336,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13772}
+{"testID":343,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13812}
+{"test":{"id":346,"name":"SuggestionCard header layout and positioning tests scheduled:true, canManage:false, width:360.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13813}
+{"suite":{"id":347,"platform":"vm","path":"D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"suite","time":13832}
+{"test":{"id":348,"name":"loading D:/VsCode/wayfound/test/suggestion_domain_test.dart","suiteID":347,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":13832}
+{"testID":325,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13843}
+{"test":{"id":349,"name":"SignUpScreen renders correctly in Dark Mode","suiteID":253,"groupIDs":[291,292],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":76,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/sign_up_screen_test.dart"},"type":"testStart","time":13844}
+{"testID":344,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13910}
+{"test":{"id":350,"name":"Settlements Overflow Matrix Tests (O1) O1.20 Leave dialog blocked (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":526,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":13911}
+{"testID":339,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13929}
+{"testID":346,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":13936}
+{"test":{"id":351,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:true, width:320.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":13936}
+{"suite":{"id":352,"platform":"vm","path":"D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"suite","time":13975}
+{"test":{"id":353,"name":"loading D:/VsCode/wayfound/test/suggestion_repository_test.dart","suiteID":352,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":13975}
+{"testID":345,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14001}
+{"test":{"id":354,"name":"Widget Tests (W1 - W10) W7 \"(left)\" label appears for left member in balances, and not for active members","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":512,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":14001}
+{"testID":313,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14028}
+{"test":{"id":355,"name":"ItineraryItemTile does not overflow at widths 320 and 360 dp with text scale 1.3","suiteID":296,"groupIDs":[312],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":80,"root_column":3,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart"},"type":"testStart","time":14029}
+{"testID":351,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14065}
+{"test":{"id":356,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:true, width:320.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14066}
+{"testID":337,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14075}
+{"test":{"id":357,"name":"Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":230,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":14075}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":350,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14120}
+{"testID":354,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14121}
+{"test":{"id":358,"name":"Settlements Overflow Matrix Tests (O1) O1.21 Leave dialog allowed (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":535,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":14121}
+{"test":{"id":359,"name":"Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":547,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":14122}
+{"testID":349,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14143}
+{"testID":355,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14167}
+{"testID":356,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14179}
+{"test":{"id":360,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:true, width:360.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14179}
+{"suite":{"id":361,"platform":"vm","path":"D:/VsCode/wayfound/test/theme_test.dart"},"type":"suite","time":14198}
+{"test":{"id":362,"name":"loading D:/VsCode/wayfound/test/theme_test.dart","suiteID":361,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":14198}
+{"suite":{"id":363,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart"},"type":"suite","time":14215}
+{"test":{"id":364,"name":"loading D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart","suiteID":363,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":14215}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":360,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14308}
+{"test":{"id":365,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:true, width:360.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14308}
+{"testID":358,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14323}
+{"test":{"id":366,"name":"Settlements Overflow Matrix Tests (O1) O1.22 Leave dialog allowed (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":543,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":14324}
+{"testID":365,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14395}
+{"test":{"id":367,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:false, width:320.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14396}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":367,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14498}
+{"testID":366,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14498}
+{"test":{"id":368,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:false, width:320.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14498}
+{"test":{"id":369,"name":"Settlements Overflow Matrix Tests (O1) O1.23 Leave dialog allowed (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":551,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":14499}
+{"testID":359,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14548}
+{"test":{"id":370,"name":"Widget Tests (W1 - W10) W9 Archived trip: all settlement/leave/remove/add actions absent or disabled; read content visible","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":629,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":14548}
+{"testID":368,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14578}
+{"test":{"id":371,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:false, width:360.0, scale:1.0","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14579}
+{"testID":369,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14652}
+{"test":{"id":372,"name":"Settlements Overflow Matrix Tests (O1) O1.24 Leave dialog allowed (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":559,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":14653}
+{"testID":371,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14666}
+{"test":{"id":373,"name":"SuggestionCard header layout and positioning tests scheduled:false, canManage:false, width:360.0, scale:1.3","suiteID":281,"groupIDs":[302,303],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":13,"root_url":"file:///D:/VsCode/wayfound/test/suggestion_card_menu_test.dart"},"type":"testStart","time":14667}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":357,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14714}
+{"test":{"id":374,"name":"Suggestions UI Widget Tests Light and Dark mode smoke test for SuggestionCard","suiteID":268,"groupIDs":[298,299],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":275,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/suggestions_ui_test.dart"},"type":"testStart","time":14714}
+{"testID":373,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14747}
+{"suite":{"id":375,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"suite","time":14790}
+{"test":{"id":376,"name":"loading D:/VsCode/wayfound/test/trip_days_test.dart","suiteID":375,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":14791}
+{"testID":370,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14807}
+{"test":{"id":377,"name":"Widget Tests (W1 - W10) W10 Join error message displayed on failure","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":725,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":14808}
+{"testID":372,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14812}
+{"test":{"id":378,"name":"Settlements Overflow Matrix Tests (O1) O1.25 Remove dialog (320x568, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":568,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":14813}
+{"testID":374,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14872}
+{"testID":348,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":14902}
+{"group":{"id":379,"suiteID":347,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":null,"column":null,"url":null},"type":"group","time":14902}
+{"group":{"id":380,"suiteID":347,"parentID":379,"name":"Suggestion Domain Unit Tests","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":9,"column":3,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"group","time":14902}
+{"test":{"id":381,"name":"Suggestion Domain Unit Tests Category list in app matches security rules category list","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":10,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14902}
+{"suite":{"id":382,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"suite","time":14927}
+{"test":{"id":383,"name":"loading D:/VsCode/wayfound/test/trip_domain_test.dart","suiteID":382,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":14927}
+{"testID":381,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14938}
+{"test":{"id":384,"name":"Suggestion Domain Unit Tests computeVoteTransition handles all 6 vote transitions correctly","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":17,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14938}
+{"testID":384,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14944}
+{"test":{"id":385,"name":"Suggestion Domain Unit Tests VoteTransitionResult never lets counters drop below zero","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":77,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14945}
+{"testID":385,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14948}
+{"test":{"id":386,"name":"Suggestion Domain Unit Tests sortSuggestions sorts by score descending, ties broken by oldest createdAt first","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":83,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14949}
+{"testID":386,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14965}
+{"test":{"id":387,"name":"Suggestion Domain Unit Tests SuggestionValidators validates title, note, category and cost properly","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":128,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14965}
+{"testID":387,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14974}
+{"test":{"id":388,"name":"Suggestion Domain Unit Tests SuggestionPayloadBuilders produces exact key sets for create, update, and votes","suiteID":347,"groupIDs":[379,380],"metadata":{"skip":false,"skipReason":null},"line":165,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_domain_test.dart"},"type":"testStart","time":14974}
+{"testID":388,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14984}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":378,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15007}
+{"test":{"id":389,"name":"Settlements Overflow Matrix Tests (O1) O1.26 Remove dialog (320x568, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":576,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15007}
+{"suite":{"id":390,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"suite","time":15019}
+{"test":{"id":391,"name":"loading D:/VsCode/wayfound/test/trip_payload_builders_test.dart","suiteID":390,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":15019}
+{"testID":353,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":15085}
+{"group":{"id":392,"suiteID":352,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":null,"column":null,"url":null},"type":"group","time":15086}
+{"group":{"id":393,"suiteID":352,"parentID":392,"name":"SuggestionRepository Unit Tests","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":19,"column":3,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"group","time":15086}
+{"test":{"id":394,"name":"SuggestionRepository Unit Tests createSuggestion adds a document to Firestore","suiteID":352,"groupIDs":[392,393],"metadata":{"skip":false,"skipReason":null},"line":20,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"testStart","time":15086}
+{"testID":377,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15133}
+{"test":{"id":395,"name":"Widget Tests (W1 - W10) W10b Join screen displays rejoin refusal message on permission-denied","suiteID":241,"groupIDs":[283,284],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":745,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_widget_test.dart"},"type":"testStart","time":15134}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":389,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15151}
+{"test":{"id":396,"name":"Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":584,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15151}
+{"testID":362,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":15247}
+{"group":{"id":397,"suiteID":361,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":15247}
+{"group":{"id":398,"suiteID":361,"parentID":397,"name":"Theme System Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":10,"column":3,"url":"file:///D:/VsCode/wayfound/test/theme_test.dart"},"type":"group","time":15247}
+{"test":{"id":399,"name":"Theme System Tests Default theme mode is System","suiteID":361,"groupIDs":[397,398],"metadata":{"skip":false,"skipReason":null},"line":18,"column":5,"url":"file:///D:/VsCode/wayfound/test/theme_test.dart"},"type":"testStart","time":15247}
+{"testID":394,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15268}
+{"test":{"id":400,"name":"SuggestionRepository Unit Tests updateSuggestion updates content fields","suiteID":352,"groupIDs":[392,393],"metadata":{"skip":false,"skipReason":null},"line":48,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"testStart","time":15268}
+{"testID":396,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15275}
+{"test":{"id":401,"name":"Settlements Overflow Matrix Tests (O1) O1.28 Remove dialog (360x640, Dark, 1.3x text)","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":592,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15275}
+{"testID":400,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15278}
+{"test":{"id":402,"name":"SuggestionRepository Unit Tests deleteSuggestion removes suggestion document","suiteID":352,"groupIDs":[392,393],"metadata":{"skip":false,"skipReason":null},"line":83,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"testStart","time":15278}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":402,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15292}
+{"test":{"id":403,"name":"SuggestionRepository Unit Tests castVote handles all 6 vote transitions in transactions","suiteID":352,"groupIDs":[392,393],"metadata":{"skip":false,"skipReason":null},"line":98,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"testStart","time":15293}
+{"testID":403,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15315}
+{"test":{"id":404,"name":"SuggestionRepository Unit Tests watchSuggestions streams and sorts suggestions correctly","suiteID":352,"groupIDs":[392,393],"metadata":{"skip":false,"skipReason":null},"line":206,"column":5,"url":"file:///D:/VsCode/wayfound/test/suggestion_repository_test.dart"},"type":"testStart","time":15315}
+{"testID":404,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15336}
+{"testID":399,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15346}
+{"test":{"id":405,"name":"Theme System Tests ThemeMode persists and reloads from shared_preferences","suiteID":361,"groupIDs":[397,398],"metadata":{"skip":false,"skipReason":null},"line":28,"column":5,"url":"file:///D:/VsCode/wayfound/test/theme_test.dart"},"type":"testStart","time":15347}
+{"suite":{"id":406,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"suite","time":15370}
+{"test":{"id":407,"name":"loading D:/VsCode/wayfound/test/trip_repository_test.dart","suiteID":406,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":15370}
+{"testID":405,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15378}
+{"test":{"id":408,"name":"Theme System Tests Quick toggle flips relative to current displayed brightness","suiteID":361,"groupIDs":[397,398],"metadata":{"skip":false,"skipReason":null},"line":54,"column":5,"url":"file:///D:/VsCode/wayfound/test/theme_test.dart"},"type":"testStart","time":15378}
+{"testID":408,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15387}
+{"test":{"id":409,"name":"Theme System Tests Spot-check AppTheme ColorSchemes for palette values","suiteID":361,"groupIDs":[397,398],"metadata":{"skip":false,"skipReason":null},"line":76,"column":5,"url":"file:///D:/VsCode/wayfound/test/theme_test.dart"},"type":"testStart","time":15387}
+{"testID":401,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15390}
+{"test":{"id":410,"name":"Settlements Overflow Matrix Tests (O1) O1.29 Standard phone: Pixel 7 412x915 at 1.0 text scale","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":601,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15390}
+{"testID":409,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15427}
+{"suite":{"id":411,"platform":"vm","path":"D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"suite","time":15465}
+{"test":{"id":412,"name":"loading D:/VsCode/wayfound/test/trip_validators_test.dart","suiteID":411,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":15465}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":410,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15539}
+{"test":{"id":413,"name":"Settlements Overflow Matrix Tests (O1) O1.30 Tablet layout: iPad 10th gen 820x1180","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":609,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15539}
+{"testID":364,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":15541}
+{"group":{"id":414,"suiteID":363,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":15542}
+{"group":{"id":415,"suiteID":363,"parentID":414,"name":"TripDashboardScreen","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":13,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart"},"type":"group","time":15542}
+{"test":{"id":416,"name":"TripDashboardScreen shows loading indicator when tripProvider is loading","suiteID":363,"groupIDs":[414,415],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":43,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart"},"type":"testStart","time":15542}
+{"testID":395,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15570}
+{"suite":{"id":417,"platform":"vm","path":"D:/VsCode/wayfound/test/welcome_screen_test.dart"},"type":"suite","time":15645}
+{"test":{"id":418,"name":"loading D:/VsCode/wayfound/test/welcome_screen_test.dart","suiteID":417,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":15645}
+{"testID":413,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15704}
+{"test":{"id":419,"name":"Settlements Overflow Matrix Tests (O1) O1.31 Landscape orientation: 844x390","suiteID":227,"groupIDs":[255,256],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":615,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":15705}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":376,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":15857}
+{"group":{"id":420,"suiteID":375,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":20,"line":null,"column":null,"url":null},"type":"group","time":15858}
+{"group":{"id":421,"suiteID":375,"parentID":420,"name":"tripDays","metadata":{"skip":false,"skipReason":null},"testCount":10,"line":5,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"group","time":15858}
+{"test":{"id":422,"name":"tripDays same-day trip returns 1","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":6,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15858}
+{"testID":383,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":15873}
+{"group":{"id":423,"suiteID":382,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":null,"column":null,"url":null},"type":"group","time":15874}
+{"group":{"id":424,"suiteID":382,"parentID":423,"name":"Trip Domain Models","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":10,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"group","time":15874}
+{"group":{"id":425,"suiteID":382,"parentID":424,"name":"Trip Domain Models Currencies","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":11,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"group","time":15874}
+{"test":{"id":426,"name":"Trip Domain Models Currencies isSupportedCurrency validates currency codes","suiteID":382,"groupIDs":[423,424,425],"metadata":{"skip":false,"skipReason":null},"line":12,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15874}
+{"testID":419,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15875}
+{"testID":422,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15900}
+{"test":{"id":427,"name":"tripDays handles different times of day on same date","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":17,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15900}
+{"testID":427,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15906}
+{"test":{"id":428,"name":"tripDays handles 23-hour day (fall-back weekend)","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":29,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15907}
+{"testID":426,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15908}
+{"group":{"id":429,"suiteID":382,"parentID":424,"name":"Trip Domain Models Trip","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":21,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"group","time":15909}
+{"test":{"id":430,"name":"Trip Domain Models Trip fromMap creates valid Trip object","suiteID":382,"groupIDs":[423,424,429],"metadata":{"skip":false,"skipReason":null},"line":22,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15909}
+{"testID":428,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15911}
+{"test":{"id":431,"name":"tripDays handles 25-hour day (spring-forward weekend)","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":36,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15912}
+{"testID":431,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15917}
+{"test":{"id":432,"name":"tripDays handles month boundary crossing","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":43,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15918}
+{"testID":432,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15923}
+{"suite":{"id":433,"platform":"vm","path":"D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart"},"type":"suite","time":15939}
+{"test":{"id":434,"name":"loading D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart","suiteID":433,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":15939}
+{"test":{"id":435,"name":"tripDays handles year boundary crossing","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":51,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15940}
+{"testID":430,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15941}
+{"test":{"id":436,"name":"Trip Domain Models Trip status getters work correctly (upcoming, ongoing, past)","suiteID":382,"groupIDs":[423,424,429],"metadata":{"skip":false,"skipReason":null},"line":54,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15946}
+{"testID":435,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15954}
+{"test":{"id":437,"name":"tripDays handles leap day","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":59,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15955}
+{"testID":436,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15959}
+{"test":{"id":438,"name":"Trip Domain Models Trip sortTripsClientSide sorts upcoming/ongoing ascending and past descending","suiteID":382,"groupIDs":[423,424,429],"metadata":{"skip":false,"skipReason":null},"line":113,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15960}
+{"testID":437,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15961}
+{"test":{"id":439,"name":"tripDays end before start returns 1 (edge case)","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":67,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15962}
+{"testID":439,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15966}
+{"test":{"id":440,"name":"tripDays result depends only on calendar date, not time","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":74,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15967}
+{"testID":438,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15968}
+{"group":{"id":441,"suiteID":382,"parentID":424,"name":"Trip Domain Models Member","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":188,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"group","time":15969}
+{"test":{"id":442,"name":"Trip Domain Models Member fromMap creates valid Member object","suiteID":382,"groupIDs":[423,424,441],"metadata":{"skip":false,"skipReason":null},"line":189,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15969}
+{"testID":440,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15973}
+{"test":{"id":443,"name":"tripDays crosses leap year February correctly","suiteID":375,"groupIDs":[420,421],"metadata":{"skip":false,"skipReason":null},"line":83,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15974}
+{"testID":442,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15975}
+{"group":{"id":444,"suiteID":382,"parentID":424,"name":"Trip Domain Models JoinPreview","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":208,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"group","time":15976}
+{"test":{"id":445,"name":"Trip Domain Models JoinPreview fromMap creates valid JoinPreview object","suiteID":382,"groupIDs":[423,424,444],"metadata":{"skip":false,"skipReason":null},"line":209,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_domain_test.dart"},"type":"testStart","time":15976}
+{"testID":443,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15980}
+{"group":{"id":446,"suiteID":375,"parentID":420,"name":"dayDate","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":92,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"group","time":15980}
+{"test":{"id":447,"name":"dayDate returns correct date for dayIndex 0","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":93,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15980}
+{"testID":445,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15984}
+{"testID":447,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15987}
+{"test":{"id":448,"name":"dayDate returns correct date for dayIndex 1","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":101,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15987}
+{"testID":448,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":15994}
+{"test":{"id":449,"name":"dayDate returns correct date for dayIndex beyond month","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":109,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":15994}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"suite":{"id":450,"platform":"vm","path":"D:/VsCode/wayfound/test/widgets_test.dart"},"type":"suite","time":16015}
+{"test":{"id":451,"name":"loading D:/VsCode/wayfound/test/widgets_test.dart","suiteID":450,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":16015}
+{"testID":449,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16016}
+{"test":{"id":452,"name":"dayDate returns correct date for dayIndex beyond year","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":117,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16022}
+{"testID":452,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16027}
+{"test":{"id":453,"name":"dayDate result is at UTC midnight","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":125,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16027}
+{"testID":391,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":16034}
+{"group":{"id":454,"suiteID":390,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":null,"column":null,"url":null},"type":"group","time":16035}
+{"group":{"id":455,"suiteID":390,"parentID":454,"name":"TripPayloadBuilders","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":6,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16035}
+{"group":{"id":456,"suiteID":390,"parentID":455,"name":"TripPayloadBuilders buildTripCreatePayload","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":7,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16035}
+{"test":{"id":457,"name":"TripPayloadBuilders buildTripCreatePayload builds payload with exact required keys and values","suiteID":390,"groupIDs":[454,455,456],"metadata":{"skip":false,"skipReason":null},"line":8,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16035}
+{"testID":453,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16036}
+{"test":{"id":458,"name":"dayDate same time of day inputs give same day result","suiteID":375,"groupIDs":[420,446],"metadata":{"skip":false,"skipReason":null},"line":133,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16037}
+{"testID":458,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16041}
+{"group":{"id":459,"suiteID":375,"parentID":420,"name":"formatDayHeader","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":141,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"group","time":16041}
+{"test":{"id":460,"name":"formatDayHeader formats day 1 correctly","suiteID":375,"groupIDs":[420,459],"metadata":{"skip":false,"skipReason":null},"line":142,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16041}
+{"testID":460,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16054}
+{"test":{"id":461,"name":"formatDayHeader formats day 2 correctly","suiteID":375,"groupIDs":[420,459],"metadata":{"skip":false,"skipReason":null},"line":148,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16054}
+{"testID":461,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16059}
+{"test":{"id":462,"name":"formatDayHeader handles month boundary","suiteID":375,"groupIDs":[420,459],"metadata":{"skip":false,"skipReason":null},"line":154,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16060}
+{"testID":462,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16064}
+{"test":{"id":463,"name":"formatDayHeader handles year boundary","suiteID":375,"groupIDs":[420,459],"metadata":{"skip":false,"skipReason":null},"line":160,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_days_test.dart"},"type":"testStart","time":16065}
+{"testID":463,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16069}
+{"testID":457,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16071}
+{"group":{"id":464,"suiteID":390,"parentID":455,"name":"TripPayloadBuilders buildMemberCreatePayload","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":37,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16072}
+{"test":{"id":465,"name":"TripPayloadBuilders buildMemberCreatePayload builds member payload for organizer","suiteID":390,"groupIDs":[454,455,464],"metadata":{"skip":false,"skipReason":null},"line":38,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16072}
+{"testID":465,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16076}
+{"test":{"id":466,"name":"TripPayloadBuilders buildMemberCreatePayload builds member payload for regular member with null photoUrl","suiteID":390,"groupIDs":[454,455,464],"metadata":{"skip":false,"skipReason":null},"line":53,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16077}
+{"testID":466,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16081}
+{"group":{"id":467,"suiteID":390,"parentID":455,"name":"TripPayloadBuilders buildJoinCodeCreatePayload","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":66,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16082}
+{"test":{"id":468,"name":"TripPayloadBuilders buildJoinCodeCreatePayload builds join code payload","suiteID":390,"groupIDs":[454,455,467],"metadata":{"skip":false,"skipReason":null},"line":67,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16082}
+{"testID":468,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16086}
+{"group":{"id":469,"suiteID":390,"parentID":455,"name":"TripPayloadBuilders buildJoinTripUpdatePayload","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":89,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16087}
+{"test":{"id":470,"name":"TripPayloadBuilders buildJoinTripUpdatePayload builds join trip update payload with FieldValue.arrayUnion and FieldValue.increment","suiteID":390,"groupIDs":[454,455,469],"metadata":{"skip":false,"skipReason":null},"line":90,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16087}
+{"testID":470,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16104}
+{"group":{"id":471,"suiteID":390,"parentID":455,"name":"TripPayloadBuilders buildJoinCodeUpdatePayload","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":99,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"group","time":16105}
+{"test":{"id":472,"name":"TripPayloadBuilders buildJoinCodeUpdatePayload builds join code update payload with new member count","suiteID":390,"groupIDs":[454,455,471],"metadata":{"skip":false,"skipReason":null},"line":100,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_payload_builders_test.dart"},"type":"testStart","time":16105}
+{"testID":472,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16110}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":407,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":16315}
+{"group":{"id":473,"suiteID":406,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":null,"column":null,"url":null},"type":"group","time":16315}
+{"group":{"id":474,"suiteID":406,"parentID":473,"name":"TripRepository","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":6,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16316}
+{"group":{"id":475,"suiteID":406,"parentID":474,"name":"TripRepository createTrip","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":15,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16316}
+{"test":{"id":476,"name":"TripRepository createTrip creates trip, member, and joinCode atomically","suiteID":406,"groupIDs":[473,474,475],"metadata":{"skip":false,"skipReason":null},"line":16,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16316}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":476,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16487}
+{"group":{"id":477,"suiteID":406,"parentID":474,"name":"TripRepository watchMyTrips","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":75,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16488}
+{"test":{"id":478,"name":"TripRepository watchMyTrips emits trips where user is a member, sorted client side","suiteID":406,"groupIDs":[473,474,477],"metadata":{"skip":false,"skipReason":null},"line":76,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16488}
+{"testID":478,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16512}
+{"group":{"id":479,"suiteID":406,"parentID":474,"name":"TripRepository getJoinPreview","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":107,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16512}
+{"test":{"id":480,"name":"TripRepository getJoinPreview returns null when join code does not exist","suiteID":406,"groupIDs":[473,474,479],"metadata":{"skip":false,"skipReason":null},"line":108,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16512}
+{"testID":480,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16518}
+{"test":{"id":481,"name":"TripRepository getJoinPreview returns JoinPreview when code exists","suiteID":406,"groupIDs":[473,474,479],"metadata":{"skip":false,"skipReason":null},"line":113,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16518}
+{"testID":481,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16528}
+{"group":{"id":482,"suiteID":406,"parentID":474,"name":"TripRepository joinTrip","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":135,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16528}
+{"test":{"id":483,"name":"TripRepository joinTrip adds user to trip, members subcollection, and increments joinCode useCount","suiteID":406,"groupIDs":[473,474,482],"metadata":{"skip":false,"skipReason":null},"line":136,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16528}
+{"testID":412,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":16536}
+{"group":{"id":484,"suiteID":411,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":null,"column":null,"url":null},"type":"group","time":16537}
+{"group":{"id":485,"suiteID":411,"parentID":484,"name":"TripValidators","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":6,"column":3,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"group","time":16537}
+{"group":{"id":486,"suiteID":411,"parentID":485,"name":"TripValidators validateTripName","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":7,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"group","time":16537}
+{"test":{"id":487,"name":"TripValidators validateTripName returns error when null or empty","suiteID":411,"groupIDs":[484,485,486],"metadata":{"skip":false,"skipReason":null},"line":8,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16537}
+{"testID":483,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16541}
+{"test":{"id":488,"name":"TripRepository joinTrip throws Exception when trip is full (>= 15 members)","suiteID":406,"groupIDs":[473,474,482],"metadata":{"skip":false,"skipReason":null},"line":184,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16541}
+{"testID":488,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16550}
+{"group":{"id":489,"suiteID":406,"parentID":474,"name":"TripRepository watchTrip & watchMembers","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":200,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"group","time":16550}
+{"test":{"id":490,"name":"TripRepository watchTrip & watchMembers watchTrip emits null for non-existent trip and trip object for valid trip","suiteID":406,"groupIDs":[473,474,489],"metadata":{"skip":false,"skipReason":null},"line":201,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_repository_test.dart"},"type":"testStart","time":16550}
+{"testID":487,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16557}
+{"test":{"id":491,"name":"TripValidators validateTripName returns error when longer than 60 characters","suiteID":411,"groupIDs":[484,485,486],"metadata":{"skip":false,"skipReason":null},"line":14,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16558}
+{"testID":491,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16561}
+{"test":{"id":492,"name":"TripValidators validateTripName returns null for valid trip names","suiteID":411,"groupIDs":[484,485,486],"metadata":{"skip":false,"skipReason":null},"line":19,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16561}
+{"testID":492,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16565}
+{"group":{"id":493,"suiteID":411,"parentID":485,"name":"TripValidators validateDestination","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":25,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"group","time":16565}
+{"test":{"id":494,"name":"TripValidators validateDestination returns error when null or empty","suiteID":411,"groupIDs":[484,485,493],"metadata":{"skip":false,"skipReason":null},"line":26,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16565}
+{"testID":490,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16569}
+{"testID":494,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16569}
+{"test":{"id":495,"name":"TripValidators validateDestination returns error when longer than 80 characters","suiteID":411,"groupIDs":[484,485,493],"metadata":{"skip":false,"skipReason":null},"line":32,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16570}
+{"testID":495,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16574}
+{"test":{"id":496,"name":"TripValidators validateDestination returns null for valid destinations","suiteID":411,"groupIDs":[484,485,493],"metadata":{"skip":false,"skipReason":null},"line":37,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16574}
+{"testID":496,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16577}
+{"group":{"id":497,"suiteID":411,"parentID":485,"name":"TripValidators validateDateRange","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":43,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"group","time":16578}
+{"test":{"id":498,"name":"TripValidators validateDateRange returns error when start or end is null","suiteID":411,"groupIDs":[484,485,497],"metadata":{"skip":false,"skipReason":null},"line":44,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16578}
+{"testID":416,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16583}
+{"testID":498,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16583}
+{"test":{"id":499,"name":"TripDashboardScreen shows no access view when user is not a member of trip","suiteID":363,"groupIDs":[414,415],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":60,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart"},"type":"testStart","time":16583}
+{"test":{"id":500,"name":"TripValidators validateDateRange returns error when end date is before start date","suiteID":411,"groupIDs":[484,485,497],"metadata":{"skip":false,"skipReason":null},"line":49,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16584}
+{"testID":500,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16594}
+{"test":{"id":501,"name":"TripValidators validateDateRange returns null for valid date range","suiteID":411,"groupIDs":[484,485,497],"metadata":{"skip":false,"skipReason":null},"line":55,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16595}
+{"testID":501,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16598}
+{"group":{"id":502,"suiteID":411,"parentID":485,"name":"TripValidators validateCurrencySelection","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":63,"column":5,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"group","time":16598}
+{"test":{"id":503,"name":"TripValidators validateCurrencySelection returns error when null, empty, or unsupported","suiteID":411,"groupIDs":[484,485,502],"metadata":{"skip":false,"skipReason":null},"line":64,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16598}
+{"testID":503,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16602}
+{"test":{"id":504,"name":"TripValidators validateCurrencySelection returns null for supported currencies","suiteID":411,"groupIDs":[484,485,502],"metadata":{"skip":false,"skipReason":null},"line":70,"column":7,"url":"file:///D:/VsCode/wayfound/test/trip_validators_test.dart"},"type":"testStart","time":16602}
+{"testID":504,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16606}
+{"testID":499,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16699}
+{"test":{"id":505,"name":"TripDashboardScreen renders trip title, destination, and tabs for active member","suiteID":363,"groupIDs":[414,415],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":85,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart"},"type":"testStart","time":16699}
+{"testID":418,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":16708}
+{"group":{"id":506,"suiteID":417,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":16709}
+{"group":{"id":507,"suiteID":417,"parentID":506,"name":"WelcomeScreen","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":9,"column":3,"url":"file:///D:/VsCode/wayfound/test/welcome_screen_test.dart"},"type":"group","time":16709}
+{"test":{"id":508,"name":"WelcomeScreen renders brand title, subtitle, and action buttons in Light Mode","suiteID":417,"groupIDs":[506,507],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":10,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/welcome_screen_test.dart"},"type":"testStart","time":16709}
+{"testID":434,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":16891}
+{"group":{"id":509,"suiteID":433,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":null,"column":null,"url":null},"type":"group","time":16891}
+{"group":{"id":510,"suiteID":433,"parentID":509,"name":"AddEditExpenseScreen Input Validation Tests","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":105,"column":3,"url":"file:///D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart"},"type":"group","time":16891}
+{"test":{"id":511,"name":"AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException","suiteID":433,"groupIDs":[509,510],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":106,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart"},"type":"testStart","time":16892}
+{"testID":451,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":17019}
+{"group":{"id":512,"suiteID":450,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":17019}
+{"group":{"id":513,"suiteID":450,"parentID":512,"name":"Shared Widgets Tests","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":10,"column":3,"url":"file:///D:/VsCode/wayfound/test/widgets_test.dart"},"type":"group","time":17019}
+{"test":{"id":514,"name":"Shared Widgets Tests AppLoading renders indicator and optional message","suiteID":450,"groupIDs":[512,513],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":11,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets_test.dart"},"type":"testStart","time":17019}
+{"testID":505,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17079}
+{"testID":508,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17489}
+{"test":{"id":515,"name":"WelcomeScreen renders correctly in Dark Mode","suiteID":417,"groupIDs":[506,507],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":26,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/welcome_screen_test.dart"},"type":"testStart","time":17489}
+{"testID":515,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17564}
+{"testID":514,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17685}
+{"test":{"id":516,"name":"Shared Widgets Tests AppError renders message and triggers onRetry","suiteID":450,"groupIDs":[512,513],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":24,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets_test.dart"},"type":"testStart","time":17686}
+{"testID":516,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17856}
+{"test":{"id":517,"name":"Shared Widgets Tests AppEmpty renders title, message, and action button","suiteID":450,"groupIDs":[512,513],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":47,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets_test.dart"},"type":"testStart","time":17856}
+{"testID":517,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17913}
+{"test":{"id":518,"name":"Shared Widgets Tests AsyncValueWidget handles data, loading, and error states","suiteID":450,"groupIDs":[512,513],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":76,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets_test.dart"},"type":"testStart","time":17913}
+{"testID":518,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17990}
+{"testID":511,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":19112}
+{"test":{"id":519,"name":"AddEditExpenseScreen Input Validation Tests JPY trip validates decimal amounts correctly","suiteID":433,"groupIDs":[509,510],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":171,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart"},"type":"testStart","time":19112}
+{"testID":519,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":19407}
+{"test":{"id":520,"name":"AddEditExpenseScreen Input Validation Tests Live share preview hides when amount is invalid or zero","suiteID":433,"groupIDs":[509,510],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":215,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart"},"type":"testStart","time":19408}
+{"testID":520,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":19641}
+{"success":true,"type":"done","time":19701}

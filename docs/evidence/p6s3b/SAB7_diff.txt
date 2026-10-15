@@ -1,0 +1,39 @@
+﻿diff --git "a/D:\\VsCode\\wayfound\\lib\\features\\expenses\\presentation\\balances_view.dart" "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\expenses\\presentation\\balances_view.dart"
+index 7f1d01c..733e0a2 100644
+--- "a/D:\\VsCode\\wayfound\\lib\\features\\expenses\\presentation\\balances_view.dart"
++++ "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\expenses\\presentation\\balances_view.dart"
+@@ -1,4 +1,4 @@
+-import 'package:flutter/material.dart';
++﻿import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ 
+ import '../../../core/money.dart';
+@@ -419,11 +419,7 @@ class BalancesView extends ConsumerWidget {
+                           ],
+                         ),
+                         const SizedBox(height: 6),
+-                        Wrap(
+-                          alignment: WrapAlignment.spaceBetween,
+-                          crossAxisAlignment: WrapCrossAlignment.center,
+-                          spacing: 8,
+-                          runSpacing: 8,
++                        Row(
+                           children: [
+                             Container(
+                               padding: const EdgeInsets.symmetric(
+@@ -442,6 +438,7 @@ class BalancesView extends ConsumerWidget {
+                                 ),
+                               ),
+                             ),
++                            const Spacer(),
+                             if (canActOnPending && isMyPayment)
+                               TextButton.icon(
+                                 onPressed: () async {
+@@ -477,6 +474,7 @@ class BalancesView extends ConsumerWidget {
+                                   ),
+                                 ),
+                               ),
++                              const SizedBox(width: 4),
+                               FilledButton(
+                                 onPressed: () async {
+                                   await ref

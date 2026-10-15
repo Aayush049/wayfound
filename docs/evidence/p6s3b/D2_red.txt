@@ -1,0 +1,46 @@
+﻿00:00 +0: loading D:/VsCode/wayfound/test/settlement_test.dart
+00:00 +0: D:/VsCode/wayfound/test/settlement_test.dart: Settlement Validators Tests validateSettlementAmount validates correct amounts and errors
+00:00 +1: D:/VsCode/wayfound/test/settlement_test.dart: Settlement Validators Tests tryParseMinorUnits parses currency amounts correctly
+00:00 +2: D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Organizer cannot leave
+00:00 +2 -1: D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Organizer cannot leave [E]
+  Expected: 'Organizers can\'t leave a trip in this version.'
+    Actual: 'Organizers cannot leave the trip. You can archive the trip instead.'
+     Which: is different.
+            Expected: ... nizers can't leave a ...
+              Actual: ... nizers cannot leave  ...
+                                    ^
+             Differ at offset 14
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\settlement_test.dart 64:7                      main.<fn>.<fn>
+  
+00:00 +2 -1: D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Member with nonzero balance cannot leave
+00:00 +3 -1: D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Member with pending settlements cannot leave
+00:00 +4 -1: D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Member with zero balance and no pending settlements can leave
+00:00 +5 -1: D:/VsCode/wayfound/test/settlement_test.dart: Balances with Confirmed Settlements Tests Confirmed settlements reduce net debt balances
+00:00 +6 -1: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R1: createSettlement writes exactly required keys with status pending and minor units amount
+00:00 +7 -1: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R2: confirm/reject writes only status and resolvedAt; transitions only from pending
+00:00 +8 -1: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R3: payer can delete a pending settlement; deletion refused/unavailable for confirmed
+00:00 +9 -1: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending
+00:00 +9 -2: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending [E]
+  Expected: 'Organizers can\'t leave a trip in this version.'
+    Actual: 'Organizers cannot leave the trip. You can archive the trip instead.'
+     Which: is different.
+            Expected: ... nizers can't leave a ...
+              Actual: ... nizers cannot leave  ...
+                                    ^
+             Differ at offset 14
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\settlements_repository_test.dart 192:7         main.<fn>.<fn>
+  
+00:00 +9 -2: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R5: removeMember by organizer removes uid and sets status to left, allowed at nonzero balance
+00:00 +10 -2: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R6: join batch payload sets status active; joinTrip error presents exact message
+00:00 +11 -2: D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0
+00:00 +12 -2: Some tests failed.
+
+Failing tests:
+  D:/VsCode/wayfound/test/settlement_test.dart: Leave Eligibility Tests Organizer cannot leave
+  D:/VsCode/wayfound/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending

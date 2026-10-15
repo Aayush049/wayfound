@@ -1,0 +1,32 @@
+﻿
+test\settlements_repository_test.dart:27:    test('R1: createSettlement writes exactly required keys with status 
+pending and minor units amount', () async {
+test\settlements_repository_test.dart:79:    test('R2: confirm/reject writes only status and resolvedAt; transitions 
+only from pending', () async {
+test\settlements_repository_test.dart:140:    test('R3: payer can delete a pending settlement; deletion 
+refused/unavailable for confirmed', () async {
+test\settlements_repository_test.dart:177:    test('R4: leaveTrip removes uid from memberIds, decrements memberCount, 
+sets member status to left; refuses at nonzero balance/pending', () async {
+test\settlements_repository_test.dart:263:    test('R5: removeMember by organizer removes uid and sets status to left, 
+allowed at nonzero balance', () async {
+test\settlements_repository_test.dart:296:    test('R6: join batch payload sets status active; joinTrip error presents 
+exact message', () async {
+test\settlements_repository_test.dart:339:    test('R7: balances: only confirmed settlements change balances; 
+pending/rejected do not; left members remain; sum is 0', () {
+test\settlements_widget_test.dart:75:    testWidgets(
+test\settlements_widget_test.dart:129:    testWidgets(
+test\settlements_widget_test.dart:191:    testWidgets(
+test\settlements_widget_test.dart:253:    testWidgets(
+test\settlements_widget_test.dart:389:    testWidgets(
+test\settlements_widget_test.dart:462:    testWidgets('W6 Remove dialog: confirm and cancel paths', (tester) async {
+test\settlements_widget_test.dart:506:    testWidgets(
+test\settlements_widget_test.dart:541:    testWidgets(
+test\settlements_widget_test.dart:623:    testWidgets(
+test\settlements_widget_test.dart:719:    testWidgets('W10 Join error message displayed on failure', (tester) async {
+test\leave_router_test.dart:57:    testWidgets(
+test\settlements_overflow_test.dart:110:    testWidgets(
+test\settlements_overflow_test.dart:166:    testWidgets(
+test\settlements_overflow_test.dart:217:    testWidgets(
+test\settlements_overflow_test.dart:267:    testWidgets(
+
+

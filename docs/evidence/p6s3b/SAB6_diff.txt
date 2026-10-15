@@ -1,0 +1,13 @@
+﻿diff --git "a/D:\\VsCode\\wayfound\\lib\\features\\expenses\\presentation\\expense_card.dart" "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\expenses\\presentation\\expense_card.dart"
+index 1ae7ac7..a5f0e45 100644
+--- "a/D:\\VsCode\\wayfound\\lib\\features\\expenses\\presentation\\expense_card.dart"
++++ "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\expenses\\presentation\\expense_card.dart"
+@@ -139,7 +139,7 @@ class ExpenseCard extends StatelessWidget {
+                       itemBuilder: (ctx) => [
+                         PopupMenuItem(
+                           value: 'edit',
+-                          enabled: !hasLeftMember,
++                          enabled: true,
+                           child: Row(
+                             children: [
+                               Icon(

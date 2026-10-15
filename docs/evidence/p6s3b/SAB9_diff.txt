@@ -1,0 +1,13 @@
+﻿diff --git "a/D:\\VsCode\\wayfound\\lib\\features\\settlements\\domain\\leave_eligibility.dart" "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\settlements\\domain\\leave_eligibility.dart"
+index 7388a13..e20da26 100644
+--- "a/D:\\VsCode\\wayfound\\lib\\features\\settlements\\domain\\leave_eligibility.dart"
++++ "b/D:\\VsCode\\wayfound_sabotage2\\lib\\features\\settlements\\domain\\leave_eligibility.dart"
+@@ -24,7 +24,7 @@ LeaveEligibilityResult checkLeaveEligibility({
+   }
+ 
+   final balance = balances[uid] ?? 0;
+-  if (balance != 0) {
++  if (false && balance != 0) {
+     final formatted = balance < 0
+         ? 'owes ${balance.abs()} minor units'
+         : 'is owed $balance minor units';

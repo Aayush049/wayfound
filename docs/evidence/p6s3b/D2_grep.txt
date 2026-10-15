@@ -1,0 +1,39 @@
+﻿
+lib\features\expenses\presentation\balances_view.dart:312:                    trailing: isMyPayment && !trip.archived
+lib\features\expenses\presentation\balances_view.dart:395:                      s.status == SettlementStatus.pending 
+&& !trip.archived;
+lib\features\expenses\presentation\expenses_tab.dart:39:    final isArchived = widget.trip.archived;
+lib\features\expenses\presentation\expenses_tab.dart:93:                          actionLabel: isArchived ? null : 
+'Add Expense',
+lib\features\expenses\presentation\expenses_tab.dart:94:                          onAction: isArchived
+lib\features\expenses\presentation\expenses_tab.dart:108:                              !isArchived &&
+lib\features\expenses\presentation\expenses_tab.dart:159:          (!isArchived && _selectedSegment == 
+ExpenseTabSegment.expenses)
+lib\features\itinerary\presentation\itinerary_day_section.dart:13:  final bool isArchived;
+lib\features\itinerary\presentation\itinerary_day_section.dart:26:    required this.isArchived,
+lib\features\itinerary\presentation\itinerary_day_section.dart:69:              if (isOrganizer && !isArchived)
+lib\features\itinerary\presentation\itinerary_day_section.dart:98:            !isArchived &&
+lib\features\itinerary\presentation\itinerary_day_section.dart:115:                  isArchived: isArchived,
+lib\features\itinerary\presentation\itinerary_day_section.dart:134:                isArchived: isArchived,
+lib\features\itinerary\presentation\itinerary_item_tile.dart:11:  final bool isArchived;
+lib\features\itinerary\presentation\itinerary_item_tile.dart:20:    required this.isArchived,
+lib\features\itinerary\presentation\itinerary_item_tile.dart:94:            // Actions menu for organizer on 
+non-archived trips
+lib\features\itinerary\presentation\itinerary_item_tile.dart:95:            if (isOrganizer && !isArchived)
+lib\features\itinerary\presentation\itinerary_tab.dart:21:  final bool isArchived;
+lib\features\itinerary\presentation\itinerary_tab.dart:30:    required this.isArchived,
+lib\features\itinerary\presentation\itinerary_tab.dart:240:                        isArchived: isArchived,
+lib\features\itinerary\presentation\itinerary_tab.dart:269:                isArchived: isArchived,
+lib\features\settlements\domain\leave_eligibility.dart:22:      'Organizers cannot leave the trip. You can archive the 
+trip instead.',
+lib\features\trips\data\trip_repository.dart:90:  /// - Excludes archived trips
+lib\features\trips\data\trip_repository.dart:101:              .where((t) => !t.archived)
+lib\features\trips\domain\trip.dart:14:  final bool archived;
+lib\features\trips\domain\trip.dart:28:    required this.archived,
+lib\features\trips\domain\trip.dart:54:      archived: data['archived'] as bool? ?? false,
+lib\features\trips\domain\trip_payload_builders.dart:28:    'archived': false,
+lib\features\trips\presentation\members_tab.dart:286:                      !trip.archived;
+lib\features\trips\presentation\members_tab.dart:376:        if (!isOrganizer && !trip.archived)
+lib\features\trips\presentation\trip_dashboard_screen.dart:167:                isArchived: trip.archived,
+
+

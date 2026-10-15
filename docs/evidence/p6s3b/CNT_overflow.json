@@ -1,0 +1,18 @@
+﻿{"protocolVersion":"0.1.1","runnerVersion":null,"pid":17620,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading D:/VsCode/wayfound/test/settlements_overflow_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}
+{"count":1,"time":5,"type":"allSuites"}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":2922}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":null,"column":null,"url":null},"type":"group","time":2925}
+{"group":{"id":3,"suiteID":0,"parentID":2,"name":"Settlements Overflow Tests (O1)","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":109,"column":3,"url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"group","time":2925}
+{"test":{"id":4,"name":"Settlements Overflow Tests (O1) O1.1 BalancesView all sections populated without overflow at small screens and 1.3 text scale","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":110,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":2926}
+{"testID":4,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4138}
+{"test":{"id":5,"name":"Settlements Overflow Tests (O1) O1.2 MembersTab without overflow at small screens and 1.3 text scale","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":166,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":4139}
+{"testID":5,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4510}
+{"test":{"id":6,"name":"Settlements Overflow Tests (O1) O1.3 MarkAsPaidSheet without overflow at small screens and 1.3 text scale","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":217,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":4511}
+{"testID":6,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4799}
+{"test":{"id":7,"name":"Settlements Overflow Tests (O1) O1.4 Leave Dialog and Remove Dialog without overflow at small screens and 1.3 text scale","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":267,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/settlements_overflow_test.dart"},"type":"testStart","time":4801}
+{"testID":7,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5847}
+{"success":true,"type":"done","time":5882}

@@ -1,0 +1,15 @@
+﻿
+  lib\features\trips\data\trip_repository.dart:219:      final freshCodeDoc = await getJoinPreview(code);
+  lib\features\trips\data\trip_repository.dart:220:      if (freshCodeDoc != null && freshCodeDoc.isFull) {
+  lib\features\trips\data\trip_repository.dart:221:        throw Exception('Could not join, the trip may be full');
+  lib\features\trips\data\trip_repository.dart:222:      }
+  lib\features\trips\data\trip_repository.dart:223:      throw Exception(
+> lib\features\trips\data\trip_repository.dart:224:        'Could not join trip. Please verify the code and try 
+again.',
+  lib\features\trips\data\trip_repository.dart:225:      );
+  lib\features\trips\data\trip_repository.dart:226:    }
+  lib\features\trips\data\trip_repository.dart:227:  }
+  lib\features\trips\data\trip_repository.dart:228:
+  lib\features\trips\data\trip_repository.dart:229:  /// Leaves a trip atomically.
+
+
