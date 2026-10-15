@@ -377,6 +377,39 @@ void main() {
       },
     );
 
+    test(
+      'R6c: throwing batch with stale currentMemberCount 14 and joinCodes doc memberCount 15 expects may be full message',
+      () async {
+        final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+        await throwingFirestore.collection('joinCodes').doc('FULL99').set({
+          'tripId': 'trip_full',
+          'tripName': 'Full Trip',
+          'destination': 'Rome',
+          'startDate': Timestamp.now(),
+          'endDate': Timestamp.now(),
+          'memberCount': 15,
+        });
+        final repo = TripRepository(firestore: throwingFirestore);
+
+        expect(
+          () => repo.joinTrip(
+            code: 'FULL99',
+            tripId: 'trip_full',
+            userUid: 'u_user',
+            displayName: 'Any User',
+            currentMemberCount: 14,
+          ),
+          throwsA(
+            predicate(
+              (e) =>
+                  e is Exception &&
+                  e.toString().contains('Could not join, the trip may be full'),
+            ),
+          ),
+        );
+      },
+    );
+
     test('R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0', () {
       final now = DateTime.now();
       final members = [
