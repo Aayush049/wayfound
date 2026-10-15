@@ -1,0 +1,324 @@
+00:00 +0: loading D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart
+00:00 +0: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +1: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +2: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +3: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +4: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +5: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +6: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +7: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +8: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +9: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +10: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +11: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +12: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +13: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +14: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +15: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +16: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +17: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +18: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +19: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +20: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +21: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +22: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +23: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +24: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +25: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +26: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +27: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +28: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +29: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +30: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +31: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:00 +32: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +33: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +34: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +35: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +36: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +37: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +38: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +39: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +40: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +41: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +42: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +43: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +44: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +45: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +46: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +47: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +48: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +49: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +50: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +51: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:01 +52: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +53: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +54: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +55: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +56: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +57: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +58: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +59: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +60: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +61: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +62: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +63: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +64: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +65: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +66: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +67: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +68: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +69: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +70: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Tapping floating Add button opens AddEditSuggestionScreen
+00:02 +71: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen renders all form fields and submit button
+00:02 +72: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen renders all form fields and submit button
+00:03 +73: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen renders all form fields and submit button
+00:03 +74: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen renders all form fields and submit button
+00:03 +75: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +76: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +77: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +78: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +79: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +80: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +81: D:/VsCode/wayfound/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:03 +82: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen shows validation errors when fields are empty
+00:03 +83: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen shows validation errors when fields are empty
+00:03 +84: D:/VsCode/wayfound/test/expenses_ui_test.dart: ExpenseCard & ExpenseSplitSheet Widget Tests Tapping ExpenseCard opens ExpenseSplitSheet with per-participant shares
+00:03 +85: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:03 +86: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:03 +87: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:03 +88: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:03 +89: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:03 +90: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:04 +91: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:04 +92: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:04 +93: D:/VsCode/wayfound/test/add_suggestion_navigation_test.dart: Add & Edit Suggestion Navigation Tests (Real Router) Saving returns to Suggestions tab and new suggestion is visible in list
+00:04 +94: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +95: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +96: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +97: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +98: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +99: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:04 +100: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +101: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +102: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +103: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +104: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +105: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +106: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +107: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +108: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +109: D:/VsCode/wayfound/test/create_trip_screen_test.dart: CreateTripScreen successfully submits valid trip creation form
+00:05 +110: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:05 +111: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:05 +112: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:06 +113: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:06 +114: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:06 +115: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:06 +116: D:/VsCode/wayfound/test/join_trip_screen_test.dart: JoinTripScreen shows error when invalid join code format is searched
+00:06 +117: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +118: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +119: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +120: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +121: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +122: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +123: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +124: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +125: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +126: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:06 +127: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:07 +128: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:07 +129: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:07 +130: D:/VsCode/wayfound/test/leave_router_test.dart: Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect
+00:07 +131: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:07 +132: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +133: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +134: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +135: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +136: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +137: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +138: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +139: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +140: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +141: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +142: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +143: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +144: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +145: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +146: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +147: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +148: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +149: D:/VsCode/wayfound/test/router_test.dart: App Router Redirects Signed out user navigating to protected route is redirected to Welcome
+00:08 +150: D:/VsCode/wayfound/test/settings_screen_test.dart: SettingsScreen renders user profile details and appearance controls
+00:08 +151: D:/VsCode/wayfound/test/settings_screen_test.dart: SettingsScreen renders user profile details and appearance controls
+00:09 +152: D:/VsCode/wayfound/test/settings_screen_test.dart: SettingsScreen renders user profile details and appearance controls
+00:09 +153: D:/VsCode/wayfound/test/settings_screen_test.dart: SettingsScreen renders user profile details and appearance controls
+00:09 +154: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove
+00:09 +155: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove
+00:09 +156: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove
+00:09 +157: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W1 Role visibility: organizer sees Remove-member actions and not Leave; plain member sees Leave and not Remove
+00:09 +158: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:09 +159: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:09 +160: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +161: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +162: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +163: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +164: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +165: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +166: D:/VsCode/wayfound/test/sign_in_screen_test.dart: SignInScreen renders fields and buttons in Light mode
+00:10 +167: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +168: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +169: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +170: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +171: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +172: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +173: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders display name, email, password, confirm password fields
+00:10 +174: D:/VsCode/wayfound/test/suggestion_card_menu_test.dart: SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.0
+00:10 +175: D:/VsCode/wayfound/test/suggestion_card_menu_test.dart: SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.0
+00:11 +176: D:/VsCode/wayfound/test/suggestion_card_menu_test.dart: SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.0
+00:11 +177: D:/VsCode/wayfound/test/suggestion_card_menu_test.dart: SuggestionCard header layout and positioning tests scheduled:true, canManage:true, width:320.0, scale:1.0
+00:11 +178: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +179: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +180: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +181: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +182: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +183: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +184: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +185: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +186: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +187: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +188: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +189: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +190: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +191: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +192: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +193: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +194: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +195: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +196: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +197: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +198: D:/VsCode/wayfound/test/suggestion_card_overflow_test.dart: SuggestionCard does not overflow at widths 320 and 360 dp with text scale 1.3
+00:11 +199: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:11 +200: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:12 +201: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:12 +202: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:12 +203: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:12 +204: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen shows validation errors for empty title
+00:12 +205: D:/VsCode/wayfound/test/sign_up_screen_test.dart: SignUpScreen renders correctly in Dark Mode
+00:12 +206: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.20 Leave dialog blocked (360x640, Dark, 1.3x text)
+00:12 +207: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:12 +208: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:12 +209: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:12 +210: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:12 +211: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel
+00:12 +212: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +213: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +214: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +215: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +216: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +217: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +218: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +219: D:/VsCode/wayfound/test/suggestions_ui_test.dart: Suggestions UI Widget Tests AddEditSuggestionScreen submits new suggestion successfully
+00:12 +220: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.24 Leave dialog allowed (360x640, Dark, 1.3x text)
+00:12 +221: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:12 +222: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +223: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +224: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +225: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +226: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +227: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6 Remove dialog: confirm and cancel paths
+00:13 +228: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.25 Remove dialog (320x568, Light, 1.3x text)
+00:13 +229: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.25 Remove dialog (320x568, Light, 1.3x text)
+00:13 +230: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6b Remove dialog: confirm updates member status to left and memberIds in Firestore; cancel leaves docs unchanged
+00:13 +231: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W6b Remove dialog: confirm updates member status to left and memberIds in Firestore; cancel leaves docs unchanged
+00:13 +232: D:/VsCode/wayfound/test/suggestion_repository_test.dart: SuggestionRepository Unit Tests createSuggestion adds a document to Firestore
+00:13 +233: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +234: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +235: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +236: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +237: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +238: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O1.27 Remove dialog (360x640, Light, 1.3x text)
+00:13 +239: D:/VsCode/wayfound/test/theme_test.dart: Theme System Tests Default theme mode is System
+00:13 +240: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +241: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +242: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +243: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +244: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +245: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +246: D:/VsCode/wayfound/test/settlements_widget_test.dart: Widget Tests (W1 - W10) W8 Expense Edit is disabled when an expense involves a left member (and enabled when not)
+00:13 +247: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:13 +248: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +249: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +250: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +251: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +252: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +253: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +254: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +255: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +256: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +257: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +258: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +259: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +260: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +261: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +262: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +263: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +264: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +265: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +266: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +267: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +268: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +269: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +270: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +271: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +272: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +273: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +274: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +275: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +276: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +277: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen shows loading indicator when tripProvider is loading
+00:14 +278: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O2.6 Real bottom sheet: 360x640, Light, 1.3x text, with keyboard
+00:14 +279: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +280: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +281: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +282: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +283: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +284: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +285: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +286: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +287: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +288: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +289: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +290: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +291: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +292: D:/VsCode/wayfound/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:14 +293: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O2.7 Real bottom sheet: 360x640, Dark, 1.3x text, no keyboard
+00:15 +294: D:/VsCode/wayfound/test/settlements_overflow_test.dart: Settlements Overflow Matrix Tests (O1) O2.7 Real bottom sheet: 360x640, Dark, 1.3x text, no keyboard
+00:15 +295: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +296: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +297: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +298: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +299: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +300: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +301: D:/VsCode/wayfound/test/trip_dashboard_screen_test.dart: TripDashboardScreen renders trip title, destination, and tabs for active member
+00:15 +302: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateTripName returns error when null or empty
+00:15 +303: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateTripName returns error when longer than 60 characters
+00:15 +304: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateTripName returns null for valid trip names
+00:15 +305: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDestination returns error when null or empty
+00:15 +306: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDestination returns error when longer than 80 characters
+00:15 +307: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDestination returns null for valid destinations
+00:15 +308: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDateRange returns error when start or end is null
+00:15 +309: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDateRange returns error when end date is before start date
+00:15 +310: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateDateRange returns null for valid date range
+00:15 +311: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateCurrencySelection returns error when null, empty, or unsupported
+00:15 +312: D:/VsCode/wayfound/test/trip_validators_test.dart: TripValidators validateCurrencySelection returns null for supported currencies
+00:15 +313: D:/VsCode/wayfound/test/welcome_screen_test.dart: WelcomeScreen renders brand title, subtitle, and action buttons in Light Mode
+00:16 +314: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:16 +315: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:16 +316: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:17 +317: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:17 +318: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:17 +319: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Amount field validates invalid inputs (-5, abc, 10.999, 1,000, 1e3, empty) without throwing FormatException
+00:18 +320: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests JPY trip validates decimal amounts correctly
+00:18 +321: D:/VsCode/wayfound/test/widgets/add_edit_expense_screen_test.dart: AddEditExpenseScreen Input Validation Tests Live share preview hides when amount is invalid or zero
+00:18 +322: All tests passed!

@@ -1,0 +1,10 @@
+﻿9f02050 docs(evidence): p6s3b raw outputs
+3babd15 test(settlements): overflow matrix
+77e23b8 fix(trips): join-after-left message
+533c4ab fix(settlements): organizer leave message
+43ad95d fix(trips): leave dialog no longer promises rejoin
+0e50462 docs(evidence): p6s3 raw outputs
+9f0542b test(settlements): overflow and responsive layout
+ba3092c test(router): leave navigation
+ca767b8 test(settlements): widget tests
+86b1f86 test(settlements): repository and domain tests

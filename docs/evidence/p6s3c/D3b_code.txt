@@ -1,0 +1,316 @@
+   1: import 'dart:math';
+   2: 
+   3: import 'package:cloud_firestore/cloud_firestore.dart';
+   4: 
+   5: import '../domain/join_code.dart';
+   6: import '../domain/join_preview.dart';
+   7: import '../domain/member.dart';
+   8: import '../domain/trip.dart';
+   9: import '../domain/trip_payload_builders.dart';
+  10: 
+  11: class TripRepository {
+  12:   final FirebaseFirestore _firestore;
+  13:   final Random? _random;
+  14: 
+  15:   TripRepository({FirebaseFirestore? firestore, this._random})
+  16:     : _firestore = firestore ?? FirebaseFirestore.instance;
+  17: 
+  18:   /// Creates a new trip atomically with [createTrip] batch.
+  19:   /// Retries code generation up to 5 times if a collision occurs.
+  20:   Future<({String tripId, String joinCode})> createTrip({
+  21:     required String name,
+  22:     required String destination,
+  23:     required DateTime startDate,
+  24:     required DateTime endDate,
+  25:     required String currency,
+  26:     required String userUid,
+  27:     required String displayName,
+  28:     String? photoUrl,
+  29:   }) async {
+  30:     int attempts = 0;
+  31: 
+  32:     while (attempts < 5) {
+  33:       attempts++;
+  34:       final code = generateJoinCode(_random);
+  35:       final tripDocRef = _firestore.collection('trips').doc();
+  36:       final tripId = tripDocRef.id;
+  37: 
+  38:       final memberDocRef = tripDocRef.collection('members').doc(userUid);
+  39:       final joinCodeDocRef = _firestore.collection('joinCodes').doc(code);
+  40: 
+  41:       final batch = _firestore.batch();
+  42: 
+  43:       final tripData = buildTripCreatePayload(
+  44:         name: name,
+  45:         destination: destination,
+  46:         startDate: startDate,
+  47:         endDate: endDate,
+  48:         currency: currency,
+  49:         organizerId: userUid,
+  50:         joinCode: code,
+  51:       );
+  52: 
+  53:       final memberData = buildMemberCreatePayload(
+  54:         displayName: displayName,
+  55:         photoUrl: photoUrl,
+  56:         role: 'organizer',
+  57:       );
+  58: 
+  59:       final joinCodeData = buildJoinCodeCreatePayload(
+  60:         tripId: tripId,
+  61:         tripName: name,
+  62:         destination: destination,
+  63:         startDate: startDate,
+  64:         endDate: endDate,
+  65:         memberCount: 1,
+  66:       );
+  67: 
+  68:       batch.set(tripDocRef, tripData);
+  69:       batch.set(memberDocRef, memberData);
+  70:       batch.set(joinCodeDocRef, joinCodeData);
+  71: 
+  72:       try {
+  73:         await batch.commit();
+  74:         return (tripId: tripId, joinCode: code);
+  75:       } catch (e) {
+  76:         if (attempts >= 5) {
+  77:           throw Exception(
+  78:             'Failed to generate a unique join code after 5 attempts. Please try again.',
+  79:           );
+  80:         }
+  81:         // Retry loop for collision
+  82:       }
+  83:     }
+  84: 
+  85:     throw Exception('Could not create trip');
+  86:   }
+  87: 
+  88:   /// Streams trips where [uid] is in [memberIds].
+  89:   /// Sorts client-side without composite index:
+  90:   /// - Excludes archived trips
+  91:   /// - Upcoming/ongoing (endDate >= midnight today) by startDate ASC
+  92:   /// - Past trips by startDate DESC
+  93:   Stream<List<Trip>> watchMyTrips(String uid) {
+  94:     return _firestore
+  95:         .collection('trips')
+  96:         .where('memberIds', arrayContains: uid)
+  97:         .snapshots()
+  98:         .map((snapshot) {
+  99:           final trips = snapshot.docs
+ 100:               .map((doc) => Trip.fromFirestore(doc))
+ 101:               .where((t) => !t.archived)
+ 102:               .toList();
+ 103: 
+ 104:           return sortTripsClientSide(trips);
+ 105:         });
+ 106:   }
+ 107: 
+ 108:   /// Client-side sorting helper for trips list.
+ 109:   static List<Trip> sortTripsClientSide(List<Trip> trips) {
+ 110:     final today = DateTime.now();
+ 111:     final midnightToday = DateTime(today.year, today.month, today.day);
+ 112: 
+ 113:     final activeTrips = <Trip>[];
+ 114:     final pastTrips = <Trip>[];
+ 115: 
+ 116:     for (final trip in trips) {
+ 117:       final endDay = DateTime(
+ 118:         trip.endDate.year,
+ 119:         trip.endDate.month,
+ 120:         trip.endDate.day,
+ 121:       );
+ 122:       if (endDay.isBefore(midnightToday)) {
+ 123:         pastTrips.add(trip);
+ 124:       } else {
+ 125:         activeTrips.add(trip);
+ 126:       }
+ 127:     }
+ 128: 
+ 129:     // Active trips by startDate ascending
+ 130:     activeTrips.sort((a, b) => a.startDate.compareTo(b.startDate));
+ 131: 
+ 132:     // Past trips by startDate descending
+ 133:     pastTrips.sort((a, b) => b.startDate.compareTo(a.startDate));
+ 134: 
+ 135:     return [...activeTrips, ...pastTrips];
+ 136:   }
+ 137: 
+ 138:   /// Streams a single [Trip] document.
+ 139:   Stream<Trip?> watchTrip(String tripId) {
+ 140:     return _firestore.collection('trips').doc(tripId).snapshots().map((doc) {
+ 141:       if (!doc.exists) return null;
+ 142:       return Trip.fromFirestore(doc);
+ 143:     });
+ 144:   }
+ 145: 
+ 146:   /// Streams members of a trip (`trips/{tripId}/members`).
+ 147:   /// Active members sorted: organizer first, then by joinedAt ASC.
+ 148:   Stream<List<Member>> watchMembers(String tripId) {
+ 149:     return _firestore
+ 150:         .collection('trips')
+ 151:         .doc(tripId)
+ 152:         .collection('members')
+ 153:         .snapshots()
+ 154:         .map((snapshot) {
+ 155:           final members = snapshot.docs
+ 156:               .map((doc) => Member.fromFirestore(doc))
+ 157:               .where((m) => m.isActive)
+ 158:               .toList();
+ 159: 
+ 160:           members.sort((a, b) {
+ 161:             if (a.isOrganizer && !b.isOrganizer) return -1;
+ 162:             if (!a.isOrganizer && b.isOrganizer) return 1;
+ 163:             if (a.joinedAt != null && b.joinedAt != null) {
+ 164:               return a.joinedAt!.compareTo(b.joinedAt!);
+ 165:             }
+ 166:             return 0;
+ 167:           });
+ 168: 
+ 169:           return members;
+ 170:         });
+ 171:   }
+ 172: 
+ 173:   /// Looks up a join preview document `joinCodes/{code}`.
+ 174:   Future<JoinPreview?> getJoinPreview(String code) async {
+ 175:     final doc = await _firestore.collection('joinCodes').doc(code).get();
+ 176:     if (!doc.exists) return null;
+ 177:     return JoinPreview.fromFirestore(doc);
+ 178:   }
+ 179: 
+ 180:   /// Joins a trip via one atomic batched write.
+ 181:   Future<void> joinTrip({
+ 182:     required String code,
+ 183:     required String tripId,
+ 184:     required String userUid,
+ 185:     required String displayName,
+ 186:     String? photoUrl,
+ 187:     required int currentMemberCount,
+ 188:   }) async {
+ 189:     if (currentMemberCount >= 15) {
+ 190:       throw Exception('Trip is full');
+ 191:     }
+ 192: 
+ 193:     final tripDocRef = _firestore.collection('trips').doc(tripId);
+ 194:     final memberDocRef = tripDocRef.collection('members').doc(userUid);
+ 195:     final joinCodeDocRef = _firestore.collection('joinCodes').doc(code);
+ 196: 
+ 197:     final batch = _firestore.batch();
+ 198: 
+ 199:     batch.update(tripDocRef, buildJoinTripUpdatePayload(callerUid: userUid));
+ 200: 
+ 201:     batch.set(
+ 202:       memberDocRef,
+ 203:       buildMemberCreatePayload(
+ 204:         displayName: displayName,
+ 205:         photoUrl: photoUrl,
+ 206:         role: 'member',
+ 207:       ),
+ 208:     );
+ 209: 
+ 210:     batch.update(
+ 211:       joinCodeDocRef,
+ 212:       buildJoinCodeUpdatePayload(newMemberCount: currentMemberCount + 1),
+ 213:     );
+ 214: 
+ 215:     try {
+ 216:       await batch.commit();
+ 217:     } on FirebaseException catch (e) {
+ 218:       if (e.code == 'permission-denied') {
+ 219:         throw Exception(
+ 220:           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+ 221:         );
+ 222:       }
+ 223:       final freshCodeDoc = await getJoinPreview(code);
+ 224:       if (freshCodeDoc != null && freshCodeDoc.isFull) {
+ 225:         throw Exception('Could not join, the trip may be full');
+ 226:       }
+ 227:       throw Exception(
+ 228:         'Could not join trip. Please verify the code and try again.',
+ 229:       );
+ 230:     } catch (e) {
+ 231:       if (e.toString().contains('permission-denied')) {
+ 232:         throw Exception(
+ 233:           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+ 234:         );
+ 235:       }
+ 236:       // Re-read join code to present friendly message
+ 237:       final freshCodeDoc = await getJoinPreview(code);
+ 238:       if (freshCodeDoc != null && freshCodeDoc.isFull) {
+ 239:         throw Exception('Could not join, the trip may be full');
+ 240:       }
+ 241:       throw Exception(
+ 242:         'Could not join trip. Please verify the code and try again.',
+ 243:       );
+ 244:     }
+ 245:   }
+ 246: 
+ 247:   /// Leaves a trip atomically.
+ 248:   Future<void> leaveTrip({
+ 249:     required String tripId,
+ 250:     required String userUid,
+ 251:     required List<String> currentMemberIds,
+ 252:   }) async {
+ 253:     final tripDocRef = _firestore.collection('trips').doc(tripId);
+ 254:     final memberDocRef = tripDocRef.collection('members').doc(userUid);
+ 255: 
+ 256:     final newMemberIds = currentMemberIds.where((id) => id != userUid).toList();
+ 257: 
+ 258:     final batch = _firestore.batch();
+ 259:     batch.update(tripDocRef, {
+ 260:       'memberIds': newMemberIds,
+ 261:       'memberCount': newMemberIds.length,
+ 262:     });
+ 263:     batch.update(memberDocRef, {'status': 'left'});
+ 264: 
+ 265:     await batch.commit();
+ 266:   }
+ 267: 
+ 268:   /// Removes a member from a trip atomically (organizer action).
+ 269:   Future<void> removeMember({
+ 270:     required String tripId,
+ 271:     required String targetUid,
+ 272:     required List<String> currentMemberIds,
+ 273:   }) async {
+ 274:     final tripDocRef = _firestore.collection('trips').doc(tripId);
+ 275:     final memberDocRef = tripDocRef.collection('members').doc(targetUid);
+ 276: 
+ 277:     final newMemberIds = currentMemberIds
+ 278:         .where((id) => id != targetUid)
+ 279:         .toList();
+ 280: 
+ 281:     final batch = _firestore.batch();
+ 282:     batch.update(tripDocRef, {
+ 283:       'memberIds': newMemberIds,
+ 284:       'memberCount': newMemberIds.length,
+ 285:     });
+ 286:     batch.update(memberDocRef, {'status': 'left'});
+ 287: 
+ 288:     await batch.commit();
+ 289:   }
+ 290: 
+ 291:   /// Streams all members of a trip (active and left).
+ 292:   Stream<List<Member>> watchAllMembers(String tripId) {
+ 293:     return _firestore
+ 294:         .collection('trips')
+ 295:         .doc(tripId)
+ 296:         .collection('members')
+ 297:         .snapshots()
+ 298:         .map((snapshot) {
+ 299:           final members = snapshot.docs
+ 300:               .map((doc) => Member.fromFirestore(doc))
+ 301:               .toList();
+ 302: 
+ 303:           members.sort((a, b) {
+ 304:             if (a.isOrganizer && !b.isOrganizer) return -1;
+ 305:             if (!a.isOrganizer && b.isOrganizer) return 1;
+ 306:             if (a.joinedAt != null && b.joinedAt != null) {
+ 307:               return a.joinedAt!.compareTo(b.joinedAt!);
+ 308:             }
+ 309:             return 0;
+ 310:           });
+ 311: 
+ 312:           return members;
+ 313:         });
+ 314:   }
+ 315: }
+ 316: 

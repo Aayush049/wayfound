@@ -1,0 +1,13 @@
+diff --git a/lib/features/expenses/presentation/balances_view.dart b/lib/features/expenses/presentation/balances_view.dart
+index 6eb969b..e0ecb2c 100644
+--- a/lib/features/expenses/presentation/balances_view.dart
++++ b/lib/features/expenses/presentation/balances_view.dart
+@@ -339,7 +339,7 @@ class BalancesView extends ConsumerWidget {
+                                       color: theme.colorScheme.primary,
+                                     ),
+                                   ),
+-                                  if (isMyPayment && !trip.archived)
++                                  if (isMyPayment)
+                                     FilledButton.tonal(
+                                       onPressed: () =>
+                                           _showMarkAsPaidSheet(context, p, toName),

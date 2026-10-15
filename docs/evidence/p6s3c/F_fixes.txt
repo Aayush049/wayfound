@@ -1,0 +1,295 @@
+﻿commit 43ad95dfdfa61e9b4b38ff5944c4da9d80497dc7
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Fri Oct 16 00:56:51 2026 +0530
+
+    fix(trips): leave dialog no longer promises rejoin
+
+diff --git a/lib/features/trips/presentation/members_tab.dart b/lib/features/trips/presentation/members_tab.dart
+index 05f9318..35687f0 100644
+--- a/lib/features/trips/presentation/members_tab.dart
++++ b/lib/features/trips/presentation/members_tab.dart
+@@ -68,7 +68,7 @@ class MembersTab extends ConsumerWidget {
+       builder: (ctx) => AlertDialog(
+         title: const Text('Leave Trip'),
+         content: const Text(
+-          'Are you sure you want to leave this trip? You can rejoin later using the invite code if space allows.',
++          'Are you sure you want to leave this trip? You won\'t be able to rejoin this trip in this version. Your past expenses stay in the balances, marked (left).',
+         ),
+         actions: [
+           TextButton(
+diff --git a/test/settlements_widget_test.dart b/test/settlements_widget_test.dart
+index b26da0c..74d605f 100644
+--- a/test/settlements_widget_test.dart
++++ b/test/settlements_widget_test.dart
+@@ -443,9 +443,12 @@ void main() {
+           findsNWidgets(2),
+         ); // Button + Dialog title
+         expect(
+-          find.textContaining('Are you sure you want to leave this trip?'),
++          find.text(
++            'Are you sure you want to leave this trip? You won\'t be able to rejoin this trip in this version. Your past expenses stay in the balances, marked (left).',
++          ),
+           findsOneWidget,
+         );
++        expect(find.textContaining('rejoin later'), findsNothing);
+         expect(find.text('Cancel'), findsOneWidget);
+         expect(find.widgetWithText(FilledButton, 'Leave'), findsOneWidget);
+ 
+
+commit 533c4abf4967ec8a788332dde8c76992c06a2809
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Fri Oct 16 00:58:10 2026 +0530
+
+    fix(settlements): organizer leave message
+
+diff --git a/lib/features/settlements/domain/leave_eligibility.dart b/lib/features/settlements/domain/leave_eligibility.dart
+index 9ad7d98..7388a13 100644
+--- a/lib/features/settlements/domain/leave_eligibility.dart
++++ b/lib/features/settlements/domain/leave_eligibility.dart
+@@ -19,7 +19,7 @@ LeaveEligibilityResult checkLeaveEligibility({
+ }) {
+   if (uid == organizerId) {
+     return const LeaveEligibilityResult.denied(
+-      'Organizers cannot leave the trip. You can archive the trip instead.',
++      "Organizers can't leave a trip in this version.",
+     );
+   }
+ 
+diff --git a/test/settlement_test.dart b/test/settlement_test.dart
+index 4f9b09f..f0f64ed 100644
+--- a/test/settlement_test.dart
++++ b/test/settlement_test.dart
+@@ -61,7 +61,7 @@ void main() {
+         currencyCode: 'USD',
+       );
+       expect(res.allowed, false);
+-      expect(res.reason?.contains('Organizers cannot leave'), true);
++      expect(res.reason, "Organizers can't leave a trip in this version.");
+     });
+ 
+     test('Member with nonzero balance cannot leave', () {
+diff --git a/test/settlements_repository_test.dart b/test/settlements_repository_test.dart
+index 919b791..eb1809c 100644
+--- a/test/settlements_repository_test.dart
++++ b/test/settlements_repository_test.dart
+@@ -189,7 +189,7 @@ void main() {
+         currencyCode: 'USD',
+       );
+       expect(orgEligibility.allowed, isFalse);
+-      expect(orgEligibility.reason, contains('Organizers cannot leave'));
++      expect(orgEligibility.reason, "Organizers can't leave a trip in this version.");
+ 
+       // 2. Eligibility check: nonzero balance refuses leave
+       final nonzeroEligibility = checkLeaveEligibility(
+
+commit 77e23b8d68a7f99bcaa3d64dd274ec88d770a425
+Author: Aayush049 <ayush.sri0108@gmail.com>
+Date:   Fri Oct 16 01:04:01 2026 +0530
+
+    fix(trips): join-after-left message
+
+diff --git a/lib/features/trips/data/trip_repository.dart b/lib/features/trips/data/trip_repository.dart
+index 604bb86..f8f805d 100644
+--- a/lib/features/trips/data/trip_repository.dart
++++ b/lib/features/trips/data/trip_repository.dart
+@@ -214,7 +214,25 @@ class TripRepository {
+ 
+     try {
+       await batch.commit();
++    } on FirebaseException catch (e) {
++      if (e.code == 'permission-denied') {
++        throw Exception(
++          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
++        );
++      }
++      final freshCodeDoc = await getJoinPreview(code);
++      if (freshCodeDoc != null && freshCodeDoc.isFull) {
++        throw Exception('Could not join, the trip may be full');
++      }
++      throw Exception(
++        'Could not join trip. Please verify the code and try again.',
++      );
+     } catch (e) {
++      if (e.toString().contains('permission-denied')) {
++        throw Exception(
++          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
++        );
++      }
+       // Re-read join code to present friendly message
+       final freshCodeDoc = await getJoinPreview(code);
+       if (freshCodeDoc != null && freshCodeDoc.isFull) {
+diff --git a/test/settlements_repository_test.dart b/test/settlements_repository_test.dart
+index eb1809c..fd2e732 100644
+--- a/test/settlements_repository_test.dart
++++ b/test/settlements_repository_test.dart
+@@ -336,6 +336,38 @@ void main() {
+       // In join_trip_screen: 'Could not join trip. Please verify the code and try again.'
+     });
+ 
++    test('R6b: repository maps permission-denied to rejoin refusal message', () async {
++      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
++      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
++        'tripId': 'trip_rej',
++        'tripName': 'Rejoin Trip',
++        'destination': 'Rome',
++        'startDate': Timestamp.now(),
++        'endDate': Timestamp.now(),
++        'memberCount': 2,
++      });
++      final repo = TripRepository(firestore: throwingFirestore);
++
++      expect(
++        () => repo.joinTrip(
++          code: 'REJ234',
++          tripId: 'trip_rej',
++          userUid: 'u_left',
++          displayName: 'Left User',
++          currentMemberCount: 2,
++        ),
++        throwsA(
++          predicate(
++            (e) =>
++                e is Exception &&
++                e.toString().contains(
++                  "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
++                ),
++          ),
++        ),
++      );
++    });
++
+     test('R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0', () {
+       final now = DateTime.now();
+       final members = [
+@@ -398,3 +430,34 @@ void main() {
+     });
+   });
+ }
++
++class _ThrowingPermissionDeniedFirestore extends FakeFirebaseFirestore {
++  @override
++  WriteBatch batch() => _ThrowingPermissionDeniedBatch(super.batch());
++}
++
++class _ThrowingPermissionDeniedBatch implements WriteBatch {
++  final WriteBatch _inner;
++  _ThrowingPermissionDeniedBatch(this._inner);
++
++  @override
++  Future<void> commit() {
++    throw FirebaseException(
++      plugin: 'cloud_firestore',
++      code: 'permission-denied',
++      message: 'Missing or insufficient permissions.',
++    );
++  }
++
++  @override
++  void delete(DocumentReference document) => _inner.delete(document);
++
++  @override
++  void set<T>(DocumentReference<T> document, T data, [SetOptions? options]) =>
++      _inner.set(document, data, options);
++
++  @override
++  void update<T>(DocumentReference<T> document, T data) =>
++      _inner.update<T>(document, data);
++}
++
+diff --git a/test/settlements_widget_test.dart b/test/settlements_widget_test.dart
+index 74d605f..ef814d3 100644
+--- a/test/settlements_widget_test.dart
++++ b/test/settlements_widget_test.dart
+@@ -1,3 +1,5 @@
++import 'package:cloud_firestore/cloud_firestore.dart';
++import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
+ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+@@ -9,6 +11,7 @@ import 'package:wayfound/features/expenses/presentation/balances_view.dart';
+ import 'package:wayfound/features/expenses/presentation/expense_card.dart';
+ import 'package:wayfound/features/settlements/data/settlements_providers.dart';
+ import 'package:wayfound/features/settlements/domain/settlement.dart';
++import 'package:wayfound/features/trips/data/trip_repository.dart';
+ import 'package:wayfound/features/trips/data/trips_providers.dart';
+ import 'package:wayfound/features/trips/domain/member.dart';
+ import 'package:wayfound/features/trips/domain/trip.dart';
+@@ -738,5 +741,78 @@ void main() {
+         findsOneWidget,
+       );
+     });
++
++    testWidgets('W10b Join screen displays rejoin refusal message on permission-denied', (tester) async {
++      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
++      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
++        'tripId': 'trip_rejoin',
++        'tripName': 'Rome Adventure',
++        'destination': 'Rome',
++        'startDate': Timestamp.now(),
++        'endDate': Timestamp.now(),
++        'memberCount': 2,
++      });
++      final repo = TripRepository(firestore: throwingFirestore);
++
++      await tester.pumpApp(
++        const JoinTripScreen(),
++        authUserValue: AsyncData(
++          MockUser(
++            uid: 'u_left',
++            email: 'left@example.com',
++            displayName: 'Left User',
++          ),
++        ),
++        overrides: [
++          tripRepositoryProvider.overrideWithValue(repo),
++        ],
++      );
++
++      await tester.enterText(find.byType(TextFormField), 'REJ234');
++      await tester.tap(find.byIcon(Icons.search));
++      await tester.pumpAndSettle();
++
++      expect(find.text('Rome Adventure'), findsOneWidget);
++      await tester.tap(find.widgetWithText(FilledButton, 'Join Trip'));
++      await tester.pumpAndSettle();
++
++      expect(
++        find.text(
++          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
++        ),
++        findsOneWidget,
++      );
++    });
+   });
+ }
++
++class _ThrowingPermissionDeniedFirestore extends FakeFirebaseFirestore {
++  @override
++  WriteBatch batch() => _ThrowingPermissionDeniedBatch(super.batch());
++}
++
++class _ThrowingPermissionDeniedBatch implements WriteBatch {
++  final WriteBatch _inner;
++  _ThrowingPermissionDeniedBatch(this._inner);
++
++  @override
++  Future<void> commit() {
++    throw FirebaseException(
++      plugin: 'cloud_firestore',
++      code: 'permission-denied',
++      message: 'Missing or insufficient permissions.',
++    );
++  }
++
++  @override
++  void delete(DocumentReference document) => _inner.delete(document);
++
++  @override
++  void set<T>(DocumentReference<T> document, T data, [SetOptions? options]) =>
++      _inner.set(document, data, options);
++
++  @override
++  void update<T>(DocumentReference<T> document, T data) =>
++      _inner.update<T>(document, data);
++}
++

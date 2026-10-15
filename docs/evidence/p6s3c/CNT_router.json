@@ -1,0 +1,14 @@
+{"protocolVersion":"0.1.1","runnerVersion":null,"pid":34072,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading D:/VsCode/wayfound/test/leave_router_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}
+{"count":1,"time":7,"type":"allSuites"}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":3239}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":null,"column":null,"url":null},"type":"group","time":3241}
+{"group":{"id":3,"suiteID":0,"parentID":2,"name":"Leave Router Navigation Tests (G1)","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":56,"column":3,"url":"file:///D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"group","time":3242}
+{"test":{"id":4,"name":"Leave Router Navigation Tests (G1) G1 Leave flow navigates back to Home upon successful leave, and positive control proves cancel does not redirect","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":57,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"testStart","time":3242}
+{"testID":4,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4941}
+{"test":{"id":5,"name":"Leave Router Navigation Tests (G1) G1b Leave flow navigates back to Home upon successful leave when arrived via router.go","suiteID":0,"groupIDs":[2,3],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":171,"root_column":5,"root_url":"file:///D:/VsCode/wayfound/test/leave_router_test.dart"},"type":"testStart","time":4941}
+{"testID":5,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":5247}
+{"success":true,"type":"done","time":5303}

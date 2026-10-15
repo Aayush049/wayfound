@@ -1,0 +1,15 @@
+ lib/app/router.dart                                |   3 +
+ lib/features/expenses/data/expenses_providers.dart |  22 +-
+ .../expenses/presentation/balances_view.dart       | 612 +++++++++++++++++----
+ .../expenses/presentation/expense_card.dart        |  42 +-
+ .../expenses/presentation/expenses_tab.dart        |   2 +-
+ .../settlements/data/settlement_repository.dart    |  75 +++
+ .../settlements/data/settlements_providers.dart    |  35 ++
+ .../settlements/domain/leave_eligibility.dart      |  50 ++
+ lib/features/settlements/domain/settlement.dart    |  80 +++
+ .../domain/settlement_payload_builders.dart        |  23 +
+ .../settlements/domain/settlement_validators.dart  |  24 +
+ lib/features/trips/data/trip_repository.dart       |  88 ++-
+ lib/features/trips/data/trips_providers.dart       |   9 +
+ lib/features/trips/presentation/members_tab.dart   | 187 +++++++
+ 14 files changed, 1132 insertions(+), 120 deletions(-)

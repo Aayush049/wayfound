@@ -1,0 +1,29 @@
+diff --git a/lib/features/settlements/domain/leave_eligibility.dart b/lib/features/settlements/domain/leave_eligibility.dart
+index 022de08..7dd8b91 100644
+--- a/lib/features/settlements/domain/leave_eligibility.dart
++++ b/lib/features/settlements/domain/leave_eligibility.dart
+@@ -36,15 +36,15 @@ LeaveEligibilityResult checkLeaveEligibility({
+   }
+ 
+   // Check pending settlements where uid is fromUid or toUid
+-  for (final s in settlements) {
+-    if (s.status == SettlementStatus.pending) {
+-      if (s.fromUid == uid || s.toUid == uid) {
+-        return const LeaveEligibilityResult.denied(
+-          'Cannot leave while you have pending settlements. Please resolve or cancel them first.',
+-        );
+-      }
+-    }
+-  }
++  // for (final s in settlements) {
++  //   if (s.status == SettlementStatus.pending) {
++  //     if (s.fromUid == uid || s.toUid == uid) {
++  //       return const LeaveEligibilityResult.denied(
++  //         'Cannot leave while you have pending settlements. Please resolve or cancel them first.',
++  //       );
++  //     }
++  //   }
++  // }
+ 
+   return const LeaveEligibilityResult.allowed();
+ }

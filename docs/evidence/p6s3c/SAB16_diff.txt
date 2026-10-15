@@ -1,0 +1,13 @@
+diff --git a/lib/features/expenses/presentation/balances_view.dart b/lib/features/expenses/presentation/balances_view.dart
+index 6eb969b..215663a 100644
+--- a/lib/features/expenses/presentation/balances_view.dart
++++ b/lib/features/expenses/presentation/balances_view.dart
+@@ -605,7 +605,7 @@ class _MarkAsPaidSheetState extends ConsumerState<MarkAsPaidSheet> {
+         tripId: widget.trip.id,
+         fromUid: widget.payment.fromUid,
+         toUid: widget.payment.toUid,
+-        amount: parsedVal,
++        amount: parsedVal * 10,
+       );
+       if (mounted) {
+         Navigator.of(context).pop();

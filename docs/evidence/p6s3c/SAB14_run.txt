@@ -1,0 +1,22 @@
+00:00 +0: loading D:/VsCode/wayfound_sabotage3/test/settlements_repository_test.dart
+00:00 +0: Repository & Domain Tests (R1 - R7) R1: createSettlement writes exactly required keys with status pending and minor units amount
+00:00 +1: Repository & Domain Tests (R1 - R7) R2: resolve writes only status and resolvedAt payloads for confirmed and rejected
+00:00 +2: Repository & Domain Tests (R1 - R7) R3: payer can delete a pending settlement via cancelPending
+00:00 +3: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending
+00:00 +4: Repository & Domain Tests (R1 - R7) R5: removeMember by organizer removes uid and sets status to left, allowed at nonzero balance
+00:00 +5: Repository & Domain Tests (R1 - R7) R6: join batch payload sets status active; joinTrip error presents exact message
+00:00 +6: Repository & Domain Tests (R1 - R7) R6b: repository maps permission-denied to rejoin refusal message
+00:00 +7: Repository & Domain Tests (R1 - R7) R6c: throwing batch with stale currentMemberCount 14 and joinCodes doc memberCount 15 expects may be full message
+00:00 +8: Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0
+00:00 +8 -1: Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0 [E]
+  Expected: <2000>
+    Actual: <500>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\settlements_repository_test.dart 483:7         main.<fn>.<fn>
+  
+00:00 +8 -1: Some tests failed.
+
+Failing tests:
+  D:/VsCode/wayfound_sabotage3/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0
