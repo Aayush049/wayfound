@@ -419,7 +419,11 @@ class BalancesView extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 6),
-                        Row(
+                        Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -438,7 +442,6 @@ class BalancesView extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            const Spacer(),
                             if (canActOnPending && isMyPayment)
                               TextButton.icon(
                                 onPressed: () async {
@@ -474,7 +477,6 @@ class BalancesView extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 4),
                               FilledButton(
                                 onPressed: () async {
                                   await ref
