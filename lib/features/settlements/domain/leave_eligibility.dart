@@ -19,7 +19,7 @@ LeaveEligibilityResult checkLeaveEligibility({
 }) {
   if (uid == organizerId) {
     return const LeaveEligibilityResult.denied(
-      'Organizers cannot leave the trip. You can archive the trip instead.',
+      "Organizers can't leave a trip in this version.",
     );
   }
 

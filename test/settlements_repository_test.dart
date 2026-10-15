@@ -189,7 +189,7 @@ void main() {
         currencyCode: 'USD',
       );
       expect(orgEligibility.allowed, isFalse);
-      expect(orgEligibility.reason, contains('Organizers cannot leave'));
+      expect(orgEligibility.reason, "Organizers can't leave a trip in this version.");
 
       // 2. Eligibility check: nonzero balance refuses leave
       final nonzeroEligibility = checkLeaveEligibility(

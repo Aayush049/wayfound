@@ -61,7 +61,7 @@ void main() {
         currencyCode: 'USD',
       );
       expect(res.allowed, false);
-      expect(res.reason?.contains('Organizers cannot leave'), true);
+      expect(res.reason, "Organizers can't leave a trip in this version.");
     });
 
     test('Member with nonzero balance cannot leave', () {
