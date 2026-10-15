@@ -336,6 +336,38 @@ void main() {
       // In join_trip_screen: 'Could not join trip. Please verify the code and try again.'
     });
 
+    test('R6b: repository maps permission-denied to rejoin refusal message', () async {
+      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
+        'tripId': 'trip_rej',
+        'tripName': 'Rejoin Trip',
+        'destination': 'Rome',
+        'startDate': Timestamp.now(),
+        'endDate': Timestamp.now(),
+        'memberCount': 2,
+      });
+      final repo = TripRepository(firestore: throwingFirestore);
+
+      expect(
+        () => repo.joinTrip(
+          code: 'REJ234',
+          tripId: 'trip_rej',
+          userUid: 'u_left',
+          displayName: 'Left User',
+          currentMemberCount: 2,
+        ),
+        throwsA(
+          predicate(
+            (e) =>
+                e is Exception &&
+                e.toString().contains(
+                  "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+                ),
+          ),
+        ),
+      );
+    });
+
     test('R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0', () {
       final now = DateTime.now();
       final members = [
@@ -398,3 +430,34 @@ void main() {
     });
   });
 }
+
+class _ThrowingPermissionDeniedFirestore extends FakeFirebaseFirestore {
+  @override
+  WriteBatch batch() => _ThrowingPermissionDeniedBatch(super.batch());
+}
+
+class _ThrowingPermissionDeniedBatch implements WriteBatch {
+  final WriteBatch _inner;
+  _ThrowingPermissionDeniedBatch(this._inner);
+
+  @override
+  Future<void> commit() {
+    throw FirebaseException(
+      plugin: 'cloud_firestore',
+      code: 'permission-denied',
+      message: 'Missing or insufficient permissions.',
+    );
+  }
+
+  @override
+  void delete(DocumentReference document) => _inner.delete(document);
+
+  @override
+  void set<T>(DocumentReference<T> document, T data, [SetOptions? options]) =>
+      _inner.set(document, data, options);
+
+  @override
+  void update<T>(DocumentReference<T> document, T data) =>
+      _inner.update<T>(document, data);
+}
+

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:wayfound/features/expenses/presentation/balances_view.dart';
 import 'package:wayfound/features/expenses/presentation/expense_card.dart';
 import 'package:wayfound/features/settlements/data/settlements_providers.dart';
 import 'package:wayfound/features/settlements/domain/settlement.dart';
+import 'package:wayfound/features/trips/data/trip_repository.dart';
 import 'package:wayfound/features/trips/data/trips_providers.dart';
 import 'package:wayfound/features/trips/domain/member.dart';
 import 'package:wayfound/features/trips/domain/trip.dart';
@@ -738,5 +741,78 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('W10b Join screen displays rejoin refusal message on permission-denied', (tester) async {
+      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+      await throwingFirestore.collection('joinCodes').doc('REJ234').set({
+        'tripId': 'trip_rejoin',
+        'tripName': 'Rome Adventure',
+        'destination': 'Rome',
+        'startDate': Timestamp.now(),
+        'endDate': Timestamp.now(),
+        'memberCount': 2,
+      });
+      final repo = TripRepository(firestore: throwingFirestore);
+
+      await tester.pumpApp(
+        const JoinTripScreen(),
+        authUserValue: AsyncData(
+          MockUser(
+            uid: 'u_left',
+            email: 'left@example.com',
+            displayName: 'Left User',
+          ),
+        ),
+        overrides: [
+          tripRepositoryProvider.overrideWithValue(repo),
+        ],
+      );
+
+      await tester.enterText(find.byType(TextFormField), 'REJ234');
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rome Adventure'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Join Trip'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+        ),
+        findsOneWidget,
+      );
+    });
   });
 }
+
+class _ThrowingPermissionDeniedFirestore extends FakeFirebaseFirestore {
+  @override
+  WriteBatch batch() => _ThrowingPermissionDeniedBatch(super.batch());
+}
+
+class _ThrowingPermissionDeniedBatch implements WriteBatch {
+  final WriteBatch _inner;
+  _ThrowingPermissionDeniedBatch(this._inner);
+
+  @override
+  Future<void> commit() {
+    throw FirebaseException(
+      plugin: 'cloud_firestore',
+      code: 'permission-denied',
+      message: 'Missing or insufficient permissions.',
+    );
+  }
+
+  @override
+  void delete(DocumentReference document) => _inner.delete(document);
+
+  @override
+  void set<T>(DocumentReference<T> document, T data, [SetOptions? options]) =>
+      _inner.set(document, data, options);
+
+  @override
+  void update<T>(DocumentReference<T> document, T data) =>
+      _inner.update<T>(document, data);
+}
+

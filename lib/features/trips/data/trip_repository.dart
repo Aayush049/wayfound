@@ -214,7 +214,25 @@ class TripRepository {
 
     try {
       await batch.commit();
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw Exception(
+          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+        );
+      }
+      final freshCodeDoc = await getJoinPreview(code);
+      if (freshCodeDoc != null && freshCodeDoc.isFull) {
+        throw Exception('Could not join, the trip may be full');
+      }
+      throw Exception(
+        'Could not join trip. Please verify the code and try again.',
+      );
     } catch (e) {
+      if (e.toString().contains('permission-denied')) {
+        throw Exception(
+          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+        );
+      }
       // Re-read join code to present friendly message
       final freshCodeDoc = await getJoinPreview(code);
       if (freshCodeDoc != null && freshCodeDoc.isFull) {
