@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../app/router.dart';
 import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
@@ -92,7 +94,7 @@ class MembersTab extends ConsumerWidget {
           currentMemberIds: trip.memberIds,
         );
         if (context.mounted) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          context.go(kHomeRoute);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('You have left the trip.')),
           );

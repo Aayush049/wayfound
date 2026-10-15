@@ -16,6 +16,9 @@ import '../features/trips/presentation/home_screen.dart';
 import '../features/trips/presentation/join_trip_screen.dart';
 import '../features/trips/presentation/trip_dashboard_screen.dart';
 
+/// The route path for the Home screen.
+const String kHomeRoute = '/home';
+
 /// Provider for the app's [GoRouter] configuration with auth redirect.
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = ValueNotifier<AsyncValue<User?>>(
