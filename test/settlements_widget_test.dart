@@ -218,9 +218,7 @@ void main() {
               displayName: 'Alice Member',
             ),
           ),
-          overrides: [
-            settlementRepositoryProvider.overrideWithValue(repo),
-          ],
+          overrides: [settlementRepositoryProvider.overrideWithValue(repo)],
         );
 
         final submitBtn = find.widgetWithText(FilledButton, 'Submit Payment');
@@ -270,9 +268,7 @@ void main() {
               displayName: 'Alice Member',
             ),
           ),
-          overrides: [
-            settlementRepositoryProvider.overrideWithValue(repo),
-          ],
+          overrides: [settlementRepositoryProvider.overrideWithValue(repo)],
         );
 
         await tester.enterText(find.byType(TextField), '10.00');
@@ -602,18 +598,9 @@ void main() {
           find.textContaining('Cannot leave while you have a nonzero balance'),
           findsOneWidget,
         );
-        expect(
-          find.textContaining('you owe'),
-          findsOneWidget,
-        );
-        expect(
-          find.textContaining('5.00'),
-          findsOneWidget,
-        );
-        expect(
-          find.textContaining('minor units'),
-          findsNothing,
-        );
+        expect(find.textContaining('you owe'), findsOneWidget);
+        expect(find.textContaining('5.00'), findsOneWidget);
+        expect(find.textContaining('minor units'), findsNothing);
         await tester.tap(find.text('OK'));
         await tester.pumpAndSettle();
         expect(find.text('Cannot Leave Trip'), findsNothing);
@@ -696,7 +683,9 @@ void main() {
 
         expect(find.text('Cannot Leave Trip'), findsOneWidget);
         expect(
-          find.textContaining('Cannot leave while you have pending settlements'),
+          find.textContaining(
+            'Cannot leave while you have pending settlements',
+          ),
           findsOneWidget,
         );
         await tester.tap(find.text('OK'));
@@ -783,10 +772,10 @@ void main() {
             .collection('members')
             .doc('mem_alice')
             .set({
-          'displayName': 'Alice Member',
-          'role': 'member',
-          'status': 'active',
-        });
+              'displayName': 'Alice Member',
+              'role': 'member',
+              'status': 'active',
+            });
         final repo = TripRepository(firestore: fakeFirestore);
 
         final mockOrg = MockUser(
@@ -1131,9 +1120,9 @@ void main() {
       },
     );
 
-    testWidgets(
-      'W10 Join error message displayed on invalid code format',
-      (tester) async {
+    testWidgets('W10 Join error message displayed on invalid code format', (
+      tester,
+    ) async {
       await tester.pumpApp(const JoinTripScreen());
 
       // Positive control: error message is not unconditionally present

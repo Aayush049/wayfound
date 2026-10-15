@@ -243,16 +243,12 @@ void main() {
       ProviderScope(
         overrides: [
           authUserProvider.overrideWithValue(AsyncData(mockAlice)),
-          tripAllMembersProvider(trip.id).overrideWithValue(
-            AsyncData([orgMember, aliceMember]),
-          ),
-          tripMembersProvider(trip.id).overrideWithValue(
-            AsyncData([orgMember, aliceMember]),
-          ),
-          tripBalancesProvider(trip.id).overrideWithValue({
-            'org_user': 1550,
-            'mem_alice': -1550,
-          }),
+          tripAllMembersProvider(trip.id)
+              .overrideWithValue(AsyncData([orgMember, aliceMember])),
+          tripMembersProvider(trip.id)
+              .overrideWithValue(AsyncData([orgMember, aliceMember])),
+          tripBalancesProvider(trip.id)
+              .overrideWithValue({'org_user': 1550, 'mem_alice': -1550}),
           totalTripSpentProvider(trip.id).overrideWithValue(15000),
           settlementsStreamProvider(trip.id)
               .overrideWithValue(const AsyncData<List<Settlement>>([])),

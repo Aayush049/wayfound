@@ -140,31 +140,34 @@ void main() {
       expect(rejectedDoc.data()?['status'], 'rejected');
     });
 
-    test('R3: payer can delete a pending settlement via cancelPending', () async {
-      const tripId = 'trip_r3';
-      final pendingRef = await fakeFirestore
-          .collection('trips')
-          .doc(tripId)
-          .collection('settlements')
-          .add({
-            'fromUid': 'payer_1',
-            'toUid': 'receiver_1',
-            'amount': 3000,
-            'status': 'pending',
-            'createdAt': Timestamp.now(),
-          });
+    test(
+      'R3: payer can delete a pending settlement via cancelPending',
+      () async {
+        const tripId = 'trip_r3';
+        final pendingRef = await fakeFirestore
+            .collection('trips')
+            .doc(tripId)
+            .collection('settlements')
+            .add({
+              'fromUid': 'payer_1',
+              'toUid': 'receiver_1',
+              'amount': 3000,
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
-      // Payer deletes pending settlement
-      await settlementRepo.cancelPending(
-        tripId: tripId,
-        settlementId: pendingRef.id,
-      );
+        // Payer deletes pending settlement
+        await settlementRepo.cancelPending(
+          tripId: tripId,
+          settlementId: pendingRef.id,
+        );
 
-      final checkPending = await pendingRef.get();
-      expect(checkPending.exists, isFalse);
+        final checkPending = await pendingRef.get();
+        expect(checkPending.exists, isFalse);
 
-      // Note: absence of cancel action for confirmed settlements is covered by W4/W9 and the firestore rules tests.
-    });
+        // Note: absence of cancel action for confirmed settlements is covered by W4/W9 and the firestore rules tests.
+      },
+    );
 
     test('R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending', () async {
       const tripId = 'trip_r4';
@@ -355,38 +358,35 @@ void main() {
       },
     );
 
-    test(
-      'R6c: throwing batch with stale currentMemberCount 14 and joinCodes doc memberCount 15 expects may be full message',
-      () async {
-        final throwingFirestore = _ThrowingPermissionDeniedFirestore();
-        await throwingFirestore.collection('joinCodes').doc('FULL99').set({
-          'tripId': 'trip_full',
-          'tripName': 'Full Trip',
-          'destination': 'Rome',
-          'startDate': Timestamp.now(),
-          'endDate': Timestamp.now(),
-          'memberCount': 15,
-        });
-        final repo = TripRepository(firestore: throwingFirestore);
+    test('R6c: throwing batch with stale currentMemberCount 14 and joinCodes doc memberCount 15 expects may be full message', () async {
+      final throwingFirestore = _ThrowingPermissionDeniedFirestore();
+      await throwingFirestore.collection('joinCodes').doc('FULL99').set({
+        'tripId': 'trip_full',
+        'tripName': 'Full Trip',
+        'destination': 'Rome',
+        'startDate': Timestamp.now(),
+        'endDate': Timestamp.now(),
+        'memberCount': 15,
+      });
+      final repo = TripRepository(firestore: throwingFirestore);
 
-        expect(
-          () => repo.joinTrip(
-            code: 'FULL99',
-            tripId: 'trip_full',
-            userUid: 'u_user',
-            displayName: 'Any User',
-            currentMemberCount: 14,
+      expect(
+        () => repo.joinTrip(
+          code: 'FULL99',
+          tripId: 'trip_full',
+          userUid: 'u_user',
+          displayName: 'Any User',
+          currentMemberCount: 14,
+        ),
+        throwsA(
+          predicate(
+            (e) =>
+                e is Exception &&
+                e.toString().contains('Could not join, the trip may be full'),
           ),
-          throwsA(
-            predicate(
-              (e) =>
-                  e is Exception &&
-                  e.toString().contains('Could not join, the trip may be full'),
-            ),
-          ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
     test('R7: balances: only confirmed settlements change balances; pending/rejected do not; left members remain; sum is 0', () {
       final now = DateTime.now();
