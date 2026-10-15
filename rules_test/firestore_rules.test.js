@@ -1546,6 +1546,52 @@ describe('Trip Join Boundary & Security Tests', () => {
       );
       await assertFails(batch.commit());
     });
+
+    test('joinCodes create fails when required key is missing from joinCodes document', async () => {
+      const code = 'BCDF24';
+      const userUid = 'join_code_user_m50';
+      await seedUser(userUid, 'Join Code User M50');
+
+      const authedDb = testEnv.authenticatedContext(userUid).firestore();
+      const batch = authedDb.batch();
+      batch.set(
+        authedDb.collection('trips').doc('trip_m50'),
+        {
+          name: 'Test Trip M50',
+          destination: 'Rome',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'EUR',
+          organizerId: userUid,
+          joinCode: code,
+          memberIds: [userUid],
+          memberCount: 1,
+          archived: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        authedDb.collection('trips').doc('trip_m50').collection('members').doc(userUid),
+        {
+          displayName: 'Join Code User M50',
+          photoUrl: null,
+          role: 'organizer',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        authedDb.collection('joinCodes').doc(code),
+        {
+          tripId: 'trip_m50',
+          tripName: 'Test Trip M50',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          memberCount: 1,
+        }
+      );
+      await assertFails(batch.commit());
+    });
   });
 
   describe('Read & Query Permissions', () => {
@@ -4301,6 +4347,26 @@ describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
         memberCount: 2,
       });
       batch.update(m1Ref, { status: 'left' });
+      await assertFails(batch.commit());
+    });
+
+    test('Leave DENIED when memberIds drops two members and pads a duplicate so size equals memberCount ([A,B,C] -> [A,A], count 3->2, B leaves)', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({
+          memberIds: [organizerUid, member1Uid, member2Uid],
+          memberCount: 3,
+        });
+      });
+      const leaveMemberUid = member1Uid;
+      const leaveDb = testEnv.authenticatedContext(leaveMemberUid).firestore();
+      const tripRef = leaveDb.collection('trips').doc(tripId);
+      const memberRef = tripRef.collection('members').doc(leaveMemberUid);
+      const batch = leaveDb.batch();
+      batch.update(tripRef, {
+        memberIds: [organizerUid, organizerUid],
+        memberCount: 2,
+      });
+      batch.update(memberRef, { status: 'left' });
       await assertFails(batch.commit());
     });
   });
