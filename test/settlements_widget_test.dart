@@ -443,9 +443,12 @@ void main() {
           findsNWidgets(2),
         ); // Button + Dialog title
         expect(
-          find.textContaining('Are you sure you want to leave this trip?'),
+          find.text(
+            'Are you sure you want to leave this trip? You won\'t be able to rejoin this trip in this version. Your past expenses stay in the balances, marked (left).',
+          ),
           findsOneWidget,
         );
+        expect(find.textContaining('rejoin later'), findsNothing);
         expect(find.text('Cancel'), findsOneWidget);
         expect(find.widgetWithText(FilledButton, 'Leave'), findsOneWidget);
 

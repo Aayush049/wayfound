@@ -68,7 +68,7 @@ class MembersTab extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Leave Trip'),
         content: const Text(
-          'Are you sure you want to leave this trip? You can rejoin later using the invite code if space allows.',
+          'Are you sure you want to leave this trip? You won\'t be able to rejoin this trip in this version. Your past expenses stay in the balances, marked (left).',
         ),
         actions: [
           TextButton(
