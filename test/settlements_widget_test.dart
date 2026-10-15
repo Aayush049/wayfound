@@ -568,6 +568,329 @@ void main() {
     );
 
     testWidgets(
+      'W4c Settlement action permissions: organizer as third party, plain member as third party, payer vs receiver, rejected visibility, and real confirm',
+      (tester) async {
+        final carolMember = Member(
+          uid: 'mem_carol',
+          displayName: 'Carol Active',
+          role: 'member',
+          status: 'active',
+          joinedAt: now,
+        );
+
+        final daveMember = Member(
+          uid: 'mem_dave',
+          displayName: 'Dave Plain',
+          role: 'member',
+          status: 'active',
+          joinedAt: now,
+        );
+
+        final allMembers = [orgMember, aliceMember, carolMember, daveMember];
+
+        final sPendingAliceToCarol = Settlement(
+          id: 's_alice_carol_pen',
+          fromUid: 'mem_alice',
+          toUid: 'mem_carol',
+          amount: 2000,
+          status: SettlementStatus.pending,
+          createdAt: now,
+        );
+
+        final sRejectedAliceToCarol = Settlement(
+          id: 's_alice_carol_rej',
+          fromUid: 'mem_alice',
+          toUid: 'mem_carol',
+          amount: 2000,
+          status: SettlementStatus.rejected,
+          createdAt: now,
+          resolvedAt: now,
+        );
+
+        // (a) Organizer (neither payer nor receiver) sees Confirm and Reject and NOT Cancel
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'org_user',
+              email: 'org@test.com',
+              displayName: 'Organizer Dan',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sPendingAliceToCarol])),
+          ],
+        );
+
+        expect(find.text('Confirm'), findsOneWidget);
+        expect(find.text('Reject'), findsOneWidget);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (b) Plain member Dave (active, neither party) sees none of Confirm, Reject, Cancel
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_dave',
+              email: 'dave@test.com',
+              displayName: 'Dave Plain',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sPendingAliceToCarol])),
+          ],
+        );
+
+        expect(find.text('Awaiting confirmation'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (c1) Receiver Carol (not organizer) sees Confirm and Reject, NOT Cancel
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_carol',
+              email: 'carol@test.com',
+              displayName: 'Carol Active',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sPendingAliceToCarol])),
+          ],
+        );
+
+        expect(find.text('Confirm'), findsOneWidget);
+        expect(find.text('Reject'), findsOneWidget);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (c2) Payer Alice (not organizer) sees Cancel only, NOT Confirm or Reject
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_alice',
+              email: 'alice@test.com',
+              displayName: 'Alice Member',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sPendingAliceToCarol])),
+          ],
+        );
+
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+
+        // (d1) Rejected settlement viewed by org_user
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'org_user',
+              email: 'org@test.com',
+              displayName: 'Organizer Dan',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sRejectedAliceToCarol])),
+          ],
+        );
+        expect(find.text('Rejected'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (d2) Rejected settlement viewed by payer mem_alice
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_alice',
+              email: 'alice@test.com',
+              displayName: 'Alice Member',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sRejectedAliceToCarol])),
+          ],
+        );
+        expect(find.text('Rejected'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (d3) Rejected settlement viewed by receiver mem_carol
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_carol',
+              email: 'carol@test.com',
+              displayName: 'Carol Active',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sRejectedAliceToCarol])),
+          ],
+        );
+        expect(find.text('Rejected'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+        expect(find.text('Cancel'), findsNothing);
+
+        // (e) Organizer taps Confirm: resolves on fake Firestore
+        final fakeFirestore = FakeFirebaseFirestore();
+        final settlementRef = fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('settlements')
+            .doc('s_alice_carol_pen');
+        await settlementRef.set({
+          'fromUid': 'mem_alice',
+          'toUid': 'mem_carol',
+          'amount': 2000,
+          'status': 'pending',
+          'createdAt': Timestamp.now(),
+        });
+
+        final repo = SettlementRepository(fakeFirestore);
+
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'org_user',
+              email: 'org@test.com',
+              displayName: 'Organizer Dan',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData(allMembers)),
+            tripBalancesProvider(activeTrip.id).overrideWithValue({
+              'org_user': 0,
+              'mem_alice': 0,
+              'mem_carol': 0,
+              'mem_dave': 0,
+            }),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(2000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sPendingAliceToCarol])),
+            settlementRepositoryProvider.overrideWithValue(repo),
+          ],
+        );
+
+        final confirmBtnFinder = find.widgetWithText(FilledButton, 'Confirm');
+        expect(confirmBtnFinder, findsOneWidget);
+        await tester.ensureVisible(confirmBtnFinder);
+        await tester.tap(confirmBtnFinder);
+        await tester.pumpAndSettle();
+
+        final updatedDoc = await settlementRef.get();
+        final data = updatedDoc.data()!;
+        expect(data['status'], 'confirmed');
+        expect(data['resolvedAt'], isNotNull);
+        expect(data['amount'], 2000);
+      },
+    );
+
+    testWidgets(
       'W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel',
       (tester) async {
         final mockAlice = MockUser(
