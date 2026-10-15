@@ -1,0 +1,6 @@
+ lib/app/router.dart                                |   3 +
+ .../expenses/presentation/balances_view.dart       | 580 +++++++++++----------
+ .../settlements/domain/leave_eligibility.dart      |  10 +-
+ lib/features/trips/data/trip_repository.dart       |  17 +-
+ lib/features/trips/presentation/members_tab.dart   |   4 +-
+ 5 files changed, 329 insertions(+), 285 deletions(-)

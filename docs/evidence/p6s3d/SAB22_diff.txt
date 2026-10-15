@@ -1,0 +1,13 @@
+diff --git a/lib/features/expenses/presentation/balances_view.dart b/lib/features/expenses/presentation/balances_view.dart
+index c3b0306..69aa250 100644
+--- a/lib/features/expenses/presentation/balances_view.dart
++++ b/lib/features/expenses/presentation/balances_view.dart
+@@ -422,7 +422,7 @@ class BalancesView extends ConsumerWidget {
+                         }
+ 
+                         final isMyPayment = s.fromUid == currentUid;
+-                        final isMyReceiver = s.toUid == currentUid;
++                        final isMyReceiver = true;
+                         final isOrganizer =
+                             trip.organizerId == currentUid &&
+                             s.fromUid != currentUid;

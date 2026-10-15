@@ -1,0 +1,728 @@
+diff --git a/lib/app/router.dart b/lib/app/router.dart
+index 3a1496c..86a8ca3 100644
+--- a/lib/app/router.dart
++++ b/lib/app/router.dart
+@@ -16,6 +16,9 @@ import '../features/trips/presentation/home_screen.dart';
+ import '../features/trips/presentation/join_trip_screen.dart';
+ import '../features/trips/presentation/trip_dashboard_screen.dart';
+ 
++/// The route path for the Home screen.
++const String kHomeRoute = '/home';
++
+ /// Provider for the app's [GoRouter] configuration with auth redirect.
+ final routerProvider = Provider<GoRouter>((ref) {
+   final refreshNotifier = ValueNotifier<AsyncValue<User?>>(
+diff --git a/lib/features/expenses/presentation/balances_view.dart b/lib/features/expenses/presentation/balances_view.dart
+index 7f1d01c..c3b0306 100644
+--- a/lib/features/expenses/presentation/balances_view.dart
++++ b/lib/features/expenses/presentation/balances_view.dart
+@@ -151,83 +151,85 @@ class BalancesView extends ConsumerWidget {
+           ),
+           const SizedBox(height: 8),
+           Card(
+-            child: ListView.separated(
+-              shrinkWrap: true,
+-              physics: const NeverScrollableScrollPhysics(),
+-              itemCount: members.length,
+-              separatorBuilder: (ctx, idx) => const Divider(height: 1),
+-              itemBuilder: (ctx, idx) {
+-                final member = members[idx];
+-                final netBalance = balances[member.uid] ?? 0;
+-                final formattedAmount = formatSignedMinorUnits(
+-                  netBalance,
+-                  trip.currency,
+-                );
+-
+-                final String statusText;
+-                final Color statusColor;
+-
+-                if (netBalance > 0) {
+-                  statusText = 'is owed';
+-                  statusColor = theme.colorScheme.primary;
+-                } else if (netBalance < 0) {
+-                  statusText = 'owes';
+-                  statusColor = theme.colorScheme.error;
+-                } else {
+-                  statusText = 'settled';
+-                  statusColor = theme.colorScheme.onSurfaceVariant;
+-                }
+-
+-                final nameDisplay = member.uid == currentUid
+-                    ? '${member.displayName} (You)'
+-                    : member.displayName;
+-                final labelDisplay = member.isActive
+-                    ? nameDisplay
+-                    : '$nameDisplay (left)';
+-
+-                return ListTile(
+-                  leading: CircleAvatar(
+-                    backgroundColor: theme.colorScheme.secondaryContainer,
+-                    child: Text(
+-                      member.displayName.isNotEmpty
+-                          ? member.displayName[0].toUpperCase()
+-                          : '?',
+-                      style: TextStyle(
+-                        color: theme.colorScheme.onSecondaryContainer,
+-                        fontWeight: FontWeight.bold,
+-                      ),
+-                    ),
+-                  ),
+-                  title: Text(
+-                    labelDisplay,
+-                    style: theme.textTheme.bodyLarge?.copyWith(
+-                      fontWeight: FontWeight.w600,
+-                      color: member.isActive
+-                          ? null
+-                          : theme.colorScheme.onSurfaceVariant,
+-                    ),
+-                  ),
+-                  trailing: Column(
+-                    mainAxisAlignment: MainAxisAlignment.center,
+-                    crossAxisAlignment: CrossAxisAlignment.end,
+-                    children: [
+-                      Text(
+-                        formattedAmount,
+-                        style: theme.textTheme.titleSmall?.copyWith(
+-                          fontWeight: FontWeight.bold,
+-                          color: statusColor,
++            child: Column(
++              children: [
++                for (int idx = 0; idx < members.length; idx++) ...[
++                  if (idx > 0) const Divider(height: 1),
++                  Builder(
++                    builder: (ctx) {
++                      final member = members[idx];
++                      final netBalance = balances[member.uid] ?? 0;
++                      final formattedAmount = formatSignedMinorUnits(
++                        netBalance,
++                        trip.currency,
++                      );
++
++                      final String statusText;
++                      final Color statusColor;
++                      if (netBalance > 0) {
++                        statusText = 'is owed';
++                        statusColor = theme.colorScheme.primary;
++                      } else if (netBalance < 0) {
++                        statusText = 'owes';
++                        statusColor = theme.colorScheme.error;
++                      } else {
++                        statusText = 'settled';
++                        statusColor = theme.colorScheme.onSurfaceVariant;
++                      }
++
++                      final nameDisplay = member.uid == currentUid
++                          ? '${member.displayName} (You)'
++                          : member.displayName;
++                      final labelDisplay = member.isActive
++                          ? nameDisplay
++                          : '$nameDisplay (left)';
++
++                      return ListTile(
++                        leading: CircleAvatar(
++                          backgroundColor: theme.colorScheme.secondaryContainer,
++                          child: Text(
++                            member.displayName.isNotEmpty
++                                ? member.displayName[0].toUpperCase()
++                                : '?',
++                            style: TextStyle(
++                              color: theme.colorScheme.onSecondaryContainer,
++                              fontWeight: FontWeight.bold,
++                            ),
++                          ),
+                         ),
+-                      ),
+-                      Text(
+-                        statusText,
+-                        style: theme.textTheme.labelSmall?.copyWith(
+-                          color: statusColor,
++                        title: Text(
++                          labelDisplay,
++                          style: theme.textTheme.bodyLarge?.copyWith(
++                            fontWeight: FontWeight.w600,
++                            color: member.isActive
++                                ? null
++                                : theme.colorScheme.onSurfaceVariant,
++                          ),
+                         ),
+-                      ),
+-                    ],
++                        trailing: Column(
++                          mainAxisAlignment: MainAxisAlignment.center,
++                          crossAxisAlignment: CrossAxisAlignment.end,
++                          children: [
++                            Text(
++                              formattedAmount,
++                              style: theme.textTheme.titleSmall?.copyWith(
++                                fontWeight: FontWeight.bold,
++                                color: statusColor,
++                              ),
++                            ),
++                            Text(
++                              statusText,
++                              style: theme.textTheme.labelSmall?.copyWith(
++                                color: statusColor,
++                              ),
++                            ),
++                          ],
++                        ),
++                      );
++                    },
+                   ),
+-                );
+-              },
++                ],
++              ],
+             ),
+           ),
+           const SizedBox(height: 24),
+@@ -272,58 +274,89 @@ class BalancesView extends ConsumerWidget {
+             )
+           else
+             Card(
+-              child: ListView.separated(
+-                shrinkWrap: true,
+-                physics: const NeverScrollableScrollPhysics(),
+-                itemCount: suggestedPayments.length,
+-                separatorBuilder: (ctx, idx) => const Divider(height: 1),
+-                itemBuilder: (ctx, idx) {
+-                  final p = suggestedPayments[idx];
+-                  final fromName = memberMap[p.fromUid] ?? p.fromUid;
+-                  final toName = memberMap[p.toUid] ?? p.toUid;
+-                  final formattedPayment = formatMinorUnits(
+-                    p.amount,
+-                    trip.currency,
+-                  );
+-                  final isMyPayment = p.fromUid == currentUid;
+-
+-                  return ListTile(
+-                    leading: Icon(
+-                      Icons.swap_horiz,
+-                      color: theme.colorScheme.primary,
+-                    ),
+-                    title: RichText(
+-                      text: TextSpan(
+-                        style: theme.textTheme.bodyMedium,
+-                        children: [
+-                          TextSpan(
+-                            text: fromName,
+-                            style: const TextStyle(fontWeight: FontWeight.bold),
+-                          ),
+-                          const TextSpan(text: ' pays '),
+-                          TextSpan(
+-                            text: toName,
+-                            style: const TextStyle(fontWeight: FontWeight.bold),
++              child: Column(
++                children: [
++                  for (int idx = 0; idx < suggestedPayments.length; idx++) ...[
++                    if (idx > 0) const Divider(height: 1),
++                    Builder(
++                      builder: (ctx) {
++                        final p = suggestedPayments[idx];
++                        final fromName = memberMap[p.fromUid] ?? p.fromUid;
++                        final toName = memberMap[p.toUid] ?? p.toUid;
++                        final formattedPayment = formatMinorUnits(
++                          p.amount,
++                          trip.currency,
++                        );
++                        final isMyPayment = p.fromUid == currentUid;
++
++                        return Padding(
++                          padding: const EdgeInsets.all(16),
++                          child: Column(
++                            crossAxisAlignment: CrossAxisAlignment.start,
++                            children: [
++                              Row(
++                                children: [
++                                  Icon(
++                                    Icons.swap_horiz,
++                                    color: theme.colorScheme.primary,
++                                  ),
++                                  const SizedBox(width: 8),
++                                  Expanded(
++                                    child: RichText(
++                                      text: TextSpan(
++                                        style: theme.textTheme.bodyMedium,
++                                        children: [
++                                          TextSpan(
++                                            text: fromName,
++                                            style: const TextStyle(
++                                              fontWeight: FontWeight.bold,
++                                            ),
++                                          ),
++                                          const TextSpan(text: ' pays '),
++                                          TextSpan(
++                                            text: toName,
++                                            style: const TextStyle(
++                                              fontWeight: FontWeight.bold,
++                                            ),
++                                          ),
++                                        ],
++                                      ),
++                                    ),
++                                  ),
++                                ],
++                              ),
++                              const SizedBox(height: 6),
++                              Wrap(
++                                alignment: WrapAlignment.spaceBetween,
++                                crossAxisAlignment: WrapCrossAlignment.center,
++                                spacing: 8,
++                                runSpacing: 8,
++                                children: [
++                                  Text(
++                                    formattedPayment,
++                                    style: theme.textTheme.titleSmall?.copyWith(
++                                      fontWeight: FontWeight.bold,
++                                      color: theme.colorScheme.primary,
++                                    ),
++                                  ),
++                                  if (isMyPayment && !trip.archived)
++                                    FilledButton.tonal(
++                                      onPressed: () => _showMarkAsPaidSheet(
++                                        context,
++                                        p,
++                                        toName,
++                                      ),
++                                      child: const Text('Mark as Paid'),
++                                    ),
++                                ],
++                              ),
++                            ],
+                           ),
+-                        ],
+-                      ),
++                        );
++                      },
+                     ),
+-                    subtitle: Text(formattedPayment),
+-                    trailing: isMyPayment && !trip.archived
+-                        ? FilledButton.tonal(
+-                            onPressed: () =>
+-                                _showMarkAsPaidSheet(context, p, toName),
+-                            child: const Text('Mark as Paid'),
+-                          )
+-                        : Text(
+-                            formattedPayment,
+-                            style: theme.textTheme.titleSmall?.copyWith(
+-                              fontWeight: FontWeight.bold,
+-                              color: theme.colorScheme.primary,
+-                            ),
+-                          ),
+-                  );
+-                },
++                  ],
++                ],
+               ),
+             ),
+           const SizedBox(height: 24),
+@@ -351,151 +384,160 @@ class BalancesView extends ConsumerWidget {
+             )
+           else
+             Card(
+-              child: ListView.separated(
+-                shrinkWrap: true,
+-                physics: const NeverScrollableScrollPhysics(),
+-                itemCount: settlements.length,
+-                separatorBuilder: (ctx, idx) => const Divider(height: 1),
+-                itemBuilder: (ctx, idx) {
+-                  final s = settlements[idx];
+-                  final fromName = memberMap[s.fromUid] ?? s.fromUid;
+-                  final toName = memberMap[s.toUid] ?? s.toUid;
+-                  final formattedAmount = formatMinorUnits(
+-                    s.amount,
+-                    trip.currency,
+-                  );
+-
+-                  final String statusLabel;
+-                  final Color statusColor;
+-                  final Color statusBg;
+-
+-                  switch (s.status) {
+-                    case SettlementStatus.confirmed:
+-                      statusLabel = 'Confirmed';
+-                      statusColor = theme.colorScheme.onSecondaryContainer;
+-                      statusBg = theme.colorScheme.secondaryContainer;
+-                      break;
+-                    case SettlementStatus.rejected:
+-                      statusLabel = 'Rejected';
+-                      statusColor = theme.colorScheme.onErrorContainer;
+-                      statusBg = theme.colorScheme.errorContainer;
+-                      break;
+-                    case SettlementStatus.pending:
+-                      statusLabel = 'Awaiting confirmation';
+-                      statusColor = theme.colorScheme.onErrorContainer;
+-                      statusBg = theme.colorScheme.tertiaryContainer;
+-                      break;
+-                  }
+-
+-                  final isMyPayment = s.fromUid == currentUid;
+-                  final isMyReceiver = s.toUid == currentUid;
+-                  final isOrganizer =
+-                      trip.organizerId == currentUid && s.fromUid != currentUid;
+-                  final canActOnPending =
+-                      s.status == SettlementStatus.pending && !trip.archived;
+-
+-                  return Padding(
+-                    padding: const EdgeInsets.all(12),
+-                    child: Column(
+-                      crossAxisAlignment: CrossAxisAlignment.start,
+-                      children: [
+-                        Row(
+-                          children: [
+-                            Expanded(
+-                              child: Text(
+-                                '$fromName paid $toName',
+-                                style: theme.textTheme.bodyLarge?.copyWith(
+-                                  fontWeight: FontWeight.bold,
+-                                ),
+-                              ),
+-                            ),
+-                            Text(
+-                              formattedAmount,
+-                              style: theme.textTheme.titleMedium?.copyWith(
+-                                fontWeight: FontWeight.bold,
+-                                color: theme.colorScheme.primary,
+-                              ),
+-                            ),
+-                          ],
+-                        ),
+-                        const SizedBox(height: 6),
+-                        Wrap(
+-                          alignment: WrapAlignment.spaceBetween,
+-                          crossAxisAlignment: WrapCrossAlignment.center,
+-                          spacing: 8,
+-                          runSpacing: 8,
+-                          children: [
+-                            Container(
+-                              padding: const EdgeInsets.symmetric(
+-                                horizontal: 8,
+-                                vertical: 2,
+-                              ),
+-                              decoration: BoxDecoration(
+-                                color: statusBg,
+-                                borderRadius: BorderRadius.circular(8),
+-                              ),
+-                              child: Text(
+-                                statusLabel,
+-                                style: theme.textTheme.labelSmall?.copyWith(
+-                                  color: statusColor,
+-                                  fontWeight: FontWeight.bold,
+-                                ),
+-                              ),
+-                            ),
+-                            if (canActOnPending && isMyPayment)
+-                              TextButton.icon(
+-                                onPressed: () async {
+-                                  await ref
+-                                      .read(settlementRepositoryProvider)
+-                                      .cancelPending(
+-                                        tripId: trip.id,
+-                                        settlementId: s.id,
+-                                      );
+-                                },
+-                                icon: const Icon(
+-                                  Icons.cancel_outlined,
+-                                  size: 16,
+-                                ),
+-                                label: const Text('Cancel'),
+-                              ),
+-                            if (canActOnPending &&
+-                                (isMyReceiver || isOrganizer)) ...[
+-                              TextButton(
+-                                onPressed: () async {
+-                                  await ref
+-                                      .read(settlementRepositoryProvider)
+-                                      .resolve(
+-                                        tripId: trip.id,
+-                                        settlementId: s.id,
+-                                        confirmed: false,
+-                                      );
+-                                },
+-                                child: Text(
+-                                  'Reject',
+-                                  style: TextStyle(
+-                                    color: theme.colorScheme.error,
++              child: Column(
++                children: [
++                  for (int idx = 0; idx < settlements.length; idx++) ...[
++                    if (idx > 0) const Divider(height: 1),
++                    Builder(
++                      builder: (ctx) {
++                        final s = settlements[idx];
++                        final fromName = memberMap[s.fromUid] ?? s.fromUid;
++                        final toName = memberMap[s.toUid] ?? s.toUid;
++                        final formattedAmount = formatMinorUnits(
++                          s.amount,
++                          trip.currency,
++                        );
++
++                        final String statusLabel;
++                        final Color statusColor;
++                        final Color statusBg;
++
++                        switch (s.status) {
++                          case SettlementStatus.confirmed:
++                            statusLabel = 'Confirmed';
++                            statusColor =
++                                theme.colorScheme.onSecondaryContainer;
++                            statusBg = theme.colorScheme.secondaryContainer;
++                            break;
++                          case SettlementStatus.rejected:
++                            statusLabel = 'Rejected';
++                            statusColor = theme.colorScheme.onErrorContainer;
++                            statusBg = theme.colorScheme.errorContainer;
++                            break;
++                          case SettlementStatus.pending:
++                            statusLabel = 'Awaiting confirmation';
++                            statusColor = theme.colorScheme.onErrorContainer;
++                            statusBg = theme.colorScheme.tertiaryContainer;
++                            break;
++                        }
++
++                        final isMyPayment = s.fromUid == currentUid;
++                        final isMyReceiver = s.toUid == currentUid;
++                        final isOrganizer =
++                            trip.organizerId == currentUid &&
++                            s.fromUid != currentUid;
++                        final canActOnPending =
++                            s.status == SettlementStatus.pending &&
++                            !trip.archived;
++
++                        return Padding(
++                          padding: const EdgeInsets.all(12),
++                          child: Column(
++                            crossAxisAlignment: CrossAxisAlignment.start,
++                            children: [
++                              Row(
++                                children: [
++                                  Expanded(
++                                    child: Text(
++                                      '$fromName paid $toName',
++                                      style: theme.textTheme.bodyLarge
++                                          ?.copyWith(
++                                            fontWeight: FontWeight.bold,
++                                          ),
++                                    ),
++                                  ),
++                                  Text(
++                                    formattedAmount,
++                                    style: theme.textTheme.titleMedium
++                                        ?.copyWith(
++                                          fontWeight: FontWeight.bold,
++                                          color: theme.colorScheme.primary,
++                                        ),
+                                   ),
+-                                ),
++                                ],
+                               ),
+-                              FilledButton(
+-                                onPressed: () async {
+-                                  await ref
+-                                      .read(settlementRepositoryProvider)
+-                                      .resolve(
+-                                        tripId: trip.id,
+-                                        settlementId: s.id,
+-                                        confirmed: true,
+-                                      );
+-                                },
+-                                child: const Text('Confirm'),
++                              const SizedBox(height: 6),
++                              Wrap(
++                                alignment: WrapAlignment.spaceBetween,
++                                crossAxisAlignment: WrapCrossAlignment.center,
++                                spacing: 8,
++                                runSpacing: 8,
++                                children: [
++                                  Container(
++                                    padding: const EdgeInsets.symmetric(
++                                      horizontal: 8,
++                                      vertical: 2,
++                                    ),
++                                    decoration: BoxDecoration(
++                                      color: statusBg,
++                                      borderRadius: BorderRadius.circular(8),
++                                    ),
++                                    child: Text(
++                                      statusLabel,
++                                      style: theme.textTheme.labelSmall
++                                          ?.copyWith(
++                                            color: statusColor,
++                                            fontWeight: FontWeight.bold,
++                                          ),
++                                    ),
++                                  ),
++                                  if (canActOnPending && isMyPayment)
++                                    TextButton.icon(
++                                      onPressed: () async {
++                                        await ref
++                                            .read(settlementRepositoryProvider)
++                                            .cancelPending(
++                                              tripId: trip.id,
++                                              settlementId: s.id,
++                                            );
++                                      },
++                                      icon: const Icon(
++                                        Icons.cancel_outlined,
++                                        size: 16,
++                                      ),
++                                      label: const Text('Cancel'),
++                                    ),
++                                  if (canActOnPending &&
++                                      (isMyReceiver || isOrganizer)) ...[
++                                    TextButton(
++                                      onPressed: () async {
++                                        await ref
++                                            .read(settlementRepositoryProvider)
++                                            .resolve(
++                                              tripId: trip.id,
++                                              settlementId: s.id,
++                                              confirmed: false,
++                                            );
++                                      },
++                                      child: Text(
++                                        'Reject',
++                                        style: TextStyle(
++                                          color: theme.colorScheme.error,
++                                        ),
++                                      ),
++                                    ),
++                                    FilledButton(
++                                      onPressed: () async {
++                                        await ref
++                                            .read(settlementRepositoryProvider)
++                                            .resolve(
++                                              tripId: trip.id,
++                                              settlementId: s.id,
++                                              confirmed: true,
++                                            );
++                                      },
++                                      child: const Text('Confirm'),
++                                    ),
++                                  ],
++                                ],
+                               ),
+                             ],
+-                          ],
+-                        ),
+-                      ],
++                          ),
++                        );
++                      },
+                     ),
+-                  );
+-                },
++                  ],
++                ],
+               ),
+             ),
+         ],
+@@ -595,13 +637,9 @@ class _MarkAsPaidSheetState extends ConsumerState<MarkAsPaidSheet> {
+   @override
+   Widget build(BuildContext context) {
+     final theme = Theme.of(context);
+-    return Padding(
+-      padding: EdgeInsets.fromLTRB(
+-        24,
+-        24,
+-        24,
+-        MediaQuery.of(context).viewInsets.bottom + 24,
+-      ),
++    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
++    return SingleChildScrollView(
++      padding: EdgeInsets.fromLTRB(24, 24, 24, bottomInset + 24),
+       child: Column(
+         mainAxisSize: MainAxisSize.min,
+         crossAxisAlignment: CrossAxisAlignment.stretch,
+diff --git a/lib/features/settlements/domain/leave_eligibility.dart b/lib/features/settlements/domain/leave_eligibility.dart
+index 7388a13..022de08 100644
+--- a/lib/features/settlements/domain/leave_eligibility.dart
++++ b/lib/features/settlements/domain/leave_eligibility.dart
+@@ -1,3 +1,4 @@
++import '../../../core/money.dart';
+ import '../domain/settlement.dart';
+ 
+ class LeaveEligibilityResult {
+@@ -25,11 +26,12 @@ LeaveEligibilityResult checkLeaveEligibility({
+ 
+   final balance = balances[uid] ?? 0;
+   if (balance != 0) {
+-    final formatted = balance < 0
+-        ? 'owes ${balance.abs()} minor units'
+-        : 'is owed $balance minor units';
++    final formattedAmount = formatMinorUnits(balance.abs(), currencyCode);
++    final detail = balance < 0
++        ? 'you owe $formattedAmount'
++        : 'you are owed $formattedAmount';
+     return LeaveEligibilityResult.denied(
+-      'Cannot leave while you have a nonzero balance ($formatted). Please settle up or confirm pending payments first.',
++      'Cannot leave while you have a nonzero balance ($detail). Please settle up or confirm pending payments first.',
+     );
+   }
+ 
+diff --git a/lib/features/trips/data/trip_repository.dart b/lib/features/trips/data/trip_repository.dart
+index f8f805d..0a7ac0c 100644
+--- a/lib/features/trips/data/trip_repository.dart
++++ b/lib/features/trips/data/trip_repository.dart
+@@ -215,29 +215,28 @@ class TripRepository {
+     try {
+       await batch.commit();
+     } on FirebaseException catch (e) {
++      final freshCodeDoc = await getJoinPreview(code);
++      if (freshCodeDoc != null && freshCodeDoc.isFull) {
++        throw Exception('Could not join, the trip may be full');
++      }
+       if (e.code == 'permission-denied') {
+         throw Exception(
+           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+         );
+       }
+-      final freshCodeDoc = await getJoinPreview(code);
+-      if (freshCodeDoc != null && freshCodeDoc.isFull) {
+-        throw Exception('Could not join, the trip may be full');
+-      }
+       throw Exception(
+         'Could not join trip. Please verify the code and try again.',
+       );
+     } catch (e) {
++      final freshCodeDoc = await getJoinPreview(code);
++      if (freshCodeDoc != null && freshCodeDoc.isFull) {
++        throw Exception('Could not join, the trip may be full');
++      }
+       if (e.toString().contains('permission-denied')) {
+         throw Exception(
+           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+         );
+       }
+-      // Re-read join code to present friendly message
+-      final freshCodeDoc = await getJoinPreview(code);
+-      if (freshCodeDoc != null && freshCodeDoc.isFull) {
+-        throw Exception('Could not join, the trip may be full');
+-      }
+       throw Exception(
+         'Could not join trip. Please verify the code and try again.',
+       );
+diff --git a/lib/features/trips/presentation/members_tab.dart b/lib/features/trips/presentation/members_tab.dart
+index 35687f0..5f9016d 100644
+--- a/lib/features/trips/presentation/members_tab.dart
++++ b/lib/features/trips/presentation/members_tab.dart
+@@ -1,8 +1,10 @@
+ import 'package:flutter/material.dart';
+ import 'package:flutter/services.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
++import 'package:go_router/go_router.dart';
+ import 'package:intl/intl.dart';
+ 
++import '../../../app/router.dart';
+ import '../../../core/widgets/app_empty.dart';
+ import '../../../core/widgets/app_error.dart';
+ import '../../../core/widgets/app_loading.dart';
+@@ -92,7 +94,7 @@ class MembersTab extends ConsumerWidget {
+           currentMemberIds: trip.memberIds,
+         );
+         if (context.mounted) {
+-          Navigator.of(context).popUntil((route) => route.isFirst);
++          context.go(kHomeRoute);
+           ScaffoldMessenger.of(context).showSnackBar(
+             const SnackBar(content: Text('You have left the trip.')),
+           );

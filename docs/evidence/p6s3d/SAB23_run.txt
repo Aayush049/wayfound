@@ -1,0 +1,14 @@
+00:00 +0: loading D:/VsCode/wayfound_sabotage4/test/settlements_repository_test.dart
+00:00 +0: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending
+00:00 +0 -1: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending [E]
+  Expected: false
+    Actual: <true>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\settlements_repository_test.dart 220:7         main.<fn>.<fn>
+  
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  D:/VsCode/wayfound_sabotage4/test/settlements_repository_test.dart: Repository & Domain Tests (R1 - R7) R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending
