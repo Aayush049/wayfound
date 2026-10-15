@@ -113,6 +113,7 @@ void main() {
     addTearDown(() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
   }
 
@@ -138,8 +139,9 @@ void main() {
     WidgetTester tester,
     double width,
     double height,
-    ThemeMode themeMode,
-  ) async {
+    ThemeMode themeMode, {
+    double textScale = 1.3,
+  }) async {
     setupViewport(tester, width, height);
     await tester.pumpWidget(
       ProviderScope(
@@ -162,6 +164,7 @@ void main() {
         ],
         child: wrapWithThemeAndScaler(
           themeMode: themeMode,
+          textScale: textScale,
           child: BalancesView(trip: trip),
         ),
       ),
@@ -226,6 +229,67 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpRealMarkAsPaidSheet({
+    required WidgetTester tester,
+    required double width,
+    required double height,
+    required ThemeMode themeMode,
+    bool withKeyboard = false,
+  }) async {
+    setupViewport(tester, width, height);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authUserProvider.overrideWithValue(AsyncData(mockAlice)),
+          tripAllMembersProvider(trip.id).overrideWithValue(
+            AsyncData([orgMember, aliceMember]),
+          ),
+          tripMembersProvider(trip.id).overrideWithValue(
+            AsyncData([orgMember, aliceMember]),
+          ),
+          tripBalancesProvider(trip.id).overrideWithValue({
+            'org_user': 1550,
+            'mem_alice': -1550,
+          }),
+          totalTripSpentProvider(trip.id).overrideWithValue(15000),
+          settlementsStreamProvider(trip.id)
+              .overrideWithValue(const AsyncData<List<Settlement>>([])),
+        ],
+        child: wrapWithThemeAndScaler(
+          themeMode: themeMode,
+          textScale: 1.3,
+          child: BalancesView(trip: trip),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final markAsPaidBtn = find.widgetWithText(FilledButton, 'Mark as Paid');
+    await tester.dragUntilVisible(
+      markAsPaidBtn,
+      find.byType(SingleChildScrollView),
+      const Offset(0, -100),
+    );
+    await tester.pumpAndSettle();
+    expect(markAsPaidBtn, findsOneWidget);
+    await tester.tap(markAsPaidBtn);
+    await tester.pumpAndSettle();
+
+    if (withKeyboard) {
+      tester.view.viewInsets = FakeViewPadding(
+        bottom: 300 * tester.view.devicePixelRatio,
+      );
+      await tester.pumpAndSettle();
+    }
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Mark Payment as Paid'), findsOneWidget);
+
+    final submitBtn = find.widgetWithText(FilledButton, 'Submit Payment');
+    await tester.ensureVisible(submitBtn);
+    expect(submitBtn, findsOneWidget);
   }
 
   Future<void> pumpLeaveDialogBlocked(
@@ -601,21 +665,123 @@ void main() {
     testWidgets('O1.29 Standard phone: Pixel 7 412x915 at 1.0 text scale', (
       tester,
     ) async {
-      setupViewport(tester, 412, 915);
-      await pumpBalancesView(tester, 412, 915, ThemeMode.light);
+      await pumpBalancesView(tester, 412, 915, ThemeMode.light, textScale: 1.0);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('O1.30 Tablet layout: iPad 10th gen 820x1180', (tester) async {
-      setupViewport(tester, 820, 1180);
       await pumpBalancesView(tester, 820, 1180, ThemeMode.light);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('O1.31 Landscape orientation: 844x390', (tester) async {
-      setupViewport(tester, 844, 390);
       await pumpBalancesView(tester, 844, 390, ThemeMode.light);
       expect(tester.takeException(), isNull);
     });
+
+    // O2 Real Bottom Sheet tests
+    testWidgets(
+      'O2.1 Real bottom sheet: 320x568, Light, 1.3x text, no keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 320,
+          height: 568,
+          themeMode: ThemeMode.light,
+          withKeyboard: false,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.2 Real bottom sheet: 320x568, Light, 1.3x text, with keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 320,
+          height: 568,
+          themeMode: ThemeMode.light,
+          withKeyboard: true,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.3 Real bottom sheet: 320x568, Dark, 1.3x text, no keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 320,
+          height: 568,
+          themeMode: ThemeMode.dark,
+          withKeyboard: false,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.4 Real bottom sheet: 320x568, Dark, 1.3x text, with keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 320,
+          height: 568,
+          themeMode: ThemeMode.dark,
+          withKeyboard: true,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.5 Real bottom sheet: 360x640, Light, 1.3x text, no keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 360,
+          height: 640,
+          themeMode: ThemeMode.light,
+          withKeyboard: false,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.6 Real bottom sheet: 360x640, Light, 1.3x text, with keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 360,
+          height: 640,
+          themeMode: ThemeMode.light,
+          withKeyboard: true,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.7 Real bottom sheet: 360x640, Dark, 1.3x text, no keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 360,
+          height: 640,
+          themeMode: ThemeMode.dark,
+          withKeyboard: false,
+        );
+      },
+    );
+
+    testWidgets(
+      'O2.8 Real bottom sheet: 360x640, Dark, 1.3x text, with keyboard',
+      (tester) async {
+        await pumpRealMarkAsPaidSheet(
+          tester: tester,
+          width: 360,
+          height: 640,
+          themeMode: ThemeMode.dark,
+          withKeyboard: true,
+        );
+      },
+    );
   });
 }
