@@ -1,0 +1,15 @@
+﻿M	lib/features/expenses/data/expenses_providers.dart
+M	lib/features/expenses/presentation/balances_view.dart
+M	lib/features/expenses/presentation/expense_card.dart
+M	lib/features/expenses/presentation/expenses_tab.dart
+A	lib/features/settlements/data/settlement_repository.dart
+A	lib/features/settlements/data/settlements_providers.dart
+A	lib/features/settlements/domain/leave_eligibility.dart
+A	lib/features/settlements/domain/settlement.dart
+A	lib/features/settlements/domain/settlement_payload_builders.dart
+A	lib/features/settlements/domain/settlement_validators.dart
+M	lib/features/trips/data/trip_repository.dart
+M	lib/features/trips/data/trips_providers.dart
+M	lib/features/trips/presentation/members_tab.dart
+M	test/expenses_ui_test.dart
+A	test/settlement_test.dart
