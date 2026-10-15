@@ -1459,6 +1459,93 @@ describe('Trip Join Boundary & Security Tests', () => {
 
       await assertFails(batch16.commit());
     });
+
+    test('joinCodes update fails when modifying fields other than memberCount', async () => {
+      const code = 'BOUND1';
+      const userUid = 'join_code_user_m52';
+      await seedUser(userUid, 'Join Code User');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc('trip_m52').set({
+          name: 'Test Trip M52',
+          destination: 'Paris',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'EUR',
+          organizerId: 'org_m52',
+          joinCode: code,
+          memberIds: ['org_m52', userUid],
+          memberCount: 2,
+          archived: false,
+          createdAt: new Date(),
+        });
+        await db.collection('joinCodes').doc(code).set({
+          tripId: 'trip_m52',
+          tripName: 'Test Trip M52',
+          destination: 'Paris',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          memberCount: 1,
+        });
+      });
+
+      const authedDb = testEnv.authenticatedContext(userUid).firestore();
+      await assertFails(
+        authedDb.collection('joinCodes').doc(code).update({
+          memberCount: 2,
+          destination: 'Malicious Destination',
+        })
+      );
+    });
+
+    test('joinCodes create fails when extra key is present in joinCodes document', async () => {
+      const code = 'BCDF23';
+      const userUid = 'join_code_user_c10';
+      await seedUser(userUid, 'Join Code User');
+
+      const authedDb = testEnv.authenticatedContext(userUid).firestore();
+      const batch = authedDb.batch();
+      batch.set(
+        authedDb.collection('trips').doc('trip_c10'),
+        {
+          name: 'Test Trip C10',
+          destination: 'Rome',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          currency: 'EUR',
+          organizerId: userUid,
+          joinCode: code,
+          memberIds: [userUid],
+          memberCount: 1,
+          archived: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        authedDb.collection('trips').doc('trip_c10').collection('members').doc(userUid),
+        {
+          displayName: 'Join Code User',
+          photoUrl: null,
+          role: 'organizer',
+          status: 'active',
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        authedDb.collection('joinCodes').doc(code),
+        {
+          tripId: 'trip_c10',
+          tripName: 'Test Trip C10',
+          destination: 'Rome',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          memberCount: 1,
+          extraKey: 'malicious',
+        }
+      );
+      await assertFails(batch.commit());
+    });
   });
 
   describe('Read & Query Permissions', () => {
@@ -3829,11 +3916,11 @@ describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
       await assertSucceeds(batch.commit());
     });
 
-    test('Rejoin by previously left member denied directly through memberIds update', async () => {
+    test('Rejoin by previously left member denied when member doc status is not active in client join batch', async () => {
       const rejoinUid = 'rejoin_mem_p6';
       await seedUser(rejoinUid, 'Rejoin Member');
 
-      // Setup rejoinUid as left
+      // Setup rejoinUid as left and joinCodes doc
       await testEnv.withSecurityRulesDisabled(async (context) => {
         const db = context.firestore();
         await db.collection('trips').doc(tripId).collection('members').doc(rejoinUid).set({
@@ -3842,14 +3929,26 @@ describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
           status: 'left',
           joinedAt: new Date(),
         });
+        await db.collection('joinCodes').doc('SETTLE01').set({
+          tripId: tripId,
+          tripName: 'Settlements Test Trip',
+          destination: 'Tokyo',
+          startDate: new Date('2026-11-01T00:00:00Z'),
+          endDate: new Date('2026-11-05T00:00:00Z'),
+          memberCount: 3,
+        });
       });
 
       const rejoinDb = testEnv.authenticatedContext(rejoinUid).firestore();
-      const tripRef = rejoinDb.collection('trips').doc(tripId);
-      await assertFails(tripRef.update({
+      const batch = rejoinDb.batch();
+      batch.update(rejoinDb.collection('trips').doc(tripId), {
         memberIds: [organizerUid, member1Uid, member2Uid, rejoinUid],
         memberCount: 4,
-      }));
+      });
+      batch.update(rejoinDb.collection('joinCodes').doc('SETTLE01'), {
+        memberCount: 4,
+      });
+      await assertFails(batch.commit());
     });
 
     test('Organizer removes member successfully', async () => {
