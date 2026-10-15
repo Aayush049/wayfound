@@ -79,7 +79,7 @@ void main() {
       expect(docData['resolvedAt'], isNull);
     });
 
-    test('R2: confirm/reject writes only status and resolvedAt; transitions only from pending', () async {
+    test('R2: resolve writes only status and resolvedAt payloads for confirmed and rejected', () async {
       final confirmPayload = buildResolveSettlementPayload(confirmed: true);
       expect(confirmPayload.keys.toSet(), {'status', 'resolvedAt'});
       expect(confirmPayload['status'], 'confirmed');
@@ -140,7 +140,7 @@ void main() {
       expect(rejectedDoc.data()?['status'], 'rejected');
     });
 
-    test('R3: payer can delete a pending settlement; deletion refused/unavailable for confirmed', () async {
+    test('R3: payer can delete a pending settlement via cancelPending', () async {
       const tripId = 'trip_r3';
       final pendingRef = await fakeFirestore
           .collection('trips')
@@ -163,18 +163,7 @@ void main() {
       final checkPending = await pendingRef.get();
       expect(checkPending.exists, isFalse);
 
-      // Positive control / invariant: confirmed settlements cannot be canceled via cancelPending
-      // (verified in UI: cancel button is only visible when status == pending, and security rules deny deleting confirmed)
-      final confirmedSettlement = Settlement(
-        id: 's_conf',
-        fromUid: 'payer_1',
-        toUid: 'receiver_1',
-        amount: 3000,
-        status: SettlementStatus.confirmed,
-        createdAt: DateTime.now(),
-        resolvedAt: DateTime.now(),
-      );
-      expect(confirmedSettlement.status, isNot(SettlementStatus.pending));
+      // Note: absence of cancel action for confirmed settlements is covered by W4/W9 and the firestore rules tests.
     });
 
     test('R4: leaveTrip removes uid from memberIds, decrements memberCount, sets member status to left; refuses at nonzero balance/pending', () async {
@@ -329,17 +318,6 @@ void main() {
         ),
         throwsA(predicate((e) => e.toString().contains('Trip is full'))),
       );
-
-      // Rejoin / general verification error string
-      await fakeFirestore.collection('joinCodes').doc('CODE01').set({
-        'tripId': 'trip_test',
-        'tripName': 'Test Trip',
-        'destination': 'Paris',
-        'startDate': Timestamp.now(),
-        'endDate': Timestamp.now(),
-        'memberCount': 2,
-      });
-      // In join_trip_screen: 'Could not join trip. Please verify the code and try again.'
     });
 
     test(
@@ -486,6 +464,15 @@ void main() {
                 amount: 1000,
                 status: SettlementStatus.pending,
                 createdAt: now,
+              ),
+              Settlement(
+                id: 's_rejected',
+                fromUid: 'u3',
+                toUid: 'u1',
+                amount: 500,
+                status: SettlementStatus.rejected,
+                createdAt: now,
+                resolvedAt: now,
               ),
             ]),
           ),

@@ -9,6 +9,7 @@ import 'package:wayfound/features/expenses/domain/balance_calculator.dart';
 import 'package:wayfound/features/expenses/domain/expense.dart';
 import 'package:wayfound/features/expenses/presentation/balances_view.dart';
 import 'package:wayfound/features/expenses/presentation/expense_card.dart';
+import 'package:wayfound/features/settlements/data/settlement_repository.dart';
 import 'package:wayfound/features/settlements/data/settlements_providers.dart';
 import 'package:wayfound/features/settlements/domain/settlement.dart';
 import 'package:wayfound/features/trips/data/trip_repository.dart';
@@ -188,6 +189,108 @@ void main() {
         // 6. Positive control: valid boundary amount (25.00)
         await tester.enterText(textFieldFinder, '25.00');
         expect(find.text('25.00'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'W2b Mark-as-paid sheet: valid amounts (full debt and partial) submit successfully on fake Firestore',
+      (tester) async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final repo = SettlementRepository(fakeFirestore);
+
+        // 1. Full debt amount (25.00)
+        await tester.pumpApp(
+          Scaffold(
+            body: MarkAsPaidSheet(
+              trip: activeTrip,
+              payment: const SuggestedPayment(
+                fromUid: 'mem_alice',
+                toUid: 'org_user',
+                amount: 2500,
+              ),
+              receiverName: 'Organizer Dan',
+            ),
+          ),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_alice',
+              email: 'alice@test.com',
+              displayName: 'Alice Member',
+            ),
+          ),
+          overrides: [
+            settlementRepositoryProvider.overrideWithValue(repo),
+          ],
+        );
+
+        final submitBtn = find.widgetWithText(FilledButton, 'Submit Payment');
+        final textField = find.byType(TextField);
+
+        await tester.enterText(textField, '25.00');
+        await tester.tap(submitBtn);
+        await tester.pumpAndSettle();
+
+        // No validation errors shown
+        expect(find.textContaining('Amount cannot'), findsNothing);
+        expect(find.textContaining('Invalid number'), findsNothing);
+
+        // Assert pending doc created in Firestore
+        final settlements = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('settlements')
+            .get();
+        expect(settlements.docs.length, 1);
+        final doc1 = settlements.docs.first.data();
+        expect(doc1['amount'], 2500);
+        expect(doc1['fromUid'], 'mem_alice');
+        expect(doc1['toUid'], 'org_user');
+        expect(doc1['status'], 'pending');
+
+        // Unmount previous tree before pumping second sheet
+        await tester.pumpWidget(const SizedBox());
+
+        // 2. Partial debt amount (10.00)
+        await tester.pumpApp(
+          Scaffold(
+            body: MarkAsPaidSheet(
+              trip: activeTrip,
+              payment: const SuggestedPayment(
+                fromUid: 'mem_alice',
+                toUid: 'org_user',
+                amount: 2500,
+              ),
+              receiverName: 'Organizer Dan',
+            ),
+          ),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'mem_alice',
+              email: 'alice@test.com',
+              displayName: 'Alice Member',
+            ),
+          ),
+          overrides: [
+            settlementRepositoryProvider.overrideWithValue(repo),
+          ],
+        );
+
+        await tester.enterText(find.byType(TextField), '10.00');
+        await tester.tap(find.widgetWithText(FilledButton, 'Submit Payment'));
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('Amount cannot'), findsNothing);
+        final settlements2 = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('settlements')
+            .get();
+        expect(settlements2.docs.length, 2);
+        final doc2 = settlements2.docs.last.data();
+        expect(doc2['amount'], 1000);
+        expect(doc2['fromUid'], 'mem_alice');
+        expect(doc2['toUid'], 'org_user');
+        expect(doc2['status'], 'pending');
       },
     );
 
@@ -390,6 +493,85 @@ void main() {
     );
 
     testWidgets(
+      'W4b Settlement action permissions: organizer as payer sees Cancel only; organizer as receiver sees Confirm/Reject; rejected has no actions',
+      (tester) async {
+        final sOrgOwesAlice = Settlement(
+          id: 's_org_owes',
+          fromUid: 'org_user',
+          toUid: 'mem_alice',
+          amount: 1500,
+          status: SettlementStatus.pending,
+          createdAt: now,
+        );
+
+        final sRejected = Settlement(
+          id: 's_rej',
+          fromUid: 'mem_alice',
+          toUid: 'org_user',
+          amount: 800,
+          status: SettlementStatus.rejected,
+          createdAt: now,
+          resolvedAt: now,
+        );
+
+        // 1. Organizer as PAYER (org_user owes mem_alice)
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'org_user',
+              email: 'org@test.com',
+              displayName: 'Organizer Dan',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 0, 'mem_alice': 0}),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(1500),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sOrgOwesAlice])),
+          ],
+        );
+
+        // Organizer is payer -> Cancel visible, Confirm and Reject absent
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+
+        // 2. Rejected settlement: neither party sees any action buttons
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(
+            MockUser(
+              uid: 'org_user',
+              email: 'org@test.com',
+              displayName: 'Organizer Dan',
+            ),
+          ),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 0, 'mem_alice': 0}),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(800),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([sRejected])),
+          ],
+        );
+
+        expect(find.text('Confirm'), findsNothing);
+        expect(find.text('Reject'), findsNothing);
+        expect(find.text('Cancel'), findsNothing);
+      },
+    );
+
+    testWidgets(
       'W5 Leave dialog: blocked-state message on nonzero balance; allowed-state confirm and cancel',
       (tester) async {
         final mockAlice = MockUser(
@@ -477,6 +659,71 @@ void main() {
       },
     );
 
+    testWidgets(
+      'W5b Leave dialog: blocked by pending settlement with zero balance; allowed when no pending settlements',
+      (tester) async {
+        final mockAlice = MockUser(
+          uid: 'mem_alice',
+          email: 'alice@test.com',
+          displayName: 'Alice Member',
+        );
+
+        final pendingSettlement = Settlement(
+          id: 's_pend',
+          fromUid: 'mem_alice',
+          toUid: 'org_user',
+          amount: 1000,
+          status: SettlementStatus.pending,
+          createdAt: now,
+        );
+
+        // 1. Blocked: balance is 0, but has pending settlement
+        await tester.pumpApp(
+          Scaffold(body: MembersTab(trip: activeTrip)),
+          authUserValue: AsyncData(mockAlice),
+          overrides: [
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 0, 'mem_alice': 0}),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([pendingSettlement])),
+          ],
+        );
+
+        await tester.tap(find.text('Leave Trip'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Cannot Leave Trip'), findsOneWidget);
+        expect(
+          find.textContaining('Cannot leave while you have pending settlements'),
+          findsOneWidget,
+        );
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // 2. Allowed: balance is 0 and no pending settlements
+        await tester.pumpApp(
+          Scaffold(body: MembersTab(trip: activeTrip)),
+          authUserValue: AsyncData(mockAlice),
+          overrides: [
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 0, 'mem_alice': 0}),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(const AsyncData([])),
+          ],
+        );
+
+        await tester.tap(find.text('Leave Trip'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Leave Trip'), findsNWidgets(2)); // Button + Title
+        expect(find.widgetWithText(FilledButton, 'Leave'), findsOneWidget);
+      },
+    );
+
     testWidgets('W6 Remove dialog: confirm and cancel paths', (tester) async {
       final mockOrg = MockUser(
         uid: 'org_user',
@@ -520,6 +767,104 @@ void main() {
         findsNothing,
       );
     });
+
+    testWidgets(
+      'W6b Remove dialog: confirm updates member status to left and memberIds in Firestore; cancel leaves docs unchanged',
+      (tester) async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        await fakeFirestore.collection('trips').doc(activeTrip.id).set({
+          'name': 'Paris Trip',
+          'memberIds': ['org_user', 'mem_alice'],
+          'memberCount': 2,
+        });
+        await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('members')
+            .doc('mem_alice')
+            .set({
+          'displayName': 'Alice Member',
+          'role': 'member',
+          'status': 'active',
+        });
+        final repo = TripRepository(firestore: fakeFirestore);
+
+        final mockOrg = MockUser(
+          uid: 'org_user',
+          email: 'org@test.com',
+          displayName: 'Organizer Dan',
+        );
+
+        final twoMemberTrip = Trip(
+          id: activeTrip.id,
+          name: activeTrip.name,
+          destination: activeTrip.destination,
+          startDate: activeTrip.startDate,
+          endDate: activeTrip.endDate,
+          currency: activeTrip.currency,
+          organizerId: activeTrip.organizerId,
+          joinCode: activeTrip.joinCode,
+          memberIds: ['org_user', 'mem_alice'],
+          memberCount: 2,
+          archived: false,
+        );
+
+        // 1. Cancel does NOT mutate docs
+        await tester.pumpApp(
+          Scaffold(body: MembersTab(trip: twoMemberTrip)),
+          authUserValue: AsyncData(mockOrg),
+          overrides: [
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 0, 'mem_alice': 0}),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(const AsyncData([])),
+            tripRepositoryProvider.overrideWithValue(repo),
+          ],
+        );
+
+        await tester.tap(find.text('Remove'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        var tripDoc = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .get();
+        expect(tripDoc.data()?['memberCount'], 2);
+        var memberDoc = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('members')
+            .doc('mem_alice')
+            .get();
+        expect(memberDoc.data()?['status'], 'active');
+
+        // 2. Confirm Remove updates member status to left, removes from memberIds, decrements memberCount
+        await tester.tap(find.text('Remove'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Alice Member has been removed.'), findsOneWidget);
+
+        tripDoc = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .get();
+        expect(tripDoc.data()?['memberCount'], 1);
+        expect(tripDoc.data()?['memberIds'], ['org_user']);
+        memberDoc = await fakeFirestore
+            .collection('trips')
+            .doc(activeTrip.id)
+            .collection('members')
+            .doc('mem_alice')
+            .get();
+        expect(memberDoc.data()?['status'], 'left');
+      },
+    );
 
     testWidgets(
       'W7 "(left)" label appears for left member in balances, and not for active members',
@@ -734,7 +1079,61 @@ void main() {
       },
     );
 
-    testWidgets('W10 Join error message displayed on failure', (tester) async {
+    testWidgets(
+      'W9b Suggested payments: Mark as Paid button shown on active trip and absent on archived trip',
+      (tester) async {
+        final mockAlice = MockUser(
+          uid: 'mem_alice',
+          email: 'alice@test.com',
+          displayName: 'Alice Member',
+        );
+
+        // 1. Active trip: mem_alice owes org_user -> Mark as Paid is visible
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: activeTrip)),
+          authUserValue: AsyncData(mockAlice),
+          overrides: [
+            tripAllMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripMembersProvider(activeTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(activeTrip.id)
+                .overrideWithValue({'org_user': 2500, 'mem_alice': -2500}),
+            totalTripSpentProvider(activeTrip.id).overrideWithValue(5000),
+            settlementsStreamProvider(activeTrip.id)
+                .overrideWithValue(const AsyncData([])),
+          ],
+        );
+
+        expect(find.text('Mark as Paid'), findsOneWidget);
+
+        // Unmount before pumping archived trip
+        await tester.pumpWidget(const SizedBox());
+
+        // 2. Archived trip: mem_alice owes org_user -> Mark as Paid is absent
+        await tester.pumpApp(
+          Scaffold(body: BalancesView(trip: archivedTrip)),
+          authUserValue: AsyncData(mockAlice),
+          overrides: [
+            tripAllMembersProvider(archivedTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripMembersProvider(archivedTrip.id)
+                .overrideWithValue(AsyncData([orgMember, aliceMember])),
+            tripBalancesProvider(archivedTrip.id)
+                .overrideWithValue({'org_user': 2500, 'mem_alice': -2500}),
+            totalTripSpentProvider(archivedTrip.id).overrideWithValue(5000),
+            settlementsStreamProvider(archivedTrip.id)
+                .overrideWithValue(const AsyncData([])),
+          ],
+        );
+
+        expect(find.text('Mark as Paid'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'W10 Join error message displayed on invalid code format',
+      (tester) async {
       await tester.pumpApp(const JoinTripScreen());
 
       // Positive control: error message is not unconditionally present
