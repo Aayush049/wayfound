@@ -1,3 +1,4 @@
+import '../../../core/money.dart';
 import '../domain/settlement.dart';
 
 class LeaveEligibilityResult {
@@ -25,11 +26,12 @@ LeaveEligibilityResult checkLeaveEligibility({
 
   final balance = balances[uid] ?? 0;
   if (balance != 0) {
-    final formatted = balance < 0
-        ? 'owes ${balance.abs()} minor units'
-        : 'is owed $balance minor units';
+    final formattedAmount = formatMinorUnits(balance.abs(), currencyCode);
+    final detail = balance < 0
+        ? 'you owe $formattedAmount'
+        : 'you are owed $formattedAmount';
     return LeaveEligibilityResult.denied(
-      'Cannot leave while you have a nonzero balance ($formatted). Please settle up or confirm pending payments first.',
+      'Cannot leave while you have a nonzero balance ($detail). Please settle up or confirm pending payments first.',
     );
   }
 

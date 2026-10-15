@@ -76,6 +76,61 @@ void main() {
       expect(res.reason?.contains('nonzero balance'), true);
     });
 
+    test('Member with nonzero balance cannot leave - formatted currency (D4 unit)', () {
+      // USD owe
+      final resUsdOwe = checkLeaveEligibility(
+        uid: 'u2',
+        organizerId: 'u1',
+        balances: {'u1': 3500, 'u2': -3500},
+        settlements: [],
+        currencyCode: 'USD',
+      );
+      expect(resUsdOwe.allowed, false);
+      expect(resUsdOwe.reason, contains('Cannot leave while you have a nonzero balance'));
+      expect(resUsdOwe.reason, contains('you owe'));
+      expect(resUsdOwe.reason, contains('35.00'));
+      expect(resUsdOwe.reason, isNot(contains('minor units')));
+
+      // USD is owed
+      final resUsdOwed = checkLeaveEligibility(
+        uid: 'u2',
+        organizerId: 'u1',
+        balances: {'u1': -3500, 'u2': 3500},
+        settlements: [],
+        currencyCode: 'USD',
+      );
+      expect(resUsdOwed.allowed, false);
+      expect(resUsdOwed.reason, contains('you are owed'));
+      expect(resUsdOwed.reason, contains('35.00'));
+      expect(resUsdOwed.reason, isNot(contains('minor units')));
+
+      // JPY zero-decimal owe
+      final resJpyOwe = checkLeaveEligibility(
+        uid: 'u2',
+        organizerId: 'u1',
+        balances: {'u1': 500, 'u2': -500},
+        settlements: [],
+        currencyCode: 'JPY',
+      );
+      expect(resJpyOwe.allowed, false);
+      expect(resJpyOwe.reason, contains('you owe'));
+      expect(resJpyOwe.reason, contains('500'));
+      expect(resJpyOwe.reason, isNot(contains('minor units')));
+
+      // JPY zero-decimal is owed
+      final resJpyOwed = checkLeaveEligibility(
+        uid: 'u2',
+        organizerId: 'u1',
+        balances: {'u1': -500, 'u2': 500},
+        settlements: [],
+        currencyCode: 'JPY',
+      );
+      expect(resJpyOwed.allowed, false);
+      expect(resJpyOwed.reason, contains('you are owed'));
+      expect(resJpyOwed.reason, contains('500'));
+      expect(resJpyOwed.reason, isNot(contains('minor units')));
+    });
+
     test('Member with pending settlements cannot leave', () {
       final res = checkLeaveEligibility(
         uid: 'u2',

@@ -420,6 +420,18 @@ void main() {
           find.textContaining('Cannot leave while you have a nonzero balance'),
           findsOneWidget,
         );
+        expect(
+          find.textContaining('you owe'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('5.00'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('minor units'),
+          findsNothing,
+        );
         await tester.tap(find.text('OK'));
         await tester.pumpAndSettle();
         expect(find.text('Cannot Leave Trip'), findsNothing);
