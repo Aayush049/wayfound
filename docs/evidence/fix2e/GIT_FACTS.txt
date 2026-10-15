@@ -1,0 +1,33 @@
+﻿## phase-6/settlements
+?? docs/evidence/fix2d/GIT_FACTS.txt
+?? docs/evidence/fix2d/RUN_2026-10-14T15-40-09-651Z.txt
+?? docs/evidence/fix2d/RUN_2026-10-15T07-12-06-082Z.txt
+?? docs/evidence/fix2e/
+17bfce0 docs(mutation): equivalence proofs backed by combined mutants
+9cde0ba test(mutation): distinct m11/m12, combined mutants, recovered originals
+8322ac1 test(rules): isolated joinCode and join-batch tests
+6d775c4 test(mutation): update mutants.json killers for m7b,m60 and add equivalent.json allowlist
+19107e9 fix(rules): scope variables in un-nested Trip Join Boundary and Read & Query describes
+563654e wip(fix2d): add architect's mutation harness v3
+842289a wip(fix2d): add complete 65-mutant definitions in mutants.json
+50be742 wip(fix2d): un-nest all describe blocks to top-level depth 1
+fa639fd wip(fix2b): archive fix2b evidence artifacts
+95b8aed wip(fix2d): update mutants set and finalize fix2d execution evidence
+6bbad82 wip(fix2d): complete mutant set and execution evidence for SESSION FIX-2d
+fdd6f47 chore: archive superseded fix-session evidence and scratch scripts outside the repo
+121	7	rules_test/firestore_rules.test.js
+RULES UNCHANGED SINCE c1882ce EXIT 0
+
+Algorithm       Hash                                                                   Path                            
+---------       ----                                                                   ----                            
+SHA256          FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443       D:\VsCode\wayfound\firestore....
+
+
+
+Algorithm       Hash                                                                   Path                            
+---------       ----                                                                   ----                            
+SHA256          C0038609499539D09B37E79B2BA04E971CFF79C5FA47C9699670BEDA08114EAD       D:\VsCode\wayfound\rules_test...
+
+
+harness LF-normalised sha256: C0038609499539D09B37E79B2BA04E971CFF79C5FA47C9699670BEDA08114EAD
+test() calls: 170

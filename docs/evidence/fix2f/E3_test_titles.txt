@@ -1,0 +1,8 @@
+﻿
++    test('joinCodes update fails when modifying fields other than memberCount', async () => {
++    test('joinCodes create fails when extra key is present in joinCodes document', async () => {
+-    test('Rejoin by previously left member denied directly through memberIds update', async () => {
++    test('Rejoin by previously left member denied when member doc status is not active in client join batch', async 
+() => {
+
+

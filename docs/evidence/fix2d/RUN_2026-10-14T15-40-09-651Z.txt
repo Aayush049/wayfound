@@ -1,0 +1,144 @@
+HARNESS FILE SHA256 (LF-normalised) = c0038609499539d09b37e79b2ba04e971cff79c5fa47c9699670beda08114ead
+RULES SHA256 BEFORE = fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
+node v24.19.0 | started 2026-10-14T15:40:09.656Z
+required ids = 65 | defined = 65 | missing required = none | duplicates = none
+BASELINE m0a: total=168 passed=168 failed=0 exit=0
+BASELINE m0b: total=168 passed=168 failed=0 exit=0
+BASELINE CONTROL PASSED (twice): 168 tests, all describes top-level = true
+CANARY allow-all rules: failed=148 (must be >= 20)
+CANARY syntax-error rules: classified ERROR (must be ERROR)
+[m1] line 224 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m2] line 229 | KILLED | failed=2 | killers=Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys ; Proof 2: Vote value 2 and 0 denied on create with unchanged counters
+[m3] line 231 | KILLED | failed=2 | killers=Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys ; Proof 3: Re-vote with same value denied
+[m4a] line 224 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m4b] line 237 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m4c] line 187 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m5] line 222 | KILLED | failed=2 | killers=Votes read permissions: owner can read own vote, other member cannot read owner vote ; Proof 5: Signed-out, non-member and other-member reads of vote document denied
+[m5b] line 222 | KILLED | failed=1 | killers=Proof 5: Signed-out, non-member and other-member reads of vote document denied
+[m6] line 180 | KILLED | failed=16 | killers=Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied ; Proof 6a: Content update changing createdAt denied ; Proof 6b: Content update changing authorId denied ; Proof 6c: Content update changing status denied ; Proof 6d: Content update changing dayIndex denied ; Proof 6e: Content update changing order denied
+[m7a] line 218 | KILLED | failed=1 | killers=Suggestion delete: author and organizer succeed, other member denied
+[m7b] line 216 | KILLED | failed=1 | killers=Suggestion delete: author and organizer succeed, other member denied
+[m8a] line 192 | KILLED | failed=3 | killers=Proof 8a: Plain suggestion counter update with NO vote change denied
+[m8b] line 233 | KILLED | failed=2 | killers=Proof 8b: Vote write with NO matching counter change denied
+[m9] line 115 | KILLED | failed=1 | killers=Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C])
+[m10] line 57 | KILLED | failed=1 | killers=users create DENIED when createdAt is a client Date (not request.time)
+[m11] line 197 | KILLED | failed=1 | killers=Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip
+[m12] line 197 | KILLED | failed=1 | killers=Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip
+[m13] line 208 | KILLED | failed=6 | killers=Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+[m14] line 201 | KILLED | failed=6 | killers=Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+[m15] line 200 | KILLED | failed=1 | killers=Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+[m16] line 206 | KILLED | failed=1 | killers=Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys
+[m17] line 209 | KILLED | failed=1 | killers=Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3
+[m18] line 248 | KILLED | failed=1 | killers=Read: member succeeds; non-member and signed out denied
+[m20] line 255 | KILLED | failed=1 | killers=Create denied when createdBy is not the caller
+[m21] line 253 | KILLED | failed=1 | killers=Create denied for extra key or missing key
+[m22] line 253 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m23] line 254 | KILLED | failed=1 | killers=Create denied for extra key or missing key
+[m24] line 255 | KILLED | failed=1 | killers=Create denied for invalid amount (0, negative, float, string, over cap)
+[m25] line 256 | KILLED | failed=1 | killers=Create denied for invalid amount (0, negative, float, string, over cap)
+[m26] line 256 | KILLED | failed=1 | killers=Create denied for invalid amount (0, negative, float, string, over cap)
+[m27] line 256 | KILLED | failed=1 | killers=Create denied for invalid description (empty, >100 chars, non-string)
+[m28] line 267 | KILLED | failed=1 | killers=Update: creator and organizer succeed; other member and non-member denied
+[m29] line 270 | KILLED | failed=1 | killers=Update denied when changing createdBy or createdAt
+[m30] line 281 | KILLED | failed=1 | killers=Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied
+[m31] line 288 | KILLED | failed=1 | killers=Settlement read: non-member denied
+[m32] line 295 | KILLED | failed=1 | killers=Settlement create: fromUid != auth uid denied
+[m33] line 296 | KILLED | failed=1 | killers=Settlement create: toUid not a member denied
+[m34] line 297 | KILLED | failed=1 | killers=Settlement create: toUid == auth uid (self-payment) denied
+[m35] line 298 | KILLED | failed=1 | killers=Settlement create: amount float denied
+[m36] line 298 | KILLED | failed=2 | killers=Settlement create: amount 0 denied ; Settlement create: amount negative denied
+[m37] line 300 | KILLED | failed=1 | killers=Settlement create: amount over cap denied
+[m38] line 301 | KILLED | failed=2 | killers=Settlement create: status confirmed denied ; Settlement create: status rejected denied
+[m39] line 302 | KILLED | failed=1 | killers=Settlement create: createdAt client value denied
+[m40] line 303 | KILLED | failed=1 | killers=Settlement create: resolvedAt not null denied
+[m41] line 306 | KILLED | failed=1 | killers=Settlement update: already confirmed -> rejected denied
+[m42] line 309 | KILLED | failed=4 | killers=Settlement update: amount change denied ; Settlement update: extra key denied
+[m43] line 310 | KILLED | failed=1 | killers=Settlement update: status pending or foo denied
+[m44] line 311 | KILLED | failed=1 | killers=Settlement update: resolvedAt != request.time denied
+[m45] line 312 | KILLED | failed=3 | killers=Settlement update: payer confirming own settlement denied ; Settlement update: third member denied
+[m46] line 315 | KILLED | failed=3 | killers=Settlement delete: receiver delete denied ; Settlement delete: organizer delete denied ; Settlement delete: non-member delete denied
+[m47] line 317 | KILLED | failed=1 | killers=Settlement delete: payer deletes confirmed denied
+[m48] line 323 | KILLED | failed=1 | killers=Signed-out user cannot read or write trips or joinCodes
+[m49] line 327 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m50] line 328 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m51] line 330 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m52] line 338 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m53] line 99 | KILLED | failed=3 | killers=a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied)
+[m54] line 100 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m55] line 123 | KILLED | failed=1 | killers=Rejoin by previously left member denied directly through memberIds update
+[m56] line 312 | KILLED | failed=3 | killers=Settlement update: payer confirming own settlement denied
+[m57] line 315 | KILLED | failed=3 | killers=Settlement delete: receiver delete denied ; Settlement delete: organizer delete denied
+[m58] line 101 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m59] line 102 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[m60] line 103 | KILLED | failed=3 | killers=Plain member cannot remove another member ; memberCount must decrease by exactly 1 ; Batch missing members status doc write denied
+[m61] line 98 | KILLED | failed=1 | killers=Organizer self-removal denied
+
+| id | description | rules line | reconstructed | status | failed tests | killed by |
+| m1 | member/signed-in checks on vote writes | 224 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m2 | value in {1,-1} | 229 | false | KILLED | 2 | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys ; Proof 2: Vote value 2 and 0 denied on create with unchanged counters |
+| m3 | value != previous value | 231 | false | KILLED | 2 | Denied vote transactions: unmatched counters, wrong deltas, invalid vote values, extra keys ; Proof 3: Re-vote with same value denied |
+| m4a | archived check on vote create/update | 224 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m4b | archived check on vote delete | 237 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m4c | archived check on suggestion counter update | 187 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m5 | vote read owner check (uid == auth uid) | 222 | false | KILLED | 2 | Votes read permissions: owner can read own vote, other member cannot read owner vote ; Proof 5: Signed-out, non-member and other-member reads of vote document denied |
+| m5b | vote read member check | 222 | false | KILLED | 1 | Proof 5: Signed-out, non-member and other-member reads of vote document denied |
+| m6 | content-update hasOnly key restriction | 180 | false | KILLED | 16 | Content edit: author and organizer succeed; non-author member denied; forbidden field edits denied ; Proof 6a: Content update changing createdAt denied ; Proof 6b: Content update changing authorId denied ; Proof 6c: Content update changing status denied ; Proof 6d: Content update changing dayIndex denied ; Proof 6e: Content update changing order denied |
+| m7a | delete author-or-organizer check | 218 | false | KILLED | 1 | Suggestion delete: author and organizer succeed, other member denied |
+| m7b | suggestion delete author-or-organizer check | 216 | true | KILLED | 1 | Suggestion delete: author and organizer succeed, other member denied |
+| m8a | suggestion-side before != after and delta lines together | 192 | false | KILLED | 3 | Proof 8a: Plain suggestion counter update with NO vote change denied |
+| m8b | vote-side mirror delta lines together | 233 | false | KILLED | 2 | Proof 8b: Vote write with NO matching counter change denied |
+| m9 | hasAll(resource.data.memberIds) check on trip join | 115 | false | KILLED | 1 | Join DENIED when caller pads memberIds with duplicate existing member to drop another member ([B, B, C] or [A, A, C]) |
+| m10 | users createdAt == request.time | 57 | false | KILLED | 1 | users create DENIED when createdAt is a client Date (not request.time) |
+| m11 | organizer check on scheduling branch | 197 | false | KILLED | 1 | Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip |
+| m12 | archived check on scheduling | 197 | false | KILLED | 1 | Scheduling denied for plain member, non-organizer author, non-member, signed out, archived trip |
+| m13 | dayIndex upper bound | 208 | false | KILLED | 6 | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys |
+| m14 | status/dayIndex/order coherence | 201 | false | KILLED | 6 | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys |
+| m15 | hasOnly key restriction on scheduling | 200 | false | KILLED | 1 | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys |
+| m16 | integer type checks | 206 | false | KILLED | 1 | Denied scheduling for invalid dayIndex, order, status values, coherence, and extra/mixed keys |
+| m17 | day bound without tolerance (+43200000) | 209 | false | KILLED | 1 | Day bound tolerance: diff 47 hours (spring-forward) allows 2, denies 3 |
+| m18 | expense read member check | 248 | false | KILLED | 1 | Read: member succeeds; non-member and signed out denied |
+| m20 | expense createdBy == caller check | 255 | false | KILLED | 1 | Create denied when createdBy is not the caller |
+| m21 | expense create exact key sets (hasAll & hasOnly) | 253 | false | KILLED | 1 | Create denied for extra key or missing key |
+| m22 | expense create keys hasAll check | 253 | true | SURVIVED_ALLOWLISTED | 0 |  |
+| m23 | expense create keys hasOnly check | 254 | true | KILLED | 1 | Create denied for extra key or missing key |
+| m24 | expense create amount is int check | 255 | true | KILLED | 1 | Create denied for invalid amount (0, negative, float, string, over cap) |
+| m25 | expense create amount >= 1 lower bound check | 256 | true | KILLED | 1 | Create denied for invalid amount (0, negative, float, string, over cap) |
+| m26 | expense create amount <= 100000000000 upper bound check | 256 | true | KILLED | 1 | Create denied for invalid amount (0, negative, float, string, over cap) |
+| m27 | expense create description length check | 256 | true | KILLED | 1 | Create denied for invalid description (empty, >100 chars, non-string) |
+| m28 | expense update creator-or-organizer check | 267 | true | KILLED | 1 | Update: creator and organizer succeed; other member and non-member denied |
+| m29 | expense update affectedKeys restriction check | 270 | true | KILLED | 1 | Update denied when changing createdBy or createdAt |
+| m30 | expense delete creator-or-organizer check | 281 | true | KILLED | 1 | Delete: creator and organizer succeed; other member, non-member, signed out, and archived denied |
+| m31 | settlement read member check | 288 | true | KILLED | 1 | Settlement read: non-member denied |
+| m32 | settlement create fromUid == auth.uid check | 295 | true | KILLED | 1 | Settlement create: fromUid != auth uid denied |
+| m33 | settlement create toUid in memberIds check | 296 | true | KILLED | 1 | Settlement create: toUid not a member denied |
+| m34 | settlement create toUid != auth.uid check | 297 | true | KILLED | 1 | Settlement create: toUid == auth uid (self-payment) denied |
+| m35 | settlement create amount is int check | 298 | true | KILLED | 1 | Settlement create: amount float denied |
+| m36 | settlement create amount lower bound check (amount >= 1) | 298 | true | KILLED | 2 | Settlement create: amount 0 denied ; Settlement create: amount negative denied |
+| m37 | settlement create amount upper bound check (amount <= 100000000000) | 300 | true | KILLED | 1 | Settlement create: amount over cap denied |
+| m38 | settlement create status pending check | 301 | true | KILLED | 2 | Settlement create: status confirmed denied ; Settlement create: status rejected denied |
+| m39 | settlement create createdAt request.time check | 302 | true | KILLED | 1 | Settlement create: createdAt client value denied |
+| m40 | settlement create resolvedAt null check | 303 | true | KILLED | 1 | Settlement create: resolvedAt not null denied |
+| m41 | settlement update resource.data.status == pending check | 306 | true | KILLED | 1 | Settlement update: already confirmed -> rejected denied |
+| m42 | settlement update affectedKeys status and resolvedAt only | 309 | true | KILLED | 4 | Settlement update: amount change denied ; Settlement update: extra key denied |
+| m43 | settlement update status in confirmed or rejected | 310 | true | KILLED | 1 | Settlement update: status pending or foo denied |
+| m44 | settlement update resolvedAt request.time check | 311 | true | KILLED | 1 | Settlement update: resolvedAt != request.time denied |
+| m45 | settlement update toUid or non-payer organizer check | 312 | true | KILLED | 3 | Settlement update: payer confirming own settlement denied ; Settlement update: third member denied |
+| m46 | settlement delete payer check (auth.uid == fromUid) | 315 | true | KILLED | 3 | Settlement delete: receiver delete denied ; Settlement delete: organizer delete denied ; Settlement delete: non-member delete denied |
+| m47 | settlement delete pending status check | 317 | true | KILLED | 1 | Settlement delete: payer deletes confirmed denied |
+| m48 | joinCodes get signedIn check | 323 | true | KILLED | 1 | Signed-out user cannot read or write trips or joinCodes |
+| m49 | joinCodes create format check regex | 327 | true | SURVIVED_ALLOWLISTED | 0 |  |
+| m50 | joinCodes create keys hasAll check | 328 | true | SURVIVED_ALLOWLISTED | 0 |  |
+| m51 | joinCodes create memberCount 1 check | 330 | true | SURVIVED_ALLOWLISTED | 0 |  |
+| m52 | joinCodes update affectedKeys hasOnly memberCount | 338 | true | SURVIVED_ALLOWLISTED | 0 |  |
+| m53 | leave rule drop memberIds.size() == memberCount check | 99 | false | KILLED | 3 | a) memberIds [A,B,C]->[A,A,C], memberCount 3->2, B leaves (denied) |
+| m54 | leave rule drop memberIds.toSet().size() == memberCount check | 100 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m55 | join rule drop getAfter status == active check | 123 | false | KILLED | 1 | Rejoin by previously left member denied directly through memberIds update |
+| m56 | settlement update allows payer to confirm own settlement | 312 | false | KILLED | 3 | Settlement update: payer confirming own settlement denied |
+| m57 | settlement delete allows non-payer | 315 | false | KILLED | 3 | Settlement delete: receiver delete denied ; Settlement delete: organizer delete denied |
+| m58 | leave rule drops archived == false check | 101 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m59 | leave rule drops existsAfter members status doc check | 102 | false | SURVIVED_ALLOWLISTED | 0 |  |
+| m60 | leave rule drops getAfter status == left check | 103 | false | KILLED | 3 | Plain member cannot remove another member ; memberCount must decrease by exactly 1 ; Batch missing members status doc write denied |
+| m61 | leave rule drops organizer self-removal protection | 98 | false | KILLED | 1 | Organizer self-removal denied |
+TOTALS killed=53 survived_allowlisted=12 survived_not_allowlisted=0 invalid=0 error=0 unexpected=0 total=65 required=65 reconstructed=32
+RULES SHA256 AFTER  = fc5f7525ebd47ad927dac5a55132810a9589fd74cdc75e2ad87efd4233440443
+HARNESS EXIT 0
