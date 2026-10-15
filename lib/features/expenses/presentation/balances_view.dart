@@ -151,83 +151,85 @@ class BalancesView extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: members.length,
-              separatorBuilder: (ctx, idx) => const Divider(height: 1),
-              itemBuilder: (ctx, idx) {
-                final member = members[idx];
-                final netBalance = balances[member.uid] ?? 0;
-                final formattedAmount = formatSignedMinorUnits(
-                  netBalance,
-                  trip.currency,
-                );
+            child: Column(
+              children: [
+                for (int idx = 0; idx < members.length; idx++) ...[
+                  if (idx > 0) const Divider(height: 1),
+                  Builder(
+                    builder: (ctx) {
+                      final member = members[idx];
+                      final netBalance = balances[member.uid] ?? 0;
+                      final formattedAmount = formatSignedMinorUnits(
+                        netBalance,
+                        trip.currency,
+                      );
 
-                final String statusText;
-                final Color statusColor;
+                      final String statusText;
+                      final Color statusColor;
+                      if (netBalance > 0) {
+                        statusText = 'is owed';
+                        statusColor = theme.colorScheme.primary;
+                      } else if (netBalance < 0) {
+                        statusText = 'owes';
+                        statusColor = theme.colorScheme.error;
+                      } else {
+                        statusText = 'settled';
+                        statusColor = theme.colorScheme.onSurfaceVariant;
+                      }
 
-                if (netBalance > 0) {
-                  statusText = 'is owed';
-                  statusColor = theme.colorScheme.primary;
-                } else if (netBalance < 0) {
-                  statusText = 'owes';
-                  statusColor = theme.colorScheme.error;
-                } else {
-                  statusText = 'settled';
-                  statusColor = theme.colorScheme.onSurfaceVariant;
-                }
+                      final nameDisplay = member.uid == currentUid
+                          ? '${member.displayName} (You)'
+                          : member.displayName;
+                      final labelDisplay = member.isActive
+                          ? nameDisplay
+                          : '$nameDisplay (left)';
 
-                final nameDisplay = member.uid == currentUid
-                    ? '${member.displayName} (You)'
-                    : member.displayName;
-                final labelDisplay = member.isActive
-                    ? nameDisplay
-                    : '$nameDisplay (left)';
-
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: theme.colorScheme.secondaryContainer,
-                    child: Text(
-                      member.displayName.isNotEmpty
-                          ? member.displayName[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSecondaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    labelDisplay,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: member.isActive
-                          ? null
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        formattedAmount,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: statusColor,
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.secondaryContainer,
+                          child: Text(
+                            member.displayName.isNotEmpty
+                                ? member.displayName[0].toUpperCase()
+                                : '?',
+                            style: TextStyle(
+                              color: theme.colorScheme.onSecondaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                      Text(
-                        statusText,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: statusColor,
+                        title: Text(
+                          labelDisplay,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: member.isActive
+                                ? null
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              formattedAmount,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: statusColor,
+                              ),
+                            ),
+                            Text(
+                              statusText,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: statusColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -272,58 +274,86 @@ class BalancesView extends ConsumerWidget {
             )
           else
             Card(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: suggestedPayments.length,
-                separatorBuilder: (ctx, idx) => const Divider(height: 1),
-                itemBuilder: (ctx, idx) {
-                  final p = suggestedPayments[idx];
-                  final fromName = memberMap[p.fromUid] ?? p.fromUid;
-                  final toName = memberMap[p.toUid] ?? p.toUid;
-                  final formattedPayment = formatMinorUnits(
-                    p.amount,
-                    trip.currency,
-                  );
-                  final isMyPayment = p.fromUid == currentUid;
+              child: Column(
+                children: [
+                  for (int idx = 0; idx < suggestedPayments.length; idx++) ...[
+                    if (idx > 0) const Divider(height: 1),
+                    Builder(
+                      builder: (ctx) {
+                        final p = suggestedPayments[idx];
+                        final fromName = memberMap[p.fromUid] ?? p.fromUid;
+                        final toName = memberMap[p.toUid] ?? p.toUid;
+                        final formattedPayment = formatMinorUnits(
+                          p.amount,
+                          trip.currency,
+                        );
+                        final isMyPayment = p.fromUid == currentUid;
 
-                  return ListTile(
-                    leading: Icon(
-                      Icons.swap_horiz,
-                      color: theme.colorScheme.primary,
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.swap_horiz,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: theme.textTheme.bodyMedium,
+                                        children: [
+                                          TextSpan(
+                                            text: fromName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(text: ' pays '),
+                                          TextSpan(
+                                            text: toName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Wrap(
+                                alignment: WrapAlignment.spaceBetween,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  Text(
+                                    formattedPayment,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  if (isMyPayment && !trip.archived)
+                                    FilledButton.tonal(
+                                      onPressed: () =>
+                                          _showMarkAsPaidSheet(context, p, toName),
+                                      child: const Text('Mark as Paid'),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    title: RichText(
-                      text: TextSpan(
-                        style: theme.textTheme.bodyMedium,
-                        children: [
-                          TextSpan(
-                            text: fromName,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const TextSpan(text: ' pays '),
-                          TextSpan(
-                            text: toName,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(formattedPayment),
-                    trailing: isMyPayment && !trip.archived
-                        ? FilledButton.tonal(
-                            onPressed: () =>
-                                _showMarkAsPaidSheet(context, p, toName),
-                            child: const Text('Mark as Paid'),
-                          )
-                        : Text(
-                            formattedPayment,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                  );
-                },
+                  ],
+                ],
               ),
             ),
           const SizedBox(height: 24),
@@ -351,12 +381,12 @@ class BalancesView extends ConsumerWidget {
             )
           else
             Card(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: settlements.length,
-                separatorBuilder: (ctx, idx) => const Divider(height: 1),
-                itemBuilder: (ctx, idx) {
+              child: Column(
+                children: [
+                  for (int idx = 0; idx < settlements.length; idx++) ...[
+                    if (idx > 0) const Divider(height: 1),
+                    Builder(
+                      builder: (ctx) {
                   final s = settlements[idx];
                   final fromName = memberMap[s.fromUid] ?? s.fromUid;
                   final toName = memberMap[s.toUid] ?? s.toUid;
@@ -494,10 +524,13 @@ class BalancesView extends ConsumerWidget {
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                ],
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -595,12 +628,13 @@ class _MarkAsPaidSheetState extends ConsumerState<MarkAsPaidSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
         24,
         24,
         24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
+        bottomInset + 24,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
