@@ -1,0 +1,15 @@
+e39d984 docs(evidence): p6s3d raw outputs
+ecc6aef test(settlements): organizer and third-party action permissions
+6a2be32 docs(evidence): p6s3c raw outputs
+9cde76d style: format codebase
+b330211 test(settlements): permission and flow coverage
+cc80479 test(ui): real bottom sheet overflow
+a9387e5 fix(ui): mark-as-paid sheet scrolls with keyboard
+91a10d0 test(router): leave via go
+c48fbdd fix(trips): go home after leaving via router
+c9d17f9 fix(trips): keep full-trip message on permission-denied join
+68dc501 fix(settlements): format leave-block balance in trip currency
+9f02050 docs(evidence): p6s3b raw outputs
+3babd15 test(settlements): overflow matrix
+77e23b8 fix(trips): join-after-left message
+533c4ab fix(settlements): organizer leave message

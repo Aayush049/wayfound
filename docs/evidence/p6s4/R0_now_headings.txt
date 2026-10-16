@@ -1,0 +1,59 @@
+trip_planner_project_report.md:1:# Wayfound: Project Planning Report
+trip_planner_project_report.md:10:## 1. Overview
+trip_planner_project_report.md:12:### 1.1 Purpose
+trip_planner_project_report.md:15:### 1.2 Problem
+trip_planner_project_report.md:18:### 1.3 Users
+trip_planner_project_report.md:23:### 1.4 Non-goals (version 1)
+trip_planner_project_report.md:26:### 1.5 Success criteria
+trip_planner_project_report.md:31:## 2. Decisions Log
+trip_planner_project_report.md:58:## 3. Features and Scope
+trip_planner_project_report.md:60:### 3.1 Must-have (version 1)
+trip_planner_project_report.md:69:### 3.2 Nice-to-have (version 2)
+trip_planner_project_report.md:74:## 4. Roles and Permissions
+trip_planner_project_report.md:94:## 5. User Flows and Screens
+trip_planner_project_report.md:96:### 5.1 Flows
+trip_planner_project_report.md:103:### 5.2 Screen inventory
+trip_planner_project_report.md:122:### 5.3 Edge cases to design for
+trip_planner_project_report.md:127:## 6. Data Model (Cloud Firestore)
+trip_planner_project_report.md:129:### 6.1 Structure
+trip_planner_project_report.md:141:### 6.2 Document fields
+trip_planner_project_report.md:154:### 6.3 Design choices and reasons
+trip_planner_project_report.md:167:## 7. Security Rules Plan
+trip_planner_project_report.md:169:### 7.1 Helper checks
+trip_planner_project_report.md:172:### 7.2 Users collection rules
+trip_planner_project_report.md:178:### 7.3 Join rule
+trip_planner_project_report.md:188:### 7.4 Other rules
+trip_planner_project_report.md:197:### 7.5 Known limitations & Counter Integrity
+trip_planner_project_report.md:204:## 8. Key Logic
+trip_planner_project_report.md:206:### 8.1 Voting (single transaction: read vote, write vote, adjust counters)
+trip_planner_project_report.md:219:### 8.2 Equal split
+trip_planner_project_report.md:222:### 8.3 Balances
+trip_planner_project_report.md:225:### 8.4 Settle-up (minimal payments)
+trip_planner_project_report.md:228:### 8.5 Worked example
+trip_planner_project_report.md:235:### 8.6 Knowing someone has paid
+trip_planner_project_report.md:242:### 8.7 Leaving a trip
+trip_planner_project_report.md:245:### 8.8 Calendar Day Computation
+trip_planner_project_report.md:250:## 9. Flutter Architecture
+trip_planner_project_report.md:252:### 9.1 Layers
+trip_planner_project_report.md:256:### 9.2 Folder layout
+trip_planner_project_report.md:274:### 9.3 Models
+trip_planner_project_report.md:277:### 9.4 Navigation
+trip_planner_project_report.md:280:### 9.5 Packages
+trip_planner_project_report.md:295:## 10. Testing Plan
+trip_planner_project_report.md:337:## 11. Build Plan
+trip_planner_project_report.md:353:## 12. Risks and Mitigations
+trip_planner_project_report.md:366:## 13. Version 2 Ideas
+trip_planner_project_report.md:371:## 14. Design System and Theme Switching
+trip_planner_project_report.md:373:### 14.1 Palette: Ocean Blue + Teal
+trip_planner_project_report.md:376:### 14.2 Mapping to Flutter (Material 3)
+trip_planner_project_report.md:393:### 14.3 Theme-change feature
+trip_planner_project_report.md:399:## 15. Implementation Status & Phase Reports
+trip_planner_project_report.md:401:### 15.10 Phase 5 UI Polish
+trip_planner_project_report.md:406:### 15.5 Milestone 2 Status (Phase 2: Trips and Joining Completed)
+trip_planner_project_report.md:418:### 15.7 Milestone 3 Status (Phase 3: Suggestions and Voting Completed)
+trip_planner_project_report.md:440:### 15.8 Milestone 4 Status (Phase 4: Itinerary Completed)
+trip_planner_project_report.md:457:### 15.9 Milestone 5 Status (Phase 5: Expenses and Balances Completed)
+trip_planner_project_report.md:475:### 15.6 How to Run & Test Emulators
+trip_planner_project_report.md:477:#### Firebase Rules Test Command
+trip_planner_project_report.md:482:#### Running Flutter App with Emulators
+trip_planner_project_report.md:500:## 16. Development Workflow

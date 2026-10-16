@@ -1,0 +1,20 @@
+e39d984 HEAD@{0}: commit: docs(evidence): p6s3d raw outputs
+ecc6aef HEAD@{1}: commit (amend): test(settlements): organizer and third-party action permissions
+5ec27b8 HEAD@{2}: commit: test(settlements): organizer and third-party action permissions
+6a2be32 HEAD@{3}: commit: docs(evidence): p6s3c raw outputs
+9cde76d HEAD@{4}: commit: style: format codebase
+b330211 HEAD@{5}: commit: test(settlements): permission and flow coverage
+cc80479 HEAD@{6}: commit: test(ui): real bottom sheet overflow
+a9387e5 HEAD@{7}: commit: fix(ui): mark-as-paid sheet scrolls with keyboard
+91a10d0 HEAD@{8}: commit: test(router): leave via go
+c48fbdd HEAD@{9}: commit: fix(trips): go home after leaving via router
+c9d17f9 HEAD@{10}: commit: fix(trips): keep full-trip message on permission-denied join
+68dc501 HEAD@{11}: commit: fix(settlements): format leave-block balance in trip currency
+9f02050 HEAD@{12}: commit: docs(evidence): p6s3b raw outputs
+3babd15 HEAD@{13}: commit: test(settlements): overflow matrix
+77e23b8 HEAD@{14}: commit: fix(trips): join-after-left message
+533c4ab HEAD@{15}: commit: fix(settlements): organizer leave message
+43ad95d HEAD@{16}: commit: fix(trips): leave dialog no longer promises rejoin
+0e50462 HEAD@{17}: commit: docs(evidence): p6s3 raw outputs
+9f0542b HEAD@{18}: commit: test(settlements): overflow and responsive layout
+ba3092c HEAD@{19}: commit: test(router): leave navigation

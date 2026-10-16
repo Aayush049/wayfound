@@ -1,0 +1,7 @@
+Line 305 in 2bce7d7: ### 10.1 Security Rules Mutation Testing Results Table
+Line 404 in 2bce7d7: ### 14.4 Usage guidance
+Line 410 in 2bce7d7: ### 14.5 Derived colours (palette gaps filled)
+Line 424 in 2bce7d7: ## 15. Build Progress (as of October 10, 2026)
+Line 426 in 2bce7d7: ### 15.1 Environment and project identity
+Line 432 in 2bce7d7: ### 15.2 Firebase
+Line 439 in 2bce7d7: ### 15.3 Milestone 1 Status
