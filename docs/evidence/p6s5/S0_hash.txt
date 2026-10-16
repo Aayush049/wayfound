@@ -1,0 +1,8 @@
+
+
+Algorithm : SHA256
+Hash      : FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443
+Path      : D:\VsCode\wayfound\firestore.rules
+
+
+
