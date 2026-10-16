@@ -193,13 +193,13 @@ A non-member may update a trip only if:
 - **Expenses:** creator or organizer may edit/delete; `createdBy` must equal caller on create. Expenses involving a left member cannot be edited.
 - **Settlements:** create only as payer (`fromUid == request.auth.uid`, status `pending`); only the receiver (or organizer when not the payer) may set `confirmed` or `rejected`; payer may delete own pending; amount, `fromUid`, and `toUid` are immutable after creation.
 - **Leaving and Member Removal:** atomic batch removing caller from `memberIds`, decrementing `memberCount` by 1, and updating `members/{uid}.status = left`. Organizer cannot leave and cannot be removed; organizer can remove any active member. Left members cannot rejoin (rejoining a left member is denied by rules: member document must either not exist or status must not be 'left').
-- **Archiving:** organizer sets `archived = true`; archived trips are read-only for everyone.
+- **Trip Archiving Rule:** organizer transitions trip from active to archived (`archived == false -> archived == true`) in an atomic update that affects strictly only the `archived` key (`request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])`). Unarchiving (`true -> false`), archiving an already archived trip, non-boolean archived values, or modifying any other trip fields during archive is denied. All subcollection writes remain strictly blocked by `isTripNotArchived` once archived.
 
 ### 7.5 Known limitations & Counter Integrity
 - Stored vote counters (`upCount`, `downCount`) are protected by `getAfter` rules requiring exact correlation with atomic vote document changes. Plain counter updates without matching vote transitions are strictly denied.
 - Short join codes could in theory be brute-forced; plan Firebase App Check as a later hardening step.
 - Subcollections are not removed when a trip document is deleted, which is why trips are archived rather than deleted.
-- **No Archive UI in v1:** Trips support the `archived` boolean in security rules, but no client UI exists to trigger archiving in v1.
+- **Archive rule exists; UI pending:** Trips support one-way organizer archiving in Firestore security rules (`archived: false -> true` affecting only the `archived` key); client UI implementation remains pending (scheduled for Phase 7 UI).
 - **No Rejoin in v1:** Once a member leaves or is removed, they cannot rejoin the trip; rules explicitly deny join if the member doc status is 'left'.
 - **No Organizer Transfer in v1:** The trip organizer cannot leave the trip and cannot transfer the organizer role to another member in v1.
 - **Client-Side Leave Eligibility:** The check requiring zero balance and zero pending settlements before leaving is enforced client-side in `checkLeaveEligibility`; security rules enforce membership shape and status transitions, not monetary balances.
@@ -323,9 +323,9 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 ## 10. Testing Plan
 
 1. **Unit & Widget tests** (Flutter): 323 passing tests (verified in `docs/evidence/p6s3d/G_counts.txt`) with 0 analyzer issues and 0 format changes (`docs/evidence/p6s3d/G_analyze.txt`, `docs/evidence/p6s3d/G_format.txt`). Includes complete coverage across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models, itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, ItineraryTab UI states, 20 dedicated UTC trip days calendar arithmetic unit tests (`test/trip_days_test.dart`), and full Phase 6 settlement, leave eligibility, and responsive layout test suites (`test/settlements_widget_test.dart`, `test/settlements_repository_test.dart`, `test/leave_router_test.dart`, `test/settlements_overflow_test.dart`). Proof of test sensitivity is backed by 23 sabotage mutation proofs (SAB1 through SAB23) documented under `docs/evidence/p6s3b`, `docs/evidence/p6s3c`, and `docs/evidence/p6s3d`.
-2. **Rules tests** (Firebase Emulator): 172 passing unit tests in `rules_test/firestore_rules.test.js` against unmodified `firestore.rules` (SHA-256 hash `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`). Test execution evidence recorded in `docs/evidence/phase6/03_rules_suite.txt` and `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`.
+2. **Rules tests** (Firebase Emulator): 185 passing unit tests in `rules_test/firestore_rules.test.js` against `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`). Includes 13 dedicated organizer trip archive unit tests. Test execution evidence recorded in `docs/evidence/p7r1/R_suite.txt` and `docs/evidence/p7r1/M_run.txt`.
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
-   - **Mutation Testing Suite:** 75 mutants defined in `rules_test/mutation/mutants.json`. 75 mutants: 65 KILLED (55 individual mutants plus 10 combined mutants `c1`-`c10` that prove the allowlisted ones) and 10 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, documented in `rules_test/mutation/equivalent.json`). Complete mutation harness execution is recorded in `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`.
+   - **Mutation Testing Suite:** 81 mutants defined in `rules_test/mutation/mutants.json`. 81 mutants: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`, documented in `rules_test/mutation/equivalent.json` with proof file `docs/evidence/p7r1/P_m66.txt`). Complete mutation harness execution is recorded in `docs/evidence/p7r1/M_run.txt`.
 
 ### 10.1 Security Rules Mutation Testing Results Table
 
@@ -406,8 +406,14 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | c8 | combined: drops archived==false on trip leave and isTripNotArchived on member leave (proves m58) | KILLED | Archived trip leave denied | Yes |
 | c9 | combined: drops existsAfter and getAfter status==left on trip leave (proves m59) | KILLED | Batch missing members status doc write denied | Yes |
 | c10 | combined: drops hasAll and hasOnly on joinCodes create (proves m50) | KILLED | joinCodes create fails when extra key is present in joinCodes document | Yes |
+| m62 | trip archive drops organizer check | KILLED | Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED | Yes |
+| m63 | trip archive drops resource archived false check | KILLED | Trip archive: organizer sends archived true on an already archived trip: DENIED | Yes |
+| m64 | trip archive drops affectedKeys hasOnly archived check | KILLED | Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED | Yes |
+| m65 | trip archive drops request resource archived true check | KILLED | Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED | Yes |
+| m66 | trip archive drops isSignedIn check | SURVIVED_ALLOWLISTED | Allowlisted equivalent (proved by combined mutant c11; documented in docs/evidence/p7r1/P_m66.txt) | Allowlisted (redundant by design) |
+| c11 | combined: drops isSignedIn and organizerId check on trip archive (proves m66) | KILLED | Trip archive: signed-out user cannot archive trip: DENIED | Yes |
 
-*Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules. Evaluating combined mutants (e.g. `c1` through `c10`) proves that security protection holds across all coupled boundaries.
+*Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c`, `m66` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules or redundant authorization checks (such as null evaluation errors on `request.auth.uid`). Evaluating combined mutants (e.g. `c1` through `c11`) proves that security protection holds across all coupled boundaries.
 
 3. **Manual two-account tests** at each milestone (organizer plus member), ideally on two devices/emulators.
 4. **Theme checks:** view every screen in light and dark mode, and confirm the chosen theme survives an app restart.
@@ -509,7 +515,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` (SHA-256 hash `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`) includes complete rules for `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, `expenses/{expenseId}`, `settlements/{settlementId}`, and `joinCodes/{code}`. Verified via 172 passing Jest unit tests against the Firestore emulator and 75-mutant mutation testing suite: 65 KILLED (55 individual mutants plus 10 combined mutants `c1`-`c10` that prove the allowlisted ones) and 10 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`). Deployment to production project `wayfound-51b4d` is PENDING manual execution: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`.
+- **Firestore Security Rules status:** Local `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`) includes complete rules for `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, `expenses/{expenseId}`, `settlements/{settlementId}`, `joinCodes/{code}`, and organizer trip archiving. Verified via 185 passing Jest unit tests against the Firestore emulator and 81-mutant mutation testing suite: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`). Deployment to production project `wayfound-51b4d` is PENDING (user runs `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`).
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -615,8 +621,8 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
   - **Atomic Leave/Remove Batch:** Leaving and member removal execute as a single atomic Firestore batch updating `memberIds` (removing the UID), decrementing `memberCount` by 1, and setting `trips/{tripId}/members/{uid}.status = 'left'`.
   - **No Rejoin in v1:** Rejoining after leaving is denied by Firestore security rules. Attempting to join with a join code displays a clean refusal message.
   - **Historical Integrity:** Members who left remain visible in balances marked "(left)" to preserve auditability. Expenses involving a left member cannot be edited.
-- **Security Rules Verification:**
-  - Rules file SHA-256 hash: `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`.
+- **Security Rules Verification (Phase 6 Baseline):**
+  - Previous rules file SHA-256 hash: `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`.
   - Firestore emulator suite: 172 tests passed (`docs/evidence/phase6/03_rules_suite.txt`, `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`).
   - Mutation harness: 75 mutants evaluated: 65 KILLED (55 individual mutants plus 10 combined mutants `c1`-`c10` that prove the allowlisted ones) and 10 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`). Full execution record in `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`.
 - **Flutter Test Suite & Quality Gates:**
@@ -637,6 +643,13 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
 - **Manual Actions Required from User (PENDING):**
   - Deploy security rules: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules` (marked PENDING).
   - Two-account phone test: Run phone verification covering payment creation, confirm/reject, leave, remove, rejoin refusal, and keyboard sheet layout (marked PENDING).
+
+### 15.12 Milestone 7 Status (Session P7-R1: Organizer Trip Archive Security Rule Added)
+- **Organizer Trip Archive Rule:** Added one-way transition rule for trip organizer (`archived == false -> archived == true`) affecting strictly only the `archived` key (`request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])`).
+- **Security Rules Status:** Local `firestore.rules` current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` (previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`).
+- **Rules Test Suite:** 185 passing Jest unit tests in `rules_test/firestore_rules.test.js` (13 new archive rule tests added) verified against the Firestore emulator (`docs/evidence/p7r1/R_suite.txt`).
+- **Mutation Testing Suite:** 81 mutants evaluated: 70 KILLED (59 individual mutants plus 11 combined mutants `c1`–`c11`), 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`), 0 unallowlisted survivors (`docs/evidence/p7r1/M_run.txt`, `docs/evidence/p7r1/M_summary.txt`).
+- **Deployment Status:** Deployment of rules to production project `wayfound-51b4d` is PENDING (user runs `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`).
 
 ---
 
