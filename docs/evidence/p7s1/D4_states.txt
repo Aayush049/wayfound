@@ -1,0 +1,31 @@
+=== Loading, Error, and Empty States Audit ===
+Format: SCREEN | LOADING (file:line) | ERROR (file:line) | EMPTY (file:line)
+--------------------------------------------------------------------------------
+Home:
+  Loading: lib/features/trips/presentation/home_screen.dart:116 (AppLoading)
+  Error:   lib/features/trips/presentation/home_screen.dart:117-120 (AppError with onRetry)
+  Empty:   lib/features/trips/presentation/home_screen.dart:122-129 (AppEmpty)
+TripDashboard:
+  Loading: lib/features/trips/presentation/trip_dashboard_screen.dart:84-86 (AppLoading)
+  Error:   lib/features/trips/presentation/trip_dashboard_screen.dart:88-93 (AppError with onRetry)
+  Empty:   lib/features/trips/presentation/trip_dashboard_screen.dart:104-114 (AppEmpty when trip == null)
+MembersTab:
+  Loading: lib/features/trips/presentation/members_tab.dart:252 (AppLoading)
+  Error:   lib/features/trips/presentation/members_tab.dart:253-256 (AppError with onRetry)
+  Empty:   lib/features/trips/presentation/members_tab.dart:258-265 (AppEmpty)
+SuggestionsTab:
+  Loading: lib/features/suggestions/presentation/suggestions_tab.dart:32 (AppLoading)
+  Error:   lib/features/suggestions/presentation/suggestions_tab.dart:33-36 (AppError with onRetry)
+  Empty:   lib/features/suggestions/presentation/suggestions_tab.dart:38-46 (AppEmpty)
+ItineraryTab:
+  Loading: lib/features/itinerary/presentation/itinerary_tab.dart:202 (AppLoading)
+  Error:   lib/features/itinerary/presentation/itinerary_tab.dart:203-206 (AppError with onRetry)
+  Empty:   lib/features/itinerary/presentation/itinerary_tab.dart:220-227 (AppEmpty for unscheduled items in pending sheet; itinerary days show empty message 'No activities scheduled for this day')
+ExpensesTab:
+  Loading: lib/features/expenses/presentation/expenses_tab.dart:77-78 (AppLoading)
+  Error:   lib/features/expenses/presentation/expenses_tab.dart:79-82 (AppError with onRetry)
+  Empty:   lib/features/expenses/presentation/expenses_tab.dart:88-99 (AppEmpty)
+BalancesView:
+  Loading: MISSING (relies on membersAsync.asData?.value ?? [] and settlementsAsync.asData?.value ?? [] without loading state)
+  Error:   MISSING (silent fallback to empty list on error; no AppError rendered)
+  Empty:   lib/features/expenses/presentation/balances_view.dart:245-256 (inline Card 'All debts are settled!') and 372-383 (inline Card 'No payment records yet'); but no top-level AppEmpty state when no expenses exist

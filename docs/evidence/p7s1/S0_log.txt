@@ -1,0 +1,8 @@
+9ea3a2a docs(evidence): p6s5 raw outputs
+38a671b docs(report): fix wording, money example, build plan and folder layout
+1bb4614 docs(evidence): p6s4 post-push outputs
+bbd7374 docs(evidence): p6s4 raw outputs
+bb9dae6 docs(report): restore truncated sections and record phase 6
+e39d984 docs(evidence): p6s3d raw outputs
+ecc6aef test(settlements): organizer and third-party action permissions
+6a2be32 docs(evidence): p6s3c raw outputs

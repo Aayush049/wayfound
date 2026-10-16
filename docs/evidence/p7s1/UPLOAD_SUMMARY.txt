@@ -1,0 +1,189 @@
+================================================================================
+SESSION P7-S1 DISCOVERY SUMMARY: ARCHIVE TRIP RULES BLOCKER DETECTED
+================================================================================
+
+=== S0_HEAD ===
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+
+=== S0_HASH ===
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443       D:\VsCode\wayfound\firestore.rules
+
+=== D1_ARCHIVE_RULES (QUOTED RULES EVIDENCE) ===
+=== 1. Helper function isTripNotArchived (lines 21-23) ===
+  21:     function isTripNotArchived(tripId) {
+  22:       return get(/databases/$(database)/documents/trips/$(tripId)).data.archived == false;
+  23:     }
+
+=== 2. Trip Create Rule (lines 72-87) - sets archived == false on creation ===
+  72:       // Create: exact keys, creator is organizer, memberIds == [auth.uid], memberCount == 1, archived == false, etc.
+  73:       allow create: if isSignedIn()
+  74:         && request.resource.data.keys().hasAll(['name', 'destination', 'startDate', 'endDate', 'currency', 'organizerId', 'joinCode', 'memberIds', 'memberCount', 'archived', 'createdAt'])
+  75:         && request.resource.data.keys().hasOnly(['name', 'destination', 'startDate', 'endDate', 'currency', 'organizerId', 'joinCode', 'memberIds', 'memberCount', 'archived', 'createdAt'])
+  76:         && request.resource.data.organizerId == request.auth.uid
+  77:         && request.resource.data.memberIds == [request.auth.uid]
+  78:         && request.resource.data.memberCount == 1
+  79:         && request.resource.data.archived == false
+  80:         && request.resource.data.createdAt == request.time
+  81:         && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 60
+  82:         && request.resource.data.destination is string && request.resource.data.destination.size() >= 1 && request.resource.data.destination.size() <= 80
+  83:         && request.resource.data.startDate is timestamp && request.resource.data.endDate is timestamp && request.resource.data.endDate >= request.resource.data.startDate
+  84:         && request.resource.data.currency in ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY', 'CHF']
+  85:         && request.resource.data.joinCode is string && request.resource.data.joinCode.matches('^[A-HJKMNP-Z2-9]{6}$')
+  86:         && getAfter(/databases/$(database)/documents/joinCodes/$(request.resource.data.joinCode)).data.tripId == tripId
+  87:         && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid));
+
+=== 3. Trip Leave/Remove Update Rule (lines 88-106) - only affectedKeys memberIds, memberCount ===
+  88:       // Leave / Remove member update rule
+  89:       allow update: if isSignedIn()
+  90:         && resource.data.memberIds is list
+  91:         && resource.data.memberCount is number
+  92:         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount'])
+  93:         && request.resource.data.memberIds is list
+  94:         && request.resource.data.memberCount is number
+  95:         && request.resource.data.memberCount == resource.data.memberCount - 1
+  96:         && resource.data.memberIds.size() == resource.data.memberCount
+  97:         && resource.data.memberIds.removeAll(request.resource.data.memberIds).size() == 1
+  98:         && (resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid || get(/databases/$(database)/documents/trips/$(tripId)).data.organizerId == request.auth.uid)
+  99:         && !(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == resource.data.organizerId && resource.data.memberIds.removeAll(request.resource.data.memberIds)[0] == request.auth.uid)
+ 100:         && request.resource.data.memberIds.size() == request.resource.data.memberCount
+ 101:         && request.resource.data.memberIds.toSet().size() == request.resource.data.memberCount
+ 102:         && resource.data.archived == false
+ 103:         && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0]))
+ 104:         && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.status == 'left'
+ 105:         && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data.diff(get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.memberIds.removeAll(request.resource.data.memberIds)[0])).data).affectedKeys().hasOnly(['status']);
+ 106: 
+
+=== 4. Trip Join Update Rule (lines 107-127) - only affectedKeys memberIds, memberCount ===
+ 107:       // Join update (the high-risk rule)
+ 108:       // Important: guard against missing resource fields during create writes.
+ 109:       // Without these guards, the emulator can throw an evaluation error when it
+ 110:       // attempts to evaluate the update rule against a non-existent document.
+ 111:       allow update: if isSignedIn()
+ 112:         && resource.data.memberIds is list
+ 113:         && resource.data.memberCount is number
+ 114:         && !(request.auth.uid in resource.data.memberIds)
+ 115:         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount'])
+ 116:         && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+ 117:         && request.resource.data.memberIds.removeAll(resource.data.memberIds) == [request.auth.uid]
+ 118:         && resource.data.memberIds.size() == resource.data.memberCount
+ 119:         && request.resource.data.memberIds.size() == request.resource.data.memberCount
+ 120:         && resource.data.memberCount < 15
+ 121:         && request.resource.data.memberCount == resource.data.memberCount + 1
+ 122:         && resource.data.archived == false
+ 123:         && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid))
+ 124:         && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid)).data.status == 'active';
+ 125: 
+ 126:       allow delete: if false;
+ 127: 
+
+=== 5. Subcollection write rules guarded by isTripNotArchived(tripId) ===
+--- members update (leave) (lines 146-150) ---
+ 146:         allow update: if isSignedIn()
+ 147:           && isTripMember(tripId)
+ 148:           && isTripNotArchived(tripId)
+ 149:           && !(uid in getAfter(/databases/$(database)/documents/trips/$(tripId)).data.memberIds)
+ 150:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+
+--- members delete (remove member) (lines 160-164) ---
+ 160:         allow create: if isSignedIn()
+ 161:           && isTripMember(tripId)
+ 162:           && isTripNotArchived(tripId)
+ 163:           && request.resource.data.keys().hasAll(['title', 'note', 'estimatedCost', 'category', 'authorId', 'upCount', 'downCount', 'status', 'dayIndex', 'order', 'createdAt'])
+ 164:           && request.resource.data.keys().hasOnly(['title', 'note', 'estimatedCost', 'category', 'authorId', 'upCount', 'downCount', 'status', 'dayIndex', 'order', 'createdAt'])
+
+--- suggestions update (edit suggestion) (lines 177-181) ---
+ 177:         allow update: if isSignedIn()
+ 178:           && isTripMember(tripId)
+ 179:           && isTripNotArchived(tripId)
+ 180:           && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId))
+ 181:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'note', 'estimatedCost', 'category'])
+
+--- suggestions update (vote counter) (lines 187-191) ---
+ 187:         allow update: if isSignedIn()
+ 188:           && isTripMember(tripId)
+ 189:           && isTripNotArchived(tripId)
+ 190:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upCount', 'downCount'])
+ 191:           && request.resource.data.upCount is int && request.resource.data.upCount >= 0
+
+--- suggestions update (itinerary schedule/unschedule/order) (lines 197-202) ---
+ 197:         allow update: if isSignedIn()
+ 198:           && isTripMember(tripId)
+ 199:           && isTripOrganizer(tripId)
+ 200:           && isTripNotArchived(tripId)
+ 201:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'dayIndex', 'order'])
+ 202:           && (
+
+--- suggestions delete (lines 216-220) ---
+ 216:         allow delete: if isSignedIn()
+ 217:           && isTripMember(tripId)
+ 218:           && isTripNotArchived(tripId)
+ 219:           && (resource.data.authorId == request.auth.uid || isTripOrganizer(tripId));
+ 220: 
+
+--- votes create (lines 225-229) ---
+ 225:             && uid == request.auth.uid
+ 226:             && isTripMember(tripId)
+ 227:             && isTripNotArchived(tripId)
+ 228:             && request.resource.data.keys().hasAll(['value', 'updatedAt'])
+ 229:             && request.resource.data.keys().hasOnly(['value', 'updatedAt'])
+
+--- votes update (lines 238-242) ---
+ 238:             && uid == request.auth.uid
+ 239:             && isTripMember(tripId)
+ 240:             && isTripNotArchived(tripId)
+ 241:             && existsAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid))
+ 242:             && getAfter(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount == get(/databases/$(database)/documents/trips/$(tripId)/suggestions/$(sid)).data.upCount + getUpDelta(resource.data.value, 0)
+
+--- votes delete (lines 251-255) ---
+ 251:         allow create: if isSignedIn()
+ 252:           && isTripMember(tripId)
+ 253:           && isTripNotArchived(tripId)
+ 254:           && request.resource.data.keys().hasAll(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])
+ 255:           && request.resource.data.keys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'createdBy', 'date', 'createdAt'])
+
+--- expenses update (lines 267-271) ---
+ 267:         allow update: if isSignedIn()
+ 268:           && isTripMember(tripId)
+ 269:           && isTripNotArchived(tripId)
+ 270:           && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId))
+ 271:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount', 'description', 'paidBy', 'participantIds', 'date'])
+
+--- expenses create (lines 281-285) ---
+ 281:         allow delete: if isSignedIn()
+ 282:           && isTripMember(tripId)
+ 283:           && isTripNotArchived(tripId)
+ 284:           && (resource.data.createdBy == request.auth.uid || isTripOrganizer(tripId));
+ 285:       }
+
+--- expenses delete (lines 291-295) ---
+ 291:         allow create: if isSignedIn()
+ 292:           && isTripMember(tripId)
+ 293:           && isTripNotArchived(tripId)
+ 294:           && request.resource.data.keys().hasAll(['fromUid', 'toUid', 'amount', 'status', 'createdAt', 'resolvedAt'])
+ 295:           && request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'amount', 'status', 'createdAt', 'resolvedAt'])
+
+--- settlements update (confirm/reject) (lines 306-310) ---
+ 306:         allow update: if isSignedIn()
+ 307:           && isTripMember(tripId)
+ 308:           && isTripNotArchived(tripId)
+ 309:           && resource.data.status == 'pending'
+ 310:           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
+
+--- settlements create (mark paid) (lines 314-318) ---
+ 314: 
+ 315:         allow delete: if isSignedIn()
+ 316:           && isTripNotArchived(tripId)
+ 317:           && request.auth.uid == resource.data.fromUid
+ 318:           && resource.data.status == 'pending';
+
+=== BLOCKER STATEMENT ===
+The current firestore.rules (SHA256: FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443) does NOT contain any rule allowing an organizer (or any user) to update a trip's 'archived' field.
+The only two allow update rules for match /trips/{tripId} are:
+1. Leave / Remove member (lines 89-106): requires affectedKeys().hasOnly(['memberIds', 'memberCount']) and resource.data.archived == false
+2. Join trip (lines 111-125): requires affectedKeys().hasOnly(['memberIds', 'memberCount']) and resource.data.archived == false
+Sending {'archived': true} from the app will fail with permission-denied.
+Per Step 1 instructions: Execution stopped after Step 1 discovery, commit nothing, and report.
