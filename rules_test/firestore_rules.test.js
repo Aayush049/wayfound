@@ -4370,3 +4370,209 @@ describe('Phase 6: Settlements & Leaving a Trip Security Rules', () => {
       await assertFails(batch.commit());
     });
   });
+
+  describe('Trip Archive Rule', () => {
+    const organizerUid = 'org_archive_test';
+    const memberUid = 'mem_archive_test';
+    const nonMemberUid = 'non_mem_archive_test';
+    const tripId = 'trip_archive_test';
+
+    beforeEach(async () => {
+      await seedUser(organizerUid, 'Archive Organizer');
+      await seedUser(memberUid, 'Archive Member');
+      await seedUser(nonMemberUid, 'Archive NonMember');
+
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore();
+        await db.collection('trips').doc(tripId).set({
+          name: 'Archive Test Trip',
+          destination: 'Kyoto',
+          startDate: new Date('2026-12-01T00:00:00Z'),
+          endDate: new Date('2026-12-05T00:00:00Z'),
+          currency: 'JPY',
+          organizerId: organizerUid,
+          joinCode: 'ARCHIV01',
+          memberIds: [organizerUid, memberUid],
+          memberCount: 2,
+          archived: false,
+          createdAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(organizerUid).set({
+          displayName: 'Archive Organizer',
+          role: 'organizer',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+        await db.collection('trips').doc(tripId).collection('members').doc(memberUid).set({
+          displayName: 'Archive Member',
+          role: 'member',
+          status: 'active',
+          joinedAt: new Date(),
+        });
+      });
+    });
+
+    test('Trip archive: organizer archives an active trip (archived false->true, only that key): ALLOWED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertSucceeds(tripRef.update({ archived: true }));
+      const tripSnap = await tripRef.get();
+      expect(tripSnap.data().archived).toBe(true);
+    });
+
+    test('Trip archive: plain member cannot archive trip: DENIED', async () => {
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const tripRef = memberDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true }));
+      // Positive control: organizer succeeds
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      await assertSucceeds(orgDb.collection('trips').doc(tripId).update({ archived: true }));
+    });
+
+    test('Trip archive: signed-in non-member cannot archive trip: DENIED', async () => {
+      const nonDb = testEnv.authenticatedContext(nonMemberUid).firestore();
+      const tripRef = nonDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true }));
+    });
+
+    test('Trip archive: signed-out user cannot archive trip: DENIED', async () => {
+      const unauthDb = testEnv.unauthenticatedContext().firestore();
+      const tripRef = unauthDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true }));
+    });
+
+    test('Trip archive: organizer sends archived true->false on an archived trip (unarchive): DENIED', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: false }));
+    });
+
+    test('Trip archive: organizer sends archived true on an already archived trip: DENIED', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true }));
+    });
+
+    test('Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true, name: 'Tampered Trip Name' }));
+      // Positive control: only archived key succeeds
+      await assertSucceeds(tripRef.update({ archived: true }));
+    });
+
+    test('Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: false }));
+    });
+
+    test('Trip archive: organizer sends archived as a string "true": DENIED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: 'true' }));
+    });
+
+    test('Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      await assertFails(tripRef.update({ archived: true, memberCount: 1 }));
+      await assertFails(tripRef.update({ archived: true, memberIds: [organizerUid] }));
+    });
+
+    test('Trip archive: after archiving, member subcollection writes are denied (suggestion create, expense create): DENIED', async () => {
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+
+      // Positive control on active trip: member can create suggestion and expense
+      const activeSuggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc('sugg_active_control');
+      await assertSucceeds(activeSuggRef.set({
+        title: 'Active Suggestion',
+        note: 'Note',
+        estimatedCost: 100,
+        category: 'food',
+        authorId: memberUid,
+        upCount: 0,
+        downCount: 0,
+        status: 'pending',
+        dayIndex: null,
+        order: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      const activeExpRef = memberDb.collection('trips').doc(tripId).collection('expenses').doc('exp_active_control');
+      await assertSucceeds(activeExpRef.set({
+        amount: 1000,
+        description: 'Active Expense',
+        paidBy: memberUid,
+        participantIds: [memberUid],
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-12-02T12:00:00Z')),
+        createdBy: memberUid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      // Organizer archives trip
+      await assertSucceeds(orgDb.collection('trips').doc(tripId).update({ archived: true }));
+
+      // After archiving: member writes denied
+      const postSuggRef = memberDb.collection('trips').doc(tripId).collection('suggestions').doc('sugg_post_archive');
+      await assertFails(postSuggRef.set({
+        title: 'Post Archive Suggestion',
+        note: 'Note',
+        estimatedCost: 100,
+        category: 'food',
+        authorId: memberUid,
+        upCount: 0,
+        downCount: 0,
+        status: 'pending',
+        dayIndex: null,
+        order: null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+
+      const postExpRef = memberDb.collection('trips').doc(tripId).collection('expenses').doc('exp_post_archive');
+      await assertFails(postExpRef.set({
+        amount: 1000,
+        description: 'Post Archive Expense',
+        paidBy: memberUid,
+        participantIds: [memberUid],
+        date: firebase.firestore.Timestamp.fromDate(new Date('2026-12-02T12:00:00Z')),
+        createdBy: memberUid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }));
+    });
+
+    test('Trip archive: after archiving, members can still read the trip and a member doc: ALLOWED', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+
+      const memberDb = testEnv.authenticatedContext(memberUid).firestore();
+      const tripSnap = await assertSucceeds(memberDb.collection('trips').doc(tripId).get());
+      expect(tripSnap.exists).toBe(true);
+      expect(tripSnap.data().archived).toBe(true);
+
+      const memSnap = await assertSucceeds(memberDb.collection('trips').doc(tripId).collection('members').doc(memberUid).get());
+      expect(memSnap.exists).toBe(true);
+      expect(memSnap.data().displayName).toBe('Archive Member');
+    });
+
+    test('Trip archive: organizer cannot delete the trip: DENIED', async () => {
+      const orgDb = testEnv.authenticatedContext(organizerUid).firestore();
+      const tripRef = orgDb.collection('trips').doc(tripId);
+      // Active trip: delete denied
+      await assertFails(tripRef.delete());
+
+      // Archived trip: delete denied
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('trips').doc(tripId).update({ archived: true });
+      });
+      await assertFails(tripRef.delete());
+    });
+  });
