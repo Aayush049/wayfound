@@ -1,0 +1,18 @@
+MUTATION TEST SUMMARY (harness_v3)
+==================================
+TOTALS killed=70 survived_allowlisted=11 survived_not_allowlisted=0 invalid=0 error=0 unexpected=0 total=81 required=65 reconstructed=17
+
+NEW ARCHIVE MUTANTS (mA-mE / m62-m66):
+[m62] line 127 | KILLED | failed=2 | killers=Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED
+[m63] line 128 | KILLED | failed=1 | killers=Trip archive: organizer sends archived true on an already archived trip: DENIED
+[m64] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED
+[m65] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED
+[m66] line 127 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+
+TABLE ROWS FOR m62-m66:
+| m62 | trip archive drops organizer check | 127 | false | KILLED | 2 | Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED |
+| m63 | trip archive drops resource archived false check | 128 | false | KILLED | 1 | Trip archive: organizer sends archived true on an already archived trip: DENIED |
+| m64 | trip archive drops affectedKeys hasOnly archived check | 129 | false | KILLED | 2 | Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED |
+| m65 | trip archive drops request resource archived true check | 129 | false | KILLED | 2 | Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED |
+| m66 | trip archive drops isSignedIn check | 127 | false | SURVIVED_ALLOWLISTED | 0 |  |
+

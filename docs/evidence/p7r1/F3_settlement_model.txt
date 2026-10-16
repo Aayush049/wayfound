@@ -1,0 +1,57 @@
+=== lib/features/settlements matches ===
+
+lib\features\settlements\data\settlement_repository.dart:29:    required String fromUid,
+lib\features\settlements\data\settlement_repository.dart:30:    required String toUid,
+lib\features\settlements\data\settlement_repository.dart:34:      fromUid: fromUid,
+lib\features\settlements\data\settlement_repository.dart:35:      toUid: toUid,
+lib\features\settlements\domain\leave_eligibility.dart:38:  // Check pending settlements where uid is fromUid or toUid
+lib\features\settlements\domain\leave_eligibility.dart:41:      if (s.fromUid == uid || s.toUid == uid) {
+lib\features\settlements\domain\settlement.dart:7:  final String fromUid;
+lib\features\settlements\domain\settlement.dart:8:  final String toUid;
+lib\features\settlements\domain\settlement.dart:16:    required this.fromUid,
+lib\features\settlements\domain\settlement.dart:17:    required this.toUid,
+lib\features\settlements\domain\settlement.dart:28:      fromUid: data['fromUid'] as String? ?? '',
+lib\features\settlements\domain\settlement.dart:29:      toUid: data['toUid'] as String? ?? '',
+lib\features\settlements\domain\settlement.dart:39:      'fromUid': fromUid,
+lib\features\settlements\domain\settlement.dart:40:      'toUid': toUid,
+lib\features\settlements\domain\settlement.dart:68:          fromUid == other.fromUid &&
+lib\features\settlements\domain\settlement.dart:69:          toUid == other.toUid &&
+lib\features\settlements\domain\settlement.dart:76:      fromUid.hashCode ^
+lib\features\settlements\domain\settlement.dart:77:      toUid.hashCode ^
+lib\features\settlements\domain\settlement_payload_builders.dart:4:  required String fromUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:5:  required String toUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:9:    'fromUid': fromUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:10:    'toUid': toUid,
+
+
+
+=== rules_test/firestore_rules.test.js matches ===
+
+rules_test\firestore_rules.test.js:3464:        fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3465:        toUid: organizerUid,
+rules_test\firestore_rules.test.js:3483:      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: 
+nonMemberUid })));
+rules_test\firestore_rules.test.js:3513:    test('Settlement create: fromUid != auth uid denied', async () => {
+rules_test\firestore_rules.test.js:3516:      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: 
+member2Uid })));
+rules_test\firestore_rules.test.js:3519:    test('Settlement create: toUid == auth uid (self-payment) denied', async 
+() => {
+rules_test\firestore_rules.test.js:3522:      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: 
+member1Uid })));
+rules_test\firestore_rules.test.js:3525:    test('Settlement create: toUid not a member denied', async () => {
+rules_test\firestore_rules.test.js:3528:      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: 
+nonMemberUid })));
+rules_test\firestore_rules.test.js:3596:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3597:          toUid: member2Uid,
+rules_test\firestore_rules.test.js:3650:          fromUid: organizerUid,
+rules_test\firestore_rules.test.js:3651:          toUid: member1Uid,
+rules_test\firestore_rules.test.js:3696:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3697:          toUid: member2Uid,
+rules_test\firestore_rules.test.js:3723:    test('Settlement update: fromUid change denied', async () => {
+rules_test\firestore_rules.test.js:3728:        fromUid: member2Uid,
+rules_test\firestore_rules.test.js:3734:    test('Settlement update: toUid change denied', async () => {
+rules_test\firestore_rules.test.js:3739:        toUid: organizerUid,
+rules_test\firestore_rules.test.js:3802:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3803:          toUid: member2Uid,
+
+

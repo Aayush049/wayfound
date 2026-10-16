@@ -1,0 +1,193 @@
+================================================================================
+SESSION P7-R1 UPLOAD SUMMARY
+================================================================================
+
+1. STEP 0: HEAD & RULES HASH BEFORE
+--------------------------------------------------------------------------------
+HEAD:
+adcd5f6870781de07588020a44780946bd1e3dca
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+
+RULES SHA-256 BEFORE:
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443       D:\VsCode\wayfound\firestore.rules
+
+2. GATES: RULES SHA-256 AFTER
+--------------------------------------------------------------------------------
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6       D:\VsCode\wayfound\firestore.rules
+
+3. SUSPICIOUS DETAIL RESOLUTION (F2 vs F3: payerId vs fromUid)
+--------------------------------------------------------------------------------
+F2 (Raw settlements rules lines 285-325 from firestore.rules):
+firestore.rules:286:
+  firestore.rules:287:      // Subcollection: trips/{tripId}/settlements/{settlementId}
+> firestore.rules:288:      match /settlements/{settlementId} {
+  firestore.rules:289:        allow get, list: if isSignedIn() && isTripMember(tripId);
+  firestore.rules:290:
+  firestore.rules:291:        allow create: if isSignedIn()
+  firestore.rules:292:          && isTripMember(tripId)
+  firestore.rules:293:          && isTripNotArchived(tripId)
+  firestore.rules:294:          && request.resource.data.keys().hasAll(['fromUid', 'toUid', 'amount', 'status', 
+'createdAt', 'resolvedAt'])
+  firestore.rules:295:          && request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'amount', 'status', 
+'createdAt', 'resolvedAt'])
+  firestore.rules:296:          && request.resource.data.fromUid == request.auth.uid
+  firestore.rules:297:          && request.resource.data.toUid in 
+get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds
+  firestore.rules:298:          && request.resource.data.toUid != request.auth.uid
+  firestore.rules:299:          && request.resource.data.amount is int
+  firestore.rules:300:          && request.resource.data.amount >= 1
+  firestore.rules:301:          && request.resource.data.amount <= 100000000000
+  firestore.rules:302:          && request.resource.data.status == 'pending'
+  firestore.rules:303:          && request.resource.data.createdAt == request.time
+  firestore.rules:304:          && request.resource.data.resolvedAt == null;
+
+F3 (Settlement Dart model inspection from lib/features/settlements/domain/settlement.dart):
+=== lib/features/settlements matches ===
+
+lib\features\settlements\data\settlement_repository.dart:29:    required String fromUid,
+lib\features\settlements\data\settlement_repository.dart:30:    required String toUid,
+lib\features\settlements\data\settlement_repository.dart:34:      fromUid: fromUid,
+lib\features\settlements\data\settlement_repository.dart:35:      toUid: toUid,
+lib\features\settlements\domain\leave_eligibility.dart:38:  // Check pending settlements where uid is fromUid or toUid
+lib\features\settlements\domain\leave_eligibility.dart:41:      if (s.fromUid == uid || s.toUid == uid) {
+lib\features\settlements\domain\settlement.dart:7:  final String fromUid;
+lib\features\settlements\domain\settlement.dart:8:  final String toUid;
+lib\features\settlements\domain\settlement.dart:16:    required this.fromUid,
+lib\features\settlements\domain\settlement.dart:17:    required this.toUid,
+lib\features\settlements\domain\settlement.dart:28:      fromUid: data['fromUid'] as String? ?? '',
+lib\features\settlements\domain\settlement.dart:29:      toUid: data['toUid'] as String? ?? '',
+lib\features\settlements\domain\settlement.dart:39:      'fromUid': fromUid,
+lib\features\settlements\domain\settlement.dart:40:      'toUid': toUid,
+lib\features\settlements\domain\settlement.dart:68:          fromUid == other.fromUid &&
+lib\features\settlements\domain\settlement.dart:69:          toUid == other.toUid &&
+lib\features\settlements\domain\settlement.dart:76:      fromUid.hashCode ^
+lib\features\settlements\domain\settlement.dart:77:      toUid.hashCode ^
+lib\features\settlements\domain\settlement_payload_builders.dart:4:  required String fromUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:5:  required String toUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:9:    'fromUid': fromUid,
+lib\features\settlements\domain\settlement_payload_builders.dart:10:    'toUid': toUid,
+
+
+
+=== rules_test/firestore_rules.test.js matches ===
+
+rules_test\firestore_rules.test.js:3464:        fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3465:        toUid: organizerUid,
+rules_test\firestore_rules.test.js:3483:      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: 
+nonMemberUid })));
+rules_test\firestore_rules.test.js:3513:    test('Settlement create: fromUid != auth uid denied', async () => {
+rules_test\firestore_rules.test.js:3516:      await assertFails(settleRef.set(getValidSettlementPayload({ fromUid: 
+member2Uid })));
+rules_test\firestore_rules.test.js:3519:    test('Settlement create: toUid == auth uid (self-payment) denied', async 
+() => {
+rules_test\firestore_rules.test.js:3522:      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: 
+member1Uid })));
+rules_test\firestore_rules.test.js:3525:    test('Settlement create: toUid not a member denied', async () => {
+rules_test\firestore_rules.test.js:3528:      await assertFails(settleRef.set(getValidSettlementPayload({ toUid: 
+nonMemberUid })));
+rules_test\firestore_rules.test.js:3596:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3597:          toUid: member2Uid,
+rules_test\firestore_rules.test.js:3650:          fromUid: organizerUid,
+rules_test\firestore_rules.test.js:3651:          toUid: member1Uid,
+rules_test\firestore_rules.test.js:3696:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3697:          toUid: member2Uid,
+rules_test\firestore_rules.test.js:3723:    test('Settlement update: fromUid change denied', async () => {
+rules_test\firestore_rules.test.js:3728:        fromUid: member2Uid,
+rules_test\firestore_rules.test.js:3734:    test('Settlement update: toUid change denied', async () => {
+rules_test\firestore_rules.test.js:3739:        toUid: organizerUid,
+rules_test\firestore_rules.test.js:3802:          fromUid: member1Uid,
+rules_test\firestore_rules.test.js:3803:          toUid: member2Uid,
+
+Finding: firestore.rules lines 294-296 strictly use `fromUid` and `toUid`:
+  `request.resource.data.fromUid == request.auth.uid`
+  `request.resource.data.toUid != request.auth.uid`
+  `isTripMember(tripId, request.resource.data.toUid)`
+There is zero usage of `payerId` in firestore.rules or the Dart codebase.
+
+4. STEP 2: FIRESTORE RULES DIFF (NEW ORGANIZER ARCHIVE RULE)
+--------------------------------------------------------------------------------
+diff --git a/firestore.rules b/firestore.rules
+index c99991f..87c01b0 100644
+--- a/firestore.rules
++++ b/firestore.rules
+@@ -123,6 +123,13 @@ service cloud.firestore {
+         && existsAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid))
+         && getAfter(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid)).data.status == 'active';
+ 
++      // Trip archive rule: organizer transitions trip from active to archived (one-way)
++      allow update: if isSignedIn()
++        && resource.data.organizerId == request.auth.uid
++        && resource.data.archived == false
++        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
++        && request.resource.data.archived == true;
++
+       allow delete: if false;
+ 
+       // Subcollection: trips/{tripId}/members/{uid}
+
+5. STEP 3: RULES UNIT TEST EXECUTION COUNTS
+--------------------------------------------------------------------------------
+Rules suite results: 185 passed, 185 total (exit code: 0)
+
+6. STEP 4: MUTATION TESTING HARNESS SUMMARY
+--------------------------------------------------------------------------------
+MUTATION TEST SUMMARY (harness_v3)
+==================================
+TOTALS killed=70 survived_allowlisted=11 survived_not_allowlisted=0 invalid=0 error=0 unexpected=0 total=81 required=65 reconstructed=17
+
+NEW ARCHIVE MUTANTS (mA-mE / m62-m66):
+[m62] line 127 | KILLED | failed=2 | killers=Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED
+[m63] line 128 | KILLED | failed=1 | killers=Trip archive: organizer sends archived true on an already archived trip: DENIED
+[m64] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED
+[m65] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED
+[m66] line 127 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+
+TABLE ROWS FOR m62-m66:
+| m62 | trip archive drops organizer check | 127 | false | KILLED | 2 | Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED |
+| m63 | trip archive drops resource archived false check | 128 | false | KILLED | 1 | Trip archive: organizer sends archived true on an already archived trip: DENIED |
+| m64 | trip archive drops affectedKeys hasOnly archived check | 129 | false | KILLED | 2 | Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED |
+| m65 | trip archive drops request resource archived true check | 129 | false | KILLED | 2 | Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED |
+| m66 | trip archive drops isSignedIn check | 127 | false | SURVIVED_ALLOWLISTED | 0 |  |
+
+NEW ARCHIVE MUTANTS EVALUATION:
+[m62] line 127 | KILLED | failed=2 | killers=Trip archive: plain member cannot archive trip: DENIED ; Trip archive: signed-in non-member cannot archive trip: DENIED
+[m63] line 128 | KILLED | failed=1 | killers=Trip archive: organizer sends archived true on an already archived trip: DENIED
+[m64] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED
+[m65] line 129 | KILLED | failed=2 | killers=Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED
+[m66] line 127 | SURVIVED_ALLOWLISTED | failed=0 | killers=
+[c11] line 126 | KILLED | failed=3 | killers=Trip archive: signed-out user cannot archive trip: DENIED
+
+7. STEP 5: VERIFIED CHANGED FILES (git diff --name-only main)
+--------------------------------------------------------------------------------
+docs/evidence/p7s1/D1_archive_rules.txt
+docs/evidence/p7s1/D2_archive_code.txt
+docs/evidence/p7s1/D3_write_actions.txt
+docs/evidence/p7s1/D4_states.txt
+docs/evidence/p7s1/S0_hash.txt
+docs/evidence/p7s1/S0_head.txt
+docs/evidence/p7s1/S0_log.txt
+docs/evidence/p7s1/S0_status.txt
+docs/evidence/p7s1/UPLOAD_SUMMARY.txt
+firestore.rules
+rules_test/firestore_rules.test.js
+rules_test/mutation/equivalent.json
+rules_test/mutation/mutants.json
+trip_planner_project_report.md
+
+8. COMMITS ON BRANCH (git log --oneline main..HEAD)
+--------------------------------------------------------------------------------
+9922d5d docs(evidence): p7r1 raw outputs
+a9a4b55 docs(report): record archive rule
+9e6ab59 test(mutation): archive rule mutants
+f45ee5e test(rules): trip archive rule tests
+5a4e25a feat(rules): organizer archive trip rule
+adcd5f6 docs(evidence): p7s1 discovery outputs
+
+================================================================================
+END OF UPLOAD SUMMARY
+================================================================================

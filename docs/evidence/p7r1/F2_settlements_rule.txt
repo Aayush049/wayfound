@@ -1,0 +1,25 @@
+
+  firestore.rules:286:
+  firestore.rules:287:      // Subcollection: trips/{tripId}/settlements/{settlementId}
+> firestore.rules:288:      match /settlements/{settlementId} {
+  firestore.rules:289:        allow get, list: if isSignedIn() && isTripMember(tripId);
+  firestore.rules:290:
+  firestore.rules:291:        allow create: if isSignedIn()
+  firestore.rules:292:          && isTripMember(tripId)
+  firestore.rules:293:          && isTripNotArchived(tripId)
+  firestore.rules:294:          && request.resource.data.keys().hasAll(['fromUid', 'toUid', 'amount', 'status', 
+'createdAt', 'resolvedAt'])
+  firestore.rules:295:          && request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'amount', 'status', 
+'createdAt', 'resolvedAt'])
+  firestore.rules:296:          && request.resource.data.fromUid == request.auth.uid
+  firestore.rules:297:          && request.resource.data.toUid in 
+get(/databases/$(database)/documents/trips/$(tripId)).data.memberIds
+  firestore.rules:298:          && request.resource.data.toUid != request.auth.uid
+  firestore.rules:299:          && request.resource.data.amount is int
+  firestore.rules:300:          && request.resource.data.amount >= 1
+  firestore.rules:301:          && request.resource.data.amount <= 100000000000
+  firestore.rules:302:          && request.resource.data.status == 'pending'
+  firestore.rules:303:          && request.resource.data.createdAt == request.time
+  firestore.rules:304:          && request.resource.data.resolvedAt == null;
+
+
