@@ -1,0 +1,1 @@
+B0_guards.txt in this folder was retyped, not raw output. Superseded by docs/evidence/p7s3/B_before.txt and B_after.txt.

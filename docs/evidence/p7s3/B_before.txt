@@ -1,0 +1,20 @@
+=== lib/features/suggestions/presentation/suggestions_tab.dart ===
+
+=== lib/features/suggestions/presentation/suggestion_card.dart ===
+
+=== lib/features/expenses/presentation/expenses_tab.dart ===
+lib/features/expenses/presentation/expenses_tab.dart:39:    final isArchived = widget.trip.archived;
+lib/features/expenses/presentation/expenses_tab.dart:93:                          actionLabel: isArchived ? null : 'Add Expense',
+lib/features/expenses/presentation/expenses_tab.dart:94:                          onAction: isArchived
+lib/features/expenses/presentation/expenses_tab.dart:108:                              !isArchived &&
+lib/features/expenses/presentation/expenses_tab.dart:159:          (!isArchived && _selectedSegment == ExpenseTabSegment.expenses)
+
+=== lib/features/expenses/presentation/expense_card.dart ===
+
+=== lib/features/trips/presentation/members_tab.dart ===
+lib/features/trips/presentation/members_tab.dart:288:                      !trip.archived;
+lib/features/trips/presentation/members_tab.dart:378:        if (!isOrganizer && !trip.archived)
+
+=== lib/features/trips/presentation/trip_dashboard_screen.dart ===
+lib/features/trips/presentation/trip_dashboard_screen.dart:167:                isArchived: trip.archived,
+

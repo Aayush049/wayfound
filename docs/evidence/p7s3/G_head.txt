@@ -1,0 +1,10 @@
+﻿=== BEFORE GATES ===
+9ccb6e3a3c1595170b65d782c31d9174d39042d1
+## phase-7/archive-and-hardening
+?? docs/evidence/p7s2/B0_SUPERSEDED.txt
+?? docs/evidence/p7s3/
+=== AFTER GATES ===
+9ccb6e3a3c1595170b65d782c31d9174d39042d1
+## phase-7/archive-and-hardening
+?? docs/evidence/p7s2/B0_SUPERSEDED.txt
+?? docs/evidence/p7s3/

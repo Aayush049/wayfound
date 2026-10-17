@@ -1,0 +1,26 @@
+--- TRACKED COUNT ---
+0
+
+--- HARNESS MATCHES ---
+
+rules_test\mutation\harness_v3.js:7:const WORK = path.join(__dirname, 'out_v3');
+
+
+
+
+--- FIRST 15 NAMES IN OUT_V3 ---
+c1.rules
+c10.rules
+c10_2026-10-16T18-03-45-443Z_84.json
+c10_2026-10-16T19-05-26-866Z_84.json
+c11.rules
+c11_2026-10-16T19-05-26-866Z_85.json
+c1_2026-10-16T18-03-45-443Z_75.json
+c1_2026-10-16T19-05-26-866Z_75.json
+c2.rules
+c2_2026-10-16T18-03-45-443Z_76.json
+c2_2026-10-16T19-05-26-866Z_76.json
+c3.rules
+c3_2026-10-16T18-03-45-443Z_77.json
+c3_2026-10-16T19-05-26-866Z_77.json
+c4.rules
