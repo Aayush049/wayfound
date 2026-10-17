@@ -9,7 +9,7 @@
 - **First Commit Date:** October 4, 2026 (13 elapsed calendar days)
 - **Flutter Version:** Flutter 3.47.7 (Channel stable)
 - **Dart Version:** Dart 3.13.5 (SDK constraint: `^3.13.0`)
-- **Flutter Test Total:** 357 passed (0 failed)
+- **Flutter Test Total:** 363 passed (0 failed)
 - **Rules Test Total:** 185 passed (185 total)
 - **Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
 
@@ -689,13 +689,14 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
 ### 15.7 Phase 8: Web Platform
 - **Platform Scaffold:** Added web platform support via `web/index.html`, `web/manifest.json`, and web icons generated via `flutter_launcher_icons` from existing assets without touching Android.
 - **Google Sign-In on Web:** Added `FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider())` when operating in web mode (`isWeb: true`), preserving existing mobile `authenticate()` flow when `false`.
-- **Responsive Wrapper:** Added global `WebResponsiveWrapper` via `MaterialApp.builder` with stable key `Key('web_responsive_wrapper')` that centers the application and clamps content width to 720 logical pixels on wide screens, keeping native layout below 720.
+- **Responsive Layout & Content Width (P8-S3):** Replaced the 720px fixed column wrapper with full window width presentation. Added `CenteredContent` helper to constrain screen bodies on wide displays while letting AppBars span the full window. Breakpoints: compact (<720 px, unchanged mobile layout), medium (720–1099 px), and expanded (>=1100 px). Home screen features a responsive trip grid (1 col compact, 2 col medium, 3 col expanded). Trip dashboard features left-aligned scrollable TabBar (`isScrollable: true`, `tabAlignment: TabAlignment.start`) on medium/expanded. Auth screens are wrapped in centered cards (max width 440 px) and form screens in centered containers (max width 560 px).
+- **URL Fidelity (P8-S3):** Configured `GoRouter.optionURLReflectsImperativeAPIs = true` so imperative navigation pushes update browser address bar URLs and restore previous URLs on pop.
 - **Firebase Hosting Configuration:** Configured `"hosting"` in `firebase.json` with public path `build/web`, single-page app rewrite to `/index.html`, and `no-cache` headers for entry and service worker files.
 - **Verified Facts:**
   - `flutter analyze`: Zero issues.
   - `dart format`: Zero files changed (clean format).
-  - `flutter test`: 357 passed (0 failed).
-  - Sabotage sensitivity proofs P1 and P2 verified on external copies.
+  - `flutter test`: 363 passed (0 failed).
+  - Sabotage sensitivity proofs P1, P2, and P3 verified on external copies.
   - `flutter build web --release`: Compiled successfully (total output 41.7 MB).
   - `flutter build apk --debug`: Compiled successfully, confirming Android platform did not regress.
   - `firestore.rules` SHA-256 untouched (`6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`).

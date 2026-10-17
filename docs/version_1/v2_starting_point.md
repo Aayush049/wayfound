@@ -9,7 +9,7 @@
 - **First Commit Date:** October 4, 2026 (13 elapsed calendar days to v1 completion)
 - **Flutter SDK:** Flutter 3.47.7 (Channel stable)
 - **Dart SDK:** Dart 3.13.5 (pubspec environment constraint: `sdk: ^3.13.0`)
-- **Flutter Test Suite:** 357 passed (0 failed, 0 skipped, exit code 0)
+- **Flutter Test Suite:** 363 passed (0 failed, 0 skipped, exit code 0)
 - **Firestore Security Rules Tests:** 185 passed (185 total unit tests in Jest)
 - **Security Rules Mutation Suite:** 81 mutants evaluated (70 killed, 11 allowlisted equivalents)
 - **Firestore Security Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
@@ -34,7 +34,7 @@
   - `lib/core/`: Common domain logic, integer currency utilities, and shared presentation widgets
     - `lib/core/money.dart`: Minor unit currency parsing and formatting functions
     - `lib/core/errors/`: App-level failure definitions and user-facing error message mappers
-    - `lib/core/widgets/`: Reusable loading indicators, error views, and buttons
+    - `lib/core/widgets/`: Reusable loading indicators, error views, buttons, and `CenteredContent` responsive width helper
   - `lib/features/auth/`: Firebase user authentication, create-once profile document, and settings UI
   - `lib/features/trips/`: Trip creation, join code resolution, trip dashboard shell, and members tab
   - `lib/features/suggestions/`: Suggestions CRUD, atomic vote transactions, and suggestion cards
@@ -94,6 +94,7 @@
 - **Web URL strategy:** The web platform uses the default hash URL routing strategy (`/#/welcome`, `/#/home`); path URL strategy without hashes requires custom server rewrites on hosting environments.
 - **Service worker caching:** Firebase Hosting deploys may serve cached assets until a hard refresh or background service worker update completes; critical entry points use `no-cache` headers.
 - **iOS platform:** iOS platform is currently out of scope and not configured or supported (`ios/` does not exist in the repository).
+- **Web layout breakpoints:** The responsive web layout defines breakpoints at compact (< 720 logical px, unchanged mobile layout), medium (720–1099 px), and expanded (>= 1100 px). Shared width constraints use `CenteredContent` with default max width 1000 px (560 px for forms, 440 px for auth cards).
 - **Lockfile discipline:** `pubspec.lock` is version-controlled and must not change unless dependencies are upgraded deliberately (`flutter create` commands can silently trigger unconstrained dependency re-resolution); use `flutter pub get --enforce-lockfile` to detect accidental changes.
 
 ## 7. Prioritised v2 Backlog

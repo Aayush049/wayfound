@@ -139,6 +139,8 @@ To run the application locally in Google Chrome:
 flutter run -d chrome
 ```
 
+Wayfound adapts its presentation based on window width. On viewports below 720 logical pixels, the interface uses a single-column layout tailored for mobile interaction. On viewports of 720 logical pixels and wider, the app utilizes available desktop space with multi-column trip grids on the home screen, centered content containers with bounded widths, left-aligned dashboard navigation tabs, and structured card containers for authentication flows.
+
 ---
 
 ## Building a Release APK
