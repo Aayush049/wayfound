@@ -214,7 +214,7 @@ A non-member may update a trip only if:
 - **Left Member Doc Read:** A user who has left a trip no longer belongs to `memberIds`, so they cannot read their own previous member document.
 - **BalancesView Layout:** In Session P6-S3c, `lib/features/expenses/presentation/balances_view.dart` was refactored from nested ListViews to Column-based structures with re-laid-out suggested payment tiles to prevent scroll conflicts.
 - **MarkAsPaidSheet Keyboard on Small Screens:** The sheet sets `isScrollControlled: true` so the modal bottom sheet resizes above the software keyboard on small devices.
-- **Release SHA-1 and App Check Pending:** Release SHA-1 and Firebase App Check remain pending before production app store release.
+- **Firebase App Check Pending:** Firebase App Check remains pending before any production app store release. Release signing fingerprints were registered in Firebase for the v1.0.0 release.
 - **Add to Itinerary on Suggestions Pending:** Direct 1-tap "Add to itinerary" shortcut from the suggestions list remains a backlog item.
 
 ---
@@ -522,7 +522,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - Firebase project **Wayfound** (`wayfound-51b4d`) created
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
-- **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
+- **Google Sign-In SHA-1 status:** the debug signing certificate's SHA-1 (value omitted) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 and SHA-256 fingerprints were registered later, during the v1.0.0 release preparation, and android/app/google-services.json was refreshed.
 - **Firestore Security Rules status:** Local `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`) includes complete rules for `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, `expenses/{expenseId}`, `settlements/{settlementId}`, `joinCodes/{code}`, and organizer trip archiving. Verified via 185 passing Jest unit tests against the Firestore emulator and 81-mutant mutation testing suite: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`). Deployed to production project `wayfound-51b4d`.
 
 ### 15.3 Milestone 1 Status
