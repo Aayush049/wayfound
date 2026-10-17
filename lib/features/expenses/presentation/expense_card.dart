@@ -11,6 +11,7 @@ class ExpenseCard extends StatelessWidget {
   final String currency;
   final List<Member> members;
   final bool canManage;
+  final bool isArchived;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -20,6 +21,7 @@ class ExpenseCard extends StatelessWidget {
     required this.currency,
     required this.members,
     required this.canManage,
+    this.isArchived = false,
     this.onEdit,
     this.onDelete,
   });
@@ -115,7 +117,7 @@ class ExpenseCard extends StatelessWidget {
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  if (canManage)
+                  if (canManage && !isArchived)
                     PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert, size: 20),
                       tooltip: 'Expense Options',

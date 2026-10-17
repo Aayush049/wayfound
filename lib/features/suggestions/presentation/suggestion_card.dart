@@ -16,6 +16,7 @@ class SuggestionCard extends ConsumerStatefulWidget {
   final String currentUserId;
   final bool isOrganizer;
   final List<Member> members;
+  final bool isArchived;
 
   const SuggestionCard({
     super.key,
@@ -24,6 +25,7 @@ class SuggestionCard extends ConsumerStatefulWidget {
     required this.currentUserId,
     required this.isOrganizer,
     required this.members,
+    this.isArchived = false,
   });
 
   @override
@@ -34,7 +36,9 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
   bool _isVoteInFlight = false;
 
   bool get _canEditOrDelete =>
-      widget.suggestion.authorId == widget.currentUserId || widget.isOrganizer;
+      !widget.isArchived &&
+      (widget.suggestion.authorId == widget.currentUserId ||
+          widget.isOrganizer);
 
   String get _authorName {
     final member = widget.members.firstWhere(
@@ -51,7 +55,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
   }
 
   Future<void> _handleVote(int targetVoteValue) async {
-    if (_isVoteInFlight) return;
+    if (widget.isArchived || _isVoteInFlight) return;
 
     setState(() {
       _isVoteInFlight = true;
@@ -338,8 +342,12 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                           upCount: widget.suggestion.upCount,
                           downCount: widget.suggestion.downCount,
                           myVote: myVote,
-                          onUpVote: () => _handleVote(1),
-                          onDownVote: () => _handleVote(-1),
+                          onUpVote: widget.isArchived
+                              ? null
+                              : () => _handleVote(1),
+                          onDownVote: widget.isArchived
+                              ? null
+                              : () => _handleVote(-1),
                         ),
                       ),
                     ],
@@ -385,8 +393,10 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
                       upCount: widget.suggestion.upCount,
                       downCount: widget.suggestion.downCount,
                       myVote: myVote,
-                      onUpVote: () => _handleVote(1),
-                      onDownVote: () => _handleVote(-1),
+                      onUpVote: widget.isArchived ? null : () => _handleVote(1),
+                      onDownVote: widget.isArchived
+                          ? null
+                          : () => _handleVote(-1),
                     ),
                   ],
                 );

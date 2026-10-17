@@ -40,8 +40,10 @@ class SuggestionsTab extends ConsumerWidget {
               title: 'No suggestions yet',
               message: 'Add the first idea for this trip!',
               icon: Icons.lightbulb_outline,
-              actionLabel: 'Add Suggestion',
-              onAction: () => context.push('/trip/${trip.id}/suggestions/add'),
+              actionLabel: trip.archived ? null : 'Add Suggestion',
+              onAction: trip.archived
+                  ? null
+                  : () => context.push('/trip/${trip.id}/suggestions/add'),
             );
           }
 
@@ -57,16 +59,19 @@ class SuggestionsTab extends ConsumerWidget {
                 currentUserId: currentUserId,
                 isOrganizer: isOrganizer,
                 members: members,
+                isArchived: trip.archived,
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Suggestion'),
-      ),
+      floatingActionButton: trip.archived
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Suggestion'),
+            ),
     );
   }
 }

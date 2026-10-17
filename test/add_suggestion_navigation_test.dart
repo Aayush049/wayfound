@@ -267,7 +267,7 @@ void main() {
 
         expect(find.text('Sunset Cruise'), findsOneWidget);
 
-        final overflowButton = find.byIcon(Icons.more_vert);
+        final overflowButton = find.byIcon(Icons.more_vert).first;
         await tester.tap(overflowButton);
         await tester.pumpAndSettle();
 

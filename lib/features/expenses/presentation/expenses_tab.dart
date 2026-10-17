@@ -113,6 +113,7 @@ class _ExpensesTabState extends ConsumerState<ExpensesTab> {
                             currency: widget.trip.currency,
                             members: members,
                             canManage: canManage,
+                            isArchived: isArchived,
                             onEdit: () {
                               context.push(
                                 '/trip/${widget.trip.id}/expenses/${expense.id}/edit',
