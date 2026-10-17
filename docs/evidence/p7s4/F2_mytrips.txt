@@ -1,0 +1,66 @@
+=== lib/features/trips/data/trips_providers.dart (lines 13-25) ===
+13: /// Streams all active trips for the currently signed-in user.
+14: final myTripsProvider = StreamProvider<List<Trip>>((ref) {
+15:   final authUserAsync = ref.watch(authUserProvider);
+16:   final user = authUserAsync.asData?.value;
+17: 
+18:   if (user == null) {
+19:     return Stream.value([]);
+20:   }
+21: 
+22:   final repo = ref.watch(tripRepositoryProvider);
+23:   return repo.watchMyTrips(user.uid);
+24: });
+25: 
+
+=== lib/features/trips/data/trip_repository.dart (lines 88-137) ===
+88:   /// Streams trips where [uid] is in [memberIds].
+89:   /// Sorts client-side without composite index:
+90:   /// - Excludes archived trips
+91:   /// - Upcoming/ongoing (endDate >= midnight today) by startDate ASC
+92:   /// - Past trips by startDate DESC
+93:   Stream<List<Trip>> watchMyTrips(String uid) {
+94:     return _firestore
+95:         .collection('trips')
+96:         .where('memberIds', arrayContains: uid)
+97:         .snapshots()
+98:         .map((snapshot) {
+99:           final trips = snapshot.docs
+100:               .map((doc) => Trip.fromFirestore(doc))
+101:               .where((t) => !t.archived)
+102:               .toList();
+103: 
+104:           return sortTripsClientSide(trips);
+105:         });
+106:   }
+107: 
+108:   /// Client-side sorting helper for trips list.
+109:   static List<Trip> sortTripsClientSide(List<Trip> trips) {
+110:     final today = DateTime.now();
+111:     final midnightToday = DateTime(today.year, today.month, today.day);
+112: 
+113:     final activeTrips = <Trip>[];
+114:     final pastTrips = <Trip>[];
+115: 
+116:     for (final trip in trips) {
+117:       final endDay = DateTime(
+118:         trip.endDate.year,
+119:         trip.endDate.month,
+120:         trip.endDate.day,
+121:       );
+122:       if (endDay.isBefore(midnightToday)) {
+123:         pastTrips.add(trip);
+124:       } else {
+125:         activeTrips.add(trip);
+126:       }
+127:     }
+128: 
+129:     // Active trips by startDate ascending
+130:     activeTrips.sort((a, b) => a.startDate.compareTo(b.startDate));
+131: 
+132:     // Past trips by startDate descending
+133:     pastTrips.sort((a, b) => b.startDate.compareTo(a.startDate));
+134: 
+135:     return [...activeTrips, ...pastTrips];
+136:   }
+137: 

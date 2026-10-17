@@ -1,0 +1,38 @@
+00:00 +0: loading D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart
+00:00 +0: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository createTrip creates trip, member, and joinCode atomically
+00:00 +1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository watchMyTrips emits trips where user is a member, sorted client side
+00:00 +2: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository watchMyTrips T1: member of active and archived trip gets both from watchMyTrips; non-member trip excluded
+00:00 +2 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository watchMyTrips T1: member of active and archived trip gets both from watchMyTrips; non-member trip excluded [E]
+  Expected: <2>
+    Actual: <1>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\trip_repository_test.dart 141:9                main.<fn>.<fn>.<fn>
+  
+00:00 +2 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository getJoinPreview returns null when join code does not exist
+00:00 +3 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository getJoinPreview returns JoinPreview when code exists
+00:00 +4 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository joinTrip adds user to trip, members subcollection, and increments joinCode useCount
+00:00 +5 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository joinTrip throws Exception when trip is full (>= 15 members)
+00:00 +6 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository watchTrip & watchMembers watchTrip emits null for non-existent trip and trip object for valid trip
+00:00 +7 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository archiveTrip updates only archived: true and leaves other fields untouched
+00:07 +8 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen renders loading state when myTripsProvider is loading
+00:08 +9 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen a. empty state shows "Create a Trip" and "Join with Code"
+00:08 +10 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen b. empty-state "Join with Code" opens existing Join Trip screen
+00:09 +11 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen c. empty-state "Create a Trip" opens existing Create Trip screen
+00:09 +12 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen d. empty-state buttons are absent when trips exist, and absent during loading and error states
+00:09 +13 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen e. FAB expands to show "Create Trip" and "Join Trip"
+00:09 +14 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen f. FAB Create Trip opens create flow and menu closes; FAB Join Trip opens join flow
+00:09 +15 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen g. tapping outside the menu (scrim) closes it
+00:10 +16 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen h. QR icon is no longer present in the Home app bar
+00:10 +17 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen i. semantic labels and tooltips exist
+00:10 +18 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen toggles theme when theme toggle button is tapped
+00:10 +19 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen T2: Home with one active and one archived trip shows both cards, active first, Archived header present, chip on archived card only
+00:10 +20 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen T3: Home with only an archived trip shows the card, not the empty state
+00:10 +21 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen T4: Home with no archived trips shows no Archived header (positive control)
+00:10 +22 -1: D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/home_screen_test.dart: HomeScreen T5: tap on the archived card navigates to the trip dashboard route
+00:10 +23 -1: Some tests failed.
+
+Failing tests:
+  D:/VsCode/wayfound_archive/sabotage_p7s4/p1/test/trip_repository_test.dart: TripRepository watchMyTrips T1: member of active and archived trip gets both from watchMyTrips; non-member trip excluded
+

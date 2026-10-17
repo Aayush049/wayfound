@@ -1,0 +1,38 @@
+=== BEFORE GATES ===
+3783830e4e0563c6dbf1f331e071172cc47a4a91
+## phase-7/fix-home-archived
+ M lib/features/trips/data/trip_repository.dart
+ M lib/features/trips/presentation/home_screen.dart
+ M lib/features/trips/presentation/trip_card.dart
+ M test/home_screen_test.dart
+ M test/trip_repository_test.dart
+?? docs/evidence/p7s3/G2_analyze.txt
+?? docs/evidence/p7s3/G2_counts.txt
+?? docs/evidence/p7s3/G2_hash.txt
+?? docs/evidence/p7s3/G2_test.json
+?? docs/evidence/p7s3/G2_test.txt
+?? docs/evidence/p7s3/M0_pre.txt
+?? docs/evidence/p7s3/M1_merge.txt
+?? docs/evidence/p7s3/M2_push.txt
+?? docs/evidence/p7s3/M3_verify.txt
+?? docs/evidence/p7s3/M_SUMMARY.txt
+?? docs/evidence/p7s4/
+=== AFTER GATES ===
+3783830e4e0563c6dbf1f331e071172cc47a4a91
+## phase-7/fix-home-archived
+ M lib/features/trips/data/trip_repository.dart
+ M lib/features/trips/presentation/home_screen.dart
+ M lib/features/trips/presentation/trip_card.dart
+ M test/home_screen_test.dart
+ M test/trip_repository_test.dart
+?? docs/evidence/p7s3/G2_analyze.txt
+?? docs/evidence/p7s3/G2_counts.txt
+?? docs/evidence/p7s3/G2_hash.txt
+?? docs/evidence/p7s3/G2_test.json
+?? docs/evidence/p7s3/G2_test.txt
+?? docs/evidence/p7s3/M0_pre.txt
+?? docs/evidence/p7s3/M1_merge.txt
+?? docs/evidence/p7s3/M2_push.txt
+?? docs/evidence/p7s3/M3_verify.txt
+?? docs/evidence/p7s3/M_SUMMARY.txt
+?? docs/evidence/p7s4/
