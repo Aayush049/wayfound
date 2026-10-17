@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/data/auth_provider.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../data/trips_providers.dart';
 import '../domain/join_code.dart';
 import '../domain/join_preview.dart';
@@ -146,52 +147,218 @@ class _JoinTripScreenState extends ConsumerState<JoinTripScreen> {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('MMM d, yyyy');
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Join Trip with Code')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Enter the 6-character code provided by the trip organizer:',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 720;
+
+    Widget bodyContent = SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Enter the 6-character code provided by the trip organizer:',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Code input field
+            TextFormField(
+              controller: _codeController,
+              decoration: InputDecoration(
+                labelText: 'Join Code',
+                hintText: 'e.g. ABC234',
+                prefixIcon: const Icon(Icons.qr_code_scanner),
+                suffixIcon: IconButton(
+                  icon: _isSearching
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.search),
+                  onPressed: _isSearching || _isJoining ? null : _searchCode,
+                ),
+              ),
+              textCapitalization: TextCapitalization.characters,
+              autocorrect: false,
+              maxLength: 8, // Allow typing with dashes before normalization
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s-]')),
+              ],
+              onFieldSubmitted: (_) => _searchCode(),
+            ),
+            const SizedBox(height: 16),
+
+            if (_errorMessage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
+            ],
 
-              // Code input field
-              TextFormField(
-                controller: _codeController,
-                decoration: InputDecoration(
-                  labelText: 'Join Code',
-                  hintText: 'e.g. ABC234',
-                  prefixIcon: const Icon(Icons.qr_code_scanner),
-                  suffixIcon: IconButton(
-                    icon: _isSearching
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.search),
-                    onPressed: _isSearching || _isJoining ? null : _searchCode,
+            // Trip Preview Card
+            if (_preview != null) ...[
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                    width: 1.5,
                   ),
                 ),
-                textCapitalization: TextCapitalization.characters,
-                autocorrect: false,
-                maxLength: 8, // Allow typing with dashes before normalization
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s-]')),
-                ],
-                onFieldSubmitted: (_) => _searchCode(),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.card_travel,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Trip Preview',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _preview!.tripName,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _preview!.destination,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 16,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${dateFormat.format(_preview!.startDate)} - ${dateFormat.format(_preview!.endDate)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _preview!.isFull
+                              ? theme.colorScheme.errorContainer
+                              : theme.colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${_preview!.memberCount} of 15 members',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: _preview!.isFull
+                                ? theme.colorScheme.onErrorContainer
+                                : theme.colorScheme.onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              if (_errorMessage != null) ...[
+              if (_existingTrip != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'You are already a member of this trip.',
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () =>
+                      context.go('/trip/${_preview!.tripId}/members'),
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('Open Trip'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ),
+              ] else if (_preview!.isFull) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -201,15 +368,16 @@ class _JoinTripScreenState extends ConsumerState<JoinTripScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.error_outline,
+                        Icons.block,
                         color: theme.colorScheme.onErrorContainer,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _errorMessage!,
+                          'This trip is full (15 of 15 members).',
                           style: TextStyle(
                             color: theme.colorScheme.onErrorContainer,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -217,205 +385,47 @@ class _JoinTripScreenState extends ConsumerState<JoinTripScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-              ],
-
-              // Trip Preview Card
-              if (_preview != null) ...[
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
+                const FilledButton(
+                  onPressed: null, // Disabled
+                  child: Text('Trip is Full'),
+                ),
+              ] else ...[
+                FilledButton(
+                  onPressed: _isJoining ? null : _confirmJoin,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.card_travel,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Trip Preview',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _preview!.tripName,
-                          style: theme.textTheme.titleLarge?.copyWith(
+                  child: _isJoining
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Join Trip',
+                          style: TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 16,
-                              color: theme.colorScheme.secondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _preview!.destination,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 16,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${dateFormat.format(_preview!.startDate)} - ${dateFormat.format(_preview!.endDate)}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _preview!.isFull
-                                ? theme.colorScheme.errorContainer
-                                : theme.colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${_preview!.memberCount} of 15 members',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: _preview!.isFull
-                                  ? theme.colorScheme.onErrorContainer
-                                  : theme.colorScheme.onSecondaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 24),
-
-                if (_existingTrip != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: theme.colorScheme.onPrimaryContainer,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'You are already a member of this trip.',
-                            style: TextStyle(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () =>
-                        context.go('/trip/${_preview!.tripId}/members'),
-                    icon: const Icon(Icons.arrow_forward),
-                    label: const Text('Open Trip'),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                ] else if (_preview!.isFull) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.block,
-                          color: theme.colorScheme.onErrorContainer,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'This trip is full (15 of 15 members).',
-                            style: TextStyle(
-                              color: theme.colorScheme.onErrorContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const FilledButton(
-                    onPressed: null, // Disabled
-                    child: Text('Trip is Full'),
-                  ),
-                ] else ...[
-                  FilledButton(
-                    onPressed: _isJoining ? null : _confirmJoin,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                    ),
-                    child: _isJoining
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Join Trip',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ],
               ],
             ],
-          ),
+          ],
         ),
       ),
+    );
+
+    if (!isCompact) {
+      bodyContent = CenteredContent(maxWidth: 560, child: bodyContent);
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Join Trip with Code')),
+      body: bodyContent,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/theme_provider.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../data/auth_provider.dart';
 import '../domain/app_user.dart';
 import '../domain/auth_validators.dart';
@@ -20,6 +21,102 @@ class SettingsScreen extends ConsumerWidget {
     final appUserAsync = ref.watch(appUserProvider);
     final themeMode = ref.watch(themeProvider);
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 720;
+
+    Widget bodyContent = ListView(
+      children: [
+        // User profile section
+        appUserAsync.when(
+          data: (user) => _buildProfileSection(context, ref, user, colorScheme),
+          loading: () => const ListTile(
+            leading: CircularProgressIndicator(),
+            title: Text('Loading profile...'),
+          ),
+          error: (e, _) => ListTile(
+            leading: const Icon(Icons.error),
+            title: Text('Error loading profile: $e'),
+          ),
+        ),
+        const Divider(),
+
+        // Appearance section
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Appearance',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.system,
+                      label: Text('System'),
+                      icon: Icon(Icons.brightness_auto),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.light,
+                      label: Text('Light'),
+                      icon: Icon(Icons.light_mode),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.dark,
+                      label: Text('Dark'),
+                      icon: Icon(Icons.dark_mode),
+                    ),
+                  ],
+                  selected: {themeMode},
+                  onSelectionChanged: (newSelection) {
+                    ref
+                        .read(themeProvider.notifier)
+                        .setThemeMode(newSelection.first);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const Divider(),
+
+        // Account actions
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            'Account',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: Icon(Icons.logout, color: colorScheme.error),
+          title: Text('Sign Out', style: TextStyle(color: colorScheme.error)),
+          onTap: () => _signOut(context, ref),
+        ),
+
+        const Divider(),
+
+        // App info
+        const ListTile(
+          leading: Icon(Icons.info_outline),
+          title: Text('Wayfound'),
+          subtitle: Text('Version 1.0.0'),
+        ),
+      ],
+    );
+
+    if (!isCompact) {
+      bodyContent = CenteredContent(maxWidth: 560, child: bodyContent);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -28,95 +125,7 @@ class SettingsScreen extends ConsumerWidget {
           onPressed: () => context.go('/home'),
         ),
       ),
-      body: ListView(
-        children: [
-          // User profile section
-          appUserAsync.when(
-            data: (user) =>
-                _buildProfileSection(context, ref, user, colorScheme),
-            loading: () => const ListTile(
-              leading: CircularProgressIndicator(),
-              title: Text('Loading profile...'),
-            ),
-            error: (e, _) => ListTile(
-              leading: const Icon(Icons.error),
-              title: Text('Error loading profile: $e'),
-            ),
-          ),
-          const Divider(),
-
-          // Appearance section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Appearance',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: SegmentedButton<ThemeMode>(
-                    segments: const [
-                      ButtonSegment<ThemeMode>(
-                        value: ThemeMode.system,
-                        label: Text('System'),
-                        icon: Icon(Icons.brightness_auto),
-                      ),
-                      ButtonSegment<ThemeMode>(
-                        value: ThemeMode.light,
-                        label: Text('Light'),
-                        icon: Icon(Icons.light_mode),
-                      ),
-                      ButtonSegment<ThemeMode>(
-                        value: ThemeMode.dark,
-                        label: Text('Dark'),
-                        icon: Icon(Icons.dark_mode),
-                      ),
-                    ],
-                    selected: {themeMode},
-                    onSelectionChanged: (newSelection) {
-                      ref
-                          .read(themeProvider.notifier)
-                          .setThemeMode(newSelection.first);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const Divider(),
-
-          // Account actions
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Account',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout, color: colorScheme.error),
-            title: Text('Sign Out', style: TextStyle(color: colorScheme.error)),
-            onTap: () => _signOut(context, ref),
-          ),
-
-          const Divider(),
-
-          // App info
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('Wayfound'),
-            subtitle: Text('Version 1.0.0'),
-          ),
-        ],
-      ),
+      body: bodyContent,
     );
   }
 

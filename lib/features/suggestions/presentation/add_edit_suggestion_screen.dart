@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/money.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../trips/data/trips_providers.dart';
 import '../../trips/domain/currencies.dart';
@@ -198,6 +199,120 @@ class _AddEditSuggestionScreenState
             kCurrencyDetails[trip.currency.toUpperCase()]?.symbol ??
             trip.currency;
 
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final isCompact = screenWidth < 720;
+
+        Widget bodyContent = SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Title Field
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title *',
+                    hintText: 'e.g. Visit Aguada Fort',
+                    prefixIcon: Icon(Icons.title),
+                  ),
+                  maxLength: 80,
+                  validator: SuggestionValidators.validateTitle,
+                ),
+                const SizedBox(height: 16),
+
+                // Category Dropdown
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Category *',
+                    prefixIcon: Icon(Icons.category),
+                  ),
+                  items: kSuggestionCategories.map((catKey) {
+                    final info = getCategoryInfo(catKey);
+                    return DropdownMenuItem<String>(
+                      value: catKey,
+                      child: Row(
+                        children: [
+                          Icon(info.icon, size: 20),
+                          const SizedBox(width: 8),
+                          Text(info.label),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        _selectedCategory = val;
+                      });
+                    }
+                  },
+                  validator: SuggestionValidators.validateCategory,
+                ),
+                const SizedBox(height: 16),
+
+                // Estimated Cost Field (Optional)
+                TextFormField(
+                  controller: _costController,
+                  decoration: InputDecoration(
+                    labelText: 'Estimated Cost (Optional)',
+                    hintText: getMinorUnitDigits(trip.currency) == 0
+                        ? 'e.g. 500'
+                        : 'e.g. 125.50',
+                    prefixText: '$currencySymbol ',
+                    prefixIcon: const Icon(Icons.payments_outlined),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  validator: (val) => SuggestionValidators.validateCostInput(
+                    val,
+                    trip.currency,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Note Field (Optional)
+                TextFormField(
+                  controller: _noteController,
+                  decoration: const InputDecoration(
+                    labelText: 'Note (Optional)',
+                    hintText: 'Add details, link, or notes...',
+                    prefixIcon: Icon(Icons.notes),
+                  ),
+                  maxLines: 4,
+                  maxLength: 500,
+                  validator: SuggestionValidators.validateNote,
+                ),
+                const SizedBox(height: 32),
+
+                // Submit Button
+                FilledButton(
+                  onPressed: _isLoading ? null : () => _submit(trip.currency),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          widget.isEditing ? 'Save Changes' : 'Add Suggestion',
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        if (!isCompact) {
+          bodyContent = CenteredContent(maxWidth: 560, child: bodyContent);
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -208,114 +323,7 @@ class _AddEditSuggestionScreenState
               onPressed: _returnToSuggestions,
             ),
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Title Field
-                  TextFormField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Title *',
-                      hintText: 'e.g. Visit Aguada Fort',
-                      prefixIcon: Icon(Icons.title),
-                    ),
-                    maxLength: 80,
-                    validator: SuggestionValidators.validateTitle,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Category Dropdown
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedCategory,
-                    decoration: const InputDecoration(
-                      labelText: 'Category *',
-                      prefixIcon: Icon(Icons.category),
-                    ),
-                    items: kSuggestionCategories.map((catKey) {
-                      final info = getCategoryInfo(catKey);
-                      return DropdownMenuItem<String>(
-                        value: catKey,
-                        child: Row(
-                          children: [
-                            Icon(info.icon, size: 20),
-                            const SizedBox(width: 8),
-                            Text(info.label),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedCategory = val;
-                        });
-                      }
-                    },
-                    validator: SuggestionValidators.validateCategory,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Estimated Cost Field (Optional)
-                  TextFormField(
-                    controller: _costController,
-                    decoration: InputDecoration(
-                      labelText: 'Estimated Cost (Optional)',
-                      hintText: getMinorUnitDigits(trip.currency) == 0
-                          ? 'e.g. 500'
-                          : 'e.g. 125.50',
-                      prefixText: '$currencySymbol ',
-                      prefixIcon: const Icon(Icons.payments_outlined),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    validator: (val) => SuggestionValidators.validateCostInput(
-                      val,
-                      trip.currency,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Note Field (Optional)
-                  TextFormField(
-                    controller: _noteController,
-                    decoration: const InputDecoration(
-                      labelText: 'Note (Optional)',
-                      hintText: 'Add details, link, or notes...',
-                      prefixIcon: Icon(Icons.notes),
-                    ),
-                    maxLines: 4,
-                    maxLength: 500,
-                    validator: SuggestionValidators.validateNote,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Submit Button
-                  FilledButton(
-                    onPressed: _isLoading ? null : () => _submit(trip.currency),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            widget.isEditing
-                                ? 'Save Changes'
-                                : 'Add Suggestion',
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          body: bodyContent,
         );
       },
     );

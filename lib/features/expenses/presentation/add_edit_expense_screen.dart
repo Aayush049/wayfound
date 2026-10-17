@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/money.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../trips/data/trips_providers.dart';
 import '../../trips/domain/currencies.dart';
@@ -299,6 +300,244 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
             activeMembers.isNotEmpty &&
             _selectedParticipants.length == activeMembers.length;
 
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final isCompact = screenWidth < 720;
+
+        Widget bodyContent = SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Description Field
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description *',
+                    hintText: 'e.g. Dinner at Beach Shack',
+                    prefixIcon: Icon(Icons.description_outlined),
+                  ),
+                  maxLength: 100,
+                  validator: ExpenseValidators.validateDescription,
+                ),
+                const SizedBox(height: 16),
+
+                // Amount Field
+                TextFormField(
+                  controller: _amountController,
+                  decoration: InputDecoration(
+                    labelText: 'Amount *',
+                    hintText: getMinorUnitDigits(trip.currency) == 0
+                        ? 'e.g. 1500'
+                        : 'e.g. 45.50',
+                    prefixText: '$currencySymbol ',
+                    prefixIcon: const Icon(Icons.payments_outlined),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  onChanged: (val) {
+                    setState(() {}); // Trigger live share preview rebuild
+                    _formKey.currentState?.validate();
+                  },
+                  validator: (val) =>
+                      ExpenseValidators.validateAmountInput(val, trip.currency),
+                ),
+                const SizedBox(height: 16),
+
+                // Date Picker Button
+                InkWell(
+                  onTap: _pickDate,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Date *',
+                      prefixIcon: Icon(Icons.calendar_today_outlined),
+                    ),
+                    child: Text(
+                      DateFormat.yMMMd().format(_selectedDate),
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Paid By Dropdown
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedPaidBy,
+                  decoration: const InputDecoration(
+                    labelText: 'Paid By *',
+                    prefixIcon: Icon(Icons.person_outlined),
+                  ),
+                  items: activeMembers.map((member) {
+                    return DropdownMenuItem<String>(
+                      value: member.uid,
+                      child: Text(
+                        member.uid == currentUid
+                            ? '${member.displayName} (You)'
+                            : member.displayName,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        _selectedPaidBy = val;
+                      });
+                    }
+                  },
+                  validator: (val) =>
+                      ExpenseValidators.validatePaidBy(val, activeMemberUids),
+                ),
+                const SizedBox(height: 24),
+
+                // Participants Header & Select All Checkbox
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    Text(
+                      'Split Among (${_selectedParticipants.length}/${activeMembers.length})',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Checkbox(
+                          value: allSelected,
+                          onChanged: (checked) {
+                            setState(() {
+                              if (checked == true) {
+                                _selectedParticipants.addAll(activeMemberUids);
+                              } else {
+                                _selectedParticipants.clear();
+                              }
+                            });
+                          },
+                        ),
+                        const Text('Select all'),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Participants Checkbox List
+                Card(
+                  child: Column(
+                    children: activeMembers.map((member) {
+                      final isChecked = _selectedParticipants.contains(
+                        member.uid,
+                      );
+                      return CheckboxListTile(
+                        value: isChecked,
+                        title: Text(
+                          member.uid == currentUid
+                              ? '${member.displayName} (You)'
+                              : member.displayName,
+                        ),
+                        onChanged: (checked) {
+                          setState(() {
+                            if (checked == true) {
+                              _selectedParticipants.add(member.uid);
+                            } else {
+                              _selectedParticipants.remove(member.uid);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Live Share Preview Card (hidden when amount is invalid or zero/empty)
+                if (_selectedParticipants.isNotEmpty &&
+                    parsedAmount != null &&
+                    parsedAmount > 0) ...[
+                  Card(
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Live Share Preview',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ..._selectedParticipants.map((pUid) {
+                            final name = memberMap[pUid] ?? pUid;
+                            final share = liveShares[pUid] ?? 0;
+                            final formattedShare = formatMinorUnits(
+                              share,
+                              trip.currency,
+                            );
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      style: theme.textTheme.bodyMedium,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    formattedShare,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                // Submit Button
+                FilledButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => _submit(trip.currency, activeMemberUids),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(widget.isEditing ? 'Save Changes' : 'Add Expense'),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        if (!isCompact) {
+          bodyContent = CenteredContent(maxWidth: 560, child: bodyContent);
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text(widget.isEditing ? 'Edit Expense' : 'Add Expense'),
@@ -307,245 +546,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
               onPressed: _returnToExpenses,
             ),
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Description Field
-                  TextFormField(
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description *',
-                      hintText: 'e.g. Dinner at Beach Shack',
-                      prefixIcon: Icon(Icons.description_outlined),
-                    ),
-                    maxLength: 100,
-                    validator: ExpenseValidators.validateDescription,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Amount Field
-                  TextFormField(
-                    controller: _amountController,
-                    decoration: InputDecoration(
-                      labelText: 'Amount *',
-                      hintText: getMinorUnitDigits(trip.currency) == 0
-                          ? 'e.g. 1500'
-                          : 'e.g. 45.50',
-                      prefixText: '$currencySymbol ',
-                      prefixIcon: const Icon(Icons.payments_outlined),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (val) {
-                      setState(() {}); // Trigger live share preview rebuild
-                      _formKey.currentState?.validate();
-                    },
-                    validator: (val) => ExpenseValidators.validateAmountInput(
-                      val,
-                      trip.currency,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Date Picker Button
-                  InkWell(
-                    onTap: _pickDate,
-                    borderRadius: BorderRadius.circular(8),
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Date *',
-                        prefixIcon: Icon(Icons.calendar_today_outlined),
-                      ),
-                      child: Text(
-                        DateFormat.yMMMd().format(_selectedDate),
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Paid By Dropdown
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedPaidBy,
-                    decoration: const InputDecoration(
-                      labelText: 'Paid By *',
-                      prefixIcon: Icon(Icons.person_outlined),
-                    ),
-                    items: activeMembers.map((member) {
-                      return DropdownMenuItem<String>(
-                        value: member.uid,
-                        child: Text(
-                          member.uid == currentUid
-                              ? '${member.displayName} (You)'
-                              : member.displayName,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedPaidBy = val;
-                        });
-                      }
-                    },
-                    validator: (val) =>
-                        ExpenseValidators.validatePaidBy(val, activeMemberUids),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Participants Header & Select All Checkbox
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      Text(
-                        'Split Among (${_selectedParticipants.length}/${activeMembers.length})',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: allSelected,
-                            onChanged: (checked) {
-                              setState(() {
-                                if (checked == true) {
-                                  _selectedParticipants.addAll(
-                                    activeMemberUids,
-                                  );
-                                } else {
-                                  _selectedParticipants.clear();
-                                }
-                              });
-                            },
-                          ),
-                          const Text('Select all'),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Participants Checkbox List
-                  Card(
-                    child: Column(
-                      children: activeMembers.map((member) {
-                        final isChecked = _selectedParticipants.contains(
-                          member.uid,
-                        );
-                        return CheckboxListTile(
-                          value: isChecked,
-                          title: Text(
-                            member.uid == currentUid
-                                ? '${member.displayName} (You)'
-                                : member.displayName,
-                          ),
-                          onChanged: (checked) {
-                            setState(() {
-                              if (checked == true) {
-                                _selectedParticipants.add(member.uid);
-                              } else {
-                                _selectedParticipants.remove(member.uid);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Live Share Preview Card (hidden when amount is invalid or zero/empty)
-                  if (_selectedParticipants.isNotEmpty &&
-                      parsedAmount != null &&
-                      parsedAmount > 0) ...[
-                    Card(
-                      color: theme.colorScheme.surfaceContainerHigh,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Live Share Preview',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            ..._selectedParticipants.map((pUid) {
-                              final name = memberMap[pUid] ?? pUid;
-                              final share = liveShares[pUid] ?? 0;
-                              final formattedShare = formatMinorUnits(
-                                share,
-                                trip.currency,
-                              );
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        name,
-                                        style: theme.textTheme.bodyMedium,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      formattedShare,
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Submit Button
-                  FilledButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => _submit(trip.currency, activeMemberUids),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            widget.isEditing ? 'Save Changes' : 'Add Expense',
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          body: bodyContent,
         );
       },
     );

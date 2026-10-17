@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../auth/data/auth_provider.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../data/trips_providers.dart';
 import '../domain/currencies.dart';
 import '../domain/trip_validators.dart';
@@ -197,143 +198,147 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
         ? '${dateFormat.format(_startDate!)} - ${dateFormat.format(_endDate!)}'
         : 'Select date range';
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Create New Trip')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.errorContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(
-                            color: theme.colorScheme.onErrorContainer,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 720;
 
-              // Trip Name
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Trip Name *',
-                  hintText: 'e.g. Summer in Goa',
-                  prefixIcon: Icon(Icons.flight_takeoff),
+    Widget bodyContent = SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_errorMessage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                textCapitalization: TextCapitalization.words,
-                validator: validateTripName,
-              ),
-              const SizedBox(height: 16),
-
-              // Destination
-              TextFormField(
-                controller: _destinationController,
-                decoration: const InputDecoration(
-                  labelText: 'Destination *',
-                  hintText: 'e.g. Goa, India',
-                  prefixIcon: Icon(Icons.location_on),
-                ),
-                textCapitalization: TextCapitalization.words,
-                validator: validateDestination,
-              ),
-              const SizedBox(height: 16),
-
-              // Date Range Picker Button
-              InkWell(
-                onTap: _isSubmitting ? null : _pickDateRange,
-                borderRadius: BorderRadius.circular(12),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Trip Dates *',
-                    prefixIcon: Icon(Icons.date_range),
-                  ),
-                  child: Text(
-                    dateRangeText,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: _startDate != null
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: theme.colorScheme.onErrorContainer,
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Currency Dropdown (Required selection, no default!)
-              DropdownButtonFormField<String>(
-                isExpanded: true,
-                initialValue: _selectedCurrency,
-                decoration: const InputDecoration(
-                  labelText: 'Currency *',
-                  hintText: 'Select currency (immutable after creation)',
-                  prefixIcon: Icon(Icons.attach_money),
-                ),
-                items: kSupportedCurrencies.map((code) {
-                  return DropdownMenuItem<String>(
-                    value: code,
-                    child: Text(code),
-                  );
-                }).toList(),
-                onChanged: _isSubmitting
-                    ? null
-                    : (value) {
-                        setState(() {
-                          _selectedCurrency = value;
-                        });
-                      },
-                validator: validateCurrencySelection,
-              ),
-              const SizedBox(height: 32),
-
-              // Submit Button
-              FilledButton(
-                onPressed: _isSubmitting ? null : _submit,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.all(16),
-                ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text(
-                        'Create Trip',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
             ],
-          ),
+
+            // Trip Name
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Trip Name *',
+                hintText: 'e.g. Summer in Goa',
+                prefixIcon: Icon(Icons.flight_takeoff),
+              ),
+              textCapitalization: TextCapitalization.words,
+              validator: validateTripName,
+            ),
+            const SizedBox(height: 16),
+
+            // Destination
+            TextFormField(
+              controller: _destinationController,
+              decoration: const InputDecoration(
+                labelText: 'Destination *',
+                hintText: 'e.g. Goa, India',
+                prefixIcon: Icon(Icons.location_on),
+              ),
+              textCapitalization: TextCapitalization.words,
+              validator: validateDestination,
+            ),
+            const SizedBox(height: 16),
+
+            // Date Range Picker Button
+            InkWell(
+              onTap: _isSubmitting ? null : _pickDateRange,
+              borderRadius: BorderRadius.circular(12),
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Trip Dates *',
+                  prefixIcon: Icon(Icons.date_range),
+                ),
+                child: Text(
+                  dateRangeText,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: _startDate != null
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Currency Dropdown (Required selection, no default!)
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              initialValue: _selectedCurrency,
+              decoration: const InputDecoration(
+                labelText: 'Currency *',
+                hintText: 'Select currency (immutable after creation)',
+                prefixIcon: Icon(Icons.attach_money),
+              ),
+              items: kSupportedCurrencies.map((code) {
+                return DropdownMenuItem<String>(value: code, child: Text(code));
+              }).toList(),
+              onChanged: _isSubmitting
+                  ? null
+                  : (value) {
+                      setState(() {
+                        _selectedCurrency = value;
+                      });
+                    },
+              validator: validateCurrencySelection,
+            ),
+            const SizedBox(height: 32),
+
+            // Submit Button
+            FilledButton(
+              onPressed: _isSubmitting ? null : _submit,
+              style: FilledButton.styleFrom(padding: const EdgeInsets.all(16)),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Create Trip',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
+          ],
         ),
       ),
+    );
+
+    if (!isCompact) {
+      bodyContent = CenteredContent(maxWidth: 560, child: bodyContent);
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create New Trip')),
+      body: bodyContent,
     );
   }
 }
