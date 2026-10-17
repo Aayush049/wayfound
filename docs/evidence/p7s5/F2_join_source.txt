@@ -1,0 +1,549 @@
+=== 1. lib/features/trips/domain/join_preview.dart ===
+1: import 'package:cloud_firestore/cloud_firestore.dart';
+2: 
+3: class JoinPreview {
+4:   final String code;
+5:   final String tripId;
+6:   final String tripName;
+7:   final String destination;
+8:   final DateTime startDate;
+9:   final DateTime endDate;
+10:   final int memberCount;
+11: 
+12:   const JoinPreview({
+13:     required this.code,
+14:     required this.tripId,
+15:     required this.tripName,
+16:     required this.destination,
+17:     required this.startDate,
+18:     required this.endDate,
+19:     required this.memberCount,
+20:   });
+21: 
+22:   factory JoinPreview.fromFirestore(DocumentSnapshot doc) {
+23:     return JoinPreview.fromMap(
+24:       doc.id,
+25:       doc.data() as Map<String, dynamic>? ?? {},
+26:     );
+27:   }
+28: 
+29:   factory JoinPreview.fromMap(String code, Map<String, dynamic> data) {
+30:     DateTime parseDate(dynamic val) {
+31:       if (val is Timestamp) return val.toDate();
+32:       if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
+33:       return DateTime.now();
+34:     }
+35: 
+36:     return JoinPreview(
+37:       code: code,
+38:       tripId: data['tripId'] as String? ?? '',
+39:       tripName: data['tripName'] as String? ?? '',
+40:       destination: data['destination'] as String? ?? '',
+41:       startDate: parseDate(data['startDate']),
+42:       endDate: parseDate(data['endDate']),
+43:       memberCount: (data['memberCount'] as num?)?.toInt() ?? 1,
+44:     );
+45:   }
+46: 
+47:   bool get isFull => memberCount >= 15;
+48: }
+49: 
+
+=== 2. lib/features/trips/data/trip_repository.dart (getJoinPreview & joinTrip, lines 179-251) ===
+179:   /// Looks up a join preview document `joinCodes/{code}`.
+180:   Future<JoinPreview?> getJoinPreview(String code) async {
+181:     final doc = await _firestore.collection('joinCodes').doc(code).get();
+182:     if (!doc.exists) return null;
+183:     return JoinPreview.fromFirestore(doc);
+184:   }
+185: 
+186:   /// Joins a trip via one atomic batched write.
+187:   Future<void> joinTrip({
+188:     required String code,
+189:     required String tripId,
+190:     required String userUid,
+191:     required String displayName,
+192:     String? photoUrl,
+193:     required int currentMemberCount,
+194:   }) async {
+195:     if (currentMemberCount >= 15) {
+196:       throw Exception('Trip is full');
+197:     }
+198: 
+199:     final tripDocRef = _firestore.collection('trips').doc(tripId);
+200:     final memberDocRef = tripDocRef.collection('members').doc(userUid);
+201:     final joinCodeDocRef = _firestore.collection('joinCodes').doc(code);
+202: 
+203:     final batch = _firestore.batch();
+204: 
+205:     batch.update(tripDocRef, buildJoinTripUpdatePayload(callerUid: userUid));
+206: 
+207:     batch.set(
+208:       memberDocRef,
+209:       buildMemberCreatePayload(
+210:         displayName: displayName,
+211:         photoUrl: photoUrl,
+212:         role: 'member',
+213:       ),
+214:     );
+215: 
+216:     batch.update(
+217:       joinCodeDocRef,
+218:       buildJoinCodeUpdatePayload(newMemberCount: currentMemberCount + 1),
+219:     );
+220: 
+221:     try {
+222:       await batch.commit();
+223:     } on FirebaseException catch (e) {
+224:       final freshCodeDoc = await getJoinPreview(code);
+225:       if (freshCodeDoc != null && freshCodeDoc.isFull) {
+226:         throw Exception('Could not join, the trip may be full');
+227:       }
+228:       if (e.code == 'permission-denied') {
+229:         throw Exception(
+230:           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+231:         );
+232:       }
+233:       throw Exception(
+234:         'Could not join trip. Please verify the code and try again.',
+235:       );
+236:     } catch (e) {
+237:       final freshCodeDoc = await getJoinPreview(code);
+238:       if (freshCodeDoc != null && freshCodeDoc.isFull) {
+239:         throw Exception('Could not join, the trip may be full');
+240:       }
+241:       if (e.toString().contains('permission-denied')) {
+242:         throw Exception(
+243:           "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+244:         );
+245:       }
+246:       throw Exception(
+247:         'Could not join trip. Please verify the code and try again.',
+248:       );
+249:     }
+250:   }
+251: 
+
+=== 3. lib/features/trips/presentation/join_trip_screen.dart (full source) ===
+1: import 'package:flutter/material.dart';
+2: import 'package:flutter/services.dart';
+3: import 'package:flutter_riverpod/flutter_riverpod.dart';
+4: import 'package:go_router/go_router.dart';
+5: import 'package:intl/intl.dart';
+6: 
+7: import '../../auth/data/auth_provider.dart';
+8: import '../data/trips_providers.dart';
+9: import '../domain/join_code.dart';
+10: import '../domain/join_preview.dart';
+11: import '../domain/trip.dart';
+12: 
+13: class JoinTripScreen extends ConsumerStatefulWidget {
+14:   const JoinTripScreen({super.key});
+15: 
+16:   @override
+17:   ConsumerState<JoinTripScreen> createState() => _JoinTripScreenState();
+18: }
+19: 
+20: class _JoinTripScreenState extends ConsumerState<JoinTripScreen> {
+21:   final _codeController = TextEditingController();
+22:   final _formKey = GlobalKey<FormState>();
+23: 
+24:   bool _isSearching = false;
+25:   bool _isJoining = false;
+26: 
+27:   JoinPreview? _preview;
+28:   Trip? _existingTrip;
+29:   String? _errorMessage;
+30: 
+31:   @override
+32:   void dispose() {
+33:     _codeController.dispose();
+34:     super.dispose();
+35:   }
+36: 
+37:   Future<void> _searchCode() async {
+38:     setState(() {
+39:       _errorMessage = null;
+40:       _preview = null;
+41:       _existingTrip = null;
+42:     });
+43: 
+44:     final normalized = normalizeJoinCode(_codeController.text);
+45:     if (!isValidJoinCode(normalized)) {
+46:       setState(() {
+47:         _errorMessage = 'Invalid join code format. Must be 6 characters (letters and numbers).';
+48:       });
+49:       return;
+50:     }
+51: 
+52:     setState(() {
+53:       _isSearching = true;
+54:     });
+55: 
+56:     try {
+57:       final repo = ref.read(tripRepositoryProvider);
+58:       final preview = await repo.getJoinPreview(normalized);
+59: 
+60:       if (preview == null) {
+61:         if (!mounted) return;
+62:         setState(() {
+63:           _isSearching = false;
+64:           _errorMessage = 'Invalid code. No trip found matching "$normalized".';
+65:         });
+66:         return;
+67:       }
+68: 
+69:       // Check if user is already a member of this trip
+70:       final authUser = ref.read(authUserProvider).asData?.value;
+71:       Trip? existing;
+72:       if (authUser != null) {
+73:         final myTrips = ref.read(myTripsProvider).asData?.value ?? [];
+74:         existing = myTrips.cast<Trip?>().firstWhere(
+75:           (t) => t?.id == preview.tripId,
+76:           orElse: () => null,
+77:         );
+78:       }
+79: 
+80:       if (!mounted) return;
+81:       setState(() {
+82:         _isSearching = false;
+83:         _preview = preview;
+84:         _existingTrip = existing;
+85:       });
+86:     } catch (e) {
+87:       if (!mounted) return;
+88:       setState(() {
+89:         _isSearching = false;
+90:         _errorMessage = 'Could not lookup code. Please try again.';
+91:       });
+92:     }
+93:   }
+94: 
+95:   Future<void> _confirmJoin() async {
+96:     if (_preview == null) return;
+97: 
+98:     final authUser = ref.read(authUserProvider).asData?.value;
+99:     final appUser = ref.read(appUserProvider).asData?.value;
+100: 
+101:     if (authUser == null) {
+102:       setState(() {
+103:         _errorMessage = 'You must be signed in to join a trip.';
+104:       });
+105:       return;
+106:     }
+107: 
+108:     final displayName =
+109:         appUser?.displayName ??
+110:         (authUser.email != null && authUser.email!.isNotEmpty
+111:             ? authUser.email!.split('@').first
+112:             : 'Member');
+113:     final photoUrl = appUser?.photoUrl ?? authUser.photoURL;
+114: 
+115:     setState(() {
+116:       _isJoining = true;
+117:       _errorMessage = null;
+118:     });
+119: 
+120:     try {
+121:       final repo = ref.read(tripRepositoryProvider);
+122:       await repo.joinTrip(
+123:         code: _preview!.code,
+124:         tripId: _preview!.tripId,
+125:         userUid: authUser.uid,
+126:         displayName: displayName,
+127:         photoUrl: photoUrl,
+128:         currentMemberCount: _preview!.memberCount,
+129:       );
+130: 
+131:       if (!mounted) return;
+132: 
+133:       // Navigate to trip members tab
+134:       context.go('/trip/${_preview!.tripId}/members');
+135:     } catch (e) {
+136:       if (!mounted) return;
+137:       setState(() {
+138:         _isJoining = false;
+139:         _errorMessage = e.toString().replaceAll('Exception: ', '');
+140:       });
+141:     }
+142:   }
+143: 
+144:   @override
+145:   Widget build(BuildContext context) {
+146:     final theme = Theme.of(context);
+147:     final dateFormat = DateFormat('MMM d, yyyy');
+148: 
+149:     return Scaffold(
+150:       appBar: AppBar(title: const Text('Join Trip with Code')),
+151:       body: SingleChildScrollView(
+152:         padding: const EdgeInsets.all(24.0),
+153:         child: Form(
+154:           key: _formKey,
+155:           child: Column(
+156:             crossAxisAlignment: CrossAxisAlignment.stretch,
+157:             children: [
+158:               Text(
+159:                 'Enter the 6-character code provided by the trip organizer:',
+160:                 style: theme.textTheme.bodyMedium?.copyWith(
+161:                   color: theme.colorScheme.onSurfaceVariant,
+162:                 ),
+163:               ),
+164:               const SizedBox(height: 16),
+165: 
+166:               // Code input field
+167:               TextFormField(
+168:                 controller: _codeController,
+169:                 decoration: InputDecoration(
+170:                   labelText: 'Join Code',
+171:                   hintText: 'e.g. ABC234',
+172:                   prefixIcon: const Icon(Icons.qr_code_scanner),
+173:                   suffixIcon: IconButton(
+174:                     icon: _isSearching
+175:                         ? const SizedBox(
+176:                             width: 20,
+177:                             height: 20,
+178:                             child: CircularProgressIndicator(strokeWidth: 2),
+179:                           )
+180:                         : const Icon(Icons.search),
+181:                     onPressed: _isSearching || _isJoining ? null : _searchCode,
+182:                   ),
+183:                 ),
+184:                 textCapitalization: TextCapitalization.characters,
+185:                 autocorrect: false,
+186:                 maxLength: 8, // Allow typing with dashes before normalization
+187:                 inputFormatters: [
+188:                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s-]')),
+189:                 ],
+190:                 onFieldSubmitted: (_) => _searchCode(),
+191:               ),
+192:               const SizedBox(height: 16),
+193: 
+194:               if (_errorMessage != null) ...[
+195:                 Container(
+196:                   padding: const EdgeInsets.all(12),
+197:                   decoration: BoxDecoration(
+198:                     color: theme.colorScheme.errorContainer,
+199:                     borderRadius: BorderRadius.circular(8),
+200:                   ),
+201:                   child: Row(
+202:                     children: [
+203:                       Icon(
+204:                         Icons.error_outline,
+205:                         color: theme.colorScheme.onErrorContainer,
+206:                       ),
+207:                       const SizedBox(width: 8),
+208:                       Expanded(
+209:                         child: Text(
+210:                           _errorMessage!,
+211:                           style: TextStyle(
+212:                             color: theme.colorScheme.onErrorContainer,
+213:                           ),
+214:                         ),
+215:                       ),
+216:                     ],
+217:                   ),
+218:                 ),
+219:                 const SizedBox(height: 16),
+220:               ],
+221: 
+222:               // Trip Preview Card
+223:               if (_preview != null) ...[
+224:                 Card(
+225:                   elevation: 2,
+226:                   shape: RoundedRectangleBorder(
+227:                     borderRadius: BorderRadius.circular(16),
+228:                     side: BorderSide(
+229:                       color: theme.colorScheme.primary.withValues(alpha: 0.3),
+230:                       width: 1.5,
+231:                     ),
+232:                   ),
+233:                   child: Padding(
+234:                     padding: const EdgeInsets.all(20.0),
+235:                     child: Column(
+236:                       crossAxisAlignment: CrossAxisAlignment.start,
+237:                       children: [
+238:                         Row(
+239:                           children: [
+240:                             Icon(
+241:                               Icons.card_travel,
+242:                               color: theme.colorScheme.primary,
+243:                             ),
+244:                             const SizedBox(width: 8),
+245:                             Text(
+246:                               'Trip Preview',
+247:                               style: theme.textTheme.labelMedium?.copyWith(
+248:                                 color: theme.colorScheme.primary,
+249:                                 fontWeight: FontWeight.bold,
+250:                               ),
+251:                             ),
+252:                           ],
+253:                         ),
+254:                         const SizedBox(height: 12),
+255:                         Text(
+256:                           _preview!.tripName,
+257:                           style: theme.textTheme.titleLarge?.copyWith(
+258:                             fontWeight: FontWeight.bold,
+259:                           ),
+260:                         ),
+261:                         const SizedBox(height: 4),
+262:                         Row(
+263:                           children: [
+264:                             Icon(
+265:                               Icons.location_on_outlined,
+266:                               size: 16,
+267:                               color: theme.colorScheme.secondary,
+268:                             ),
+269:                             const SizedBox(width: 4),
+270:                             Text(
+271:                               _preview!.destination,
+272:                               style: theme.textTheme.bodyMedium?.copyWith(
+273:                                 color: theme.colorScheme.onSurfaceVariant,
+274:                               ),
+275:                             ),
+276:                           ],
+277:                         ),
+278:                         const SizedBox(height: 8),
+279:                         Row(
+280:                           children: [
+281:                             Icon(
+282:                               Icons.calendar_today_outlined,
+283:                               size: 16,
+284:                               color: theme.colorScheme.onSurfaceVariant,
+285:                             ),
+286:                             const SizedBox(width: 4),
+287:                             Text(
+288:                               '${dateFormat.format(_preview!.startDate)} - ${dateFormat.format(_preview!.endDate)}',
+289:                               style: theme.textTheme.bodySmall?.copyWith(
+290:                                 color: theme.colorScheme.onSurfaceVariant,
+291:                               ),
+292:                             ),
+293:                           ],
+294:                         ),
+295:                         const SizedBox(height: 12),
+296:                         Container(
+297:                           padding: const EdgeInsets.symmetric(
+298:                             horizontal: 12,
+299:                             vertical: 6,
+300:                           ),
+301:                           decoration: BoxDecoration(
+302:                             color: _preview!.isFull
+303:                                 ? theme.colorScheme.errorContainer
+304:                                 : theme.colorScheme.secondaryContainer,
+305:                             borderRadius: BorderRadius.circular(12),
+306:                           ),
+307:                           child: Text(
+308:                             '${_preview!.memberCount} of 15 members',
+309:                             style: theme.textTheme.labelMedium?.copyWith(
+310:                               color: _preview!.isFull
+311:                                   ? theme.colorScheme.onErrorContainer
+312:                                   : theme.colorScheme.onSecondaryContainer,
+313:                               fontWeight: FontWeight.bold,
+314:                             ),
+315:                           ),
+316:                         ),
+317:                       ],
+318:                     ),
+319:                   ),
+320:                 ),
+321:                 const SizedBox(height: 24),
+322: 
+323:                 if (_existingTrip != null) ...[
+324:                   Container(
+325:                     padding: const EdgeInsets.all(12),
+326:                     decoration: BoxDecoration(
+327:                       color: theme.colorScheme.primaryContainer,
+328:                       borderRadius: BorderRadius.circular(8),
+329:                     ),
+330:                     child: Row(
+331:                       children: [
+332:                         Icon(
+333:                           Icons.info_outline,
+334:                           color: theme.colorScheme.onPrimaryContainer,
+335:                         ),
+336:                         const SizedBox(width: 8),
+337:                         Expanded(
+338:                           child: Text(
+339:                             'You are already a member of this trip.',
+340:                             style: TextStyle(
+341:                               color: theme.colorScheme.onPrimaryContainer,
+342:                               fontWeight: FontWeight.bold,
+343:                             ),
+344:                           ),
+345:                         ),
+346:                       ],
+347:                     ),
+348:                   ),
+349:                   const SizedBox(height: 16),
+350:                   FilledButton.icon(
+351:                     onPressed: () =>
+352:                         context.go('/trip/${_preview!.tripId}/members'),
+353:                     icon: const Icon(Icons.arrow_forward),
+354:                     label: const Text('Open Trip'),
+355:                     style: FilledButton.styleFrom(
+356:                       padding: const EdgeInsets.all(16),
+357:                     ),
+358:                   ),
+359:                 ] else if (_preview!.isFull) ...[
+360:                   Container(
+361:                     padding: const EdgeInsets.all(12),
+362:                     decoration: BoxDecoration(
+363:                       color: theme.colorScheme.errorContainer,
+364:                       borderRadius: BorderRadius.circular(8),
+365:                     ),
+366:                     child: Row(
+367:                       children: [
+368:                         Icon(
+369:                           Icons.block,
+370:                           color: theme.colorScheme.onErrorContainer,
+371:                         ),
+372:                         const SizedBox(width: 8),
+373:                         Expanded(
+374:                           child: Text(
+375:                             'This trip is full (15 of 15 members).',
+376:                             style: TextStyle(
+377:                               color: theme.colorScheme.onErrorContainer,
+378:                               fontWeight: FontWeight.bold,
+379:                             ),
+380:                           ),
+381:                         ),
+382:                       ],
+383:                     ),
+384:                   ),
+385:                   const SizedBox(height: 16),
+386:                   const FilledButton(
+387:                     onPressed: null, // Disabled
+388:                     child: Text('Trip is Full'),
+389:                   ),
+390:                 ] else ...[
+391:                   FilledButton(
+392:                     onPressed: _isJoining ? null : _confirmJoin,
+393:                     style: FilledButton.styleFrom(
+394:                       padding: const EdgeInsets.all(16),
+395:                     ),
+396:                     child: _isJoining
+397:                         ? const SizedBox(
+398:                             height: 20,
+399:                             width: 20,
+400:                             child: CircularProgressIndicator(
+401:                               strokeWidth: 2,
+402:                               color: Colors.white,
+403:                             ),
+404:                           )
+405:                         : const Text(
+406:                             'Join Trip',
+407:                             style: TextStyle(
+408:                               fontSize: 16,
+409:                               fontWeight: FontWeight.bold,
+410:                             ),
+411:                           ),
+412:                   ),
+413:                 ],
+414:               ],
+415:             ],
+416:           ),
+417:         ),
+418:       ),
+419:     );
+420:   }
+421: }
+422: 

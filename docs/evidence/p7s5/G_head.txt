@@ -1,0 +1,58 @@
+=== BEFORE GATES ===
+1d35e7548717177bbefd520a5f26bbf6ea21a72e
+## phase-7/close-out
+ M lib/features/trips/data/trip_repository.dart
+ M lib/features/trips/data/trips_providers.dart
+ M test/settlements_repository_test.dart
+ M test/settlements_widget_test.dart
+ M trip_planner_project_report.md
+?? docs/evidence/p7s3/G2_analyze.txt
+?? docs/evidence/p7s3/G2_counts.txt
+?? docs/evidence/p7s3/G2_hash.txt
+?? docs/evidence/p7s3/G2_test.json
+?? docs/evidence/p7s3/G2_test.txt
+?? docs/evidence/p7s3/M0_pre.txt
+?? docs/evidence/p7s3/M1_merge.txt
+?? docs/evidence/p7s3/M2_push.txt
+?? docs/evidence/p7s3/M3_verify.txt
+?? docs/evidence/p7s3/M_SUMMARY.txt
+?? docs/evidence/p7s4/G2_analyze.txt
+?? docs/evidence/p7s4/G2_counts.txt
+?? docs/evidence/p7s4/G2_hash.txt
+?? docs/evidence/p7s4/G2_test.json
+?? docs/evidence/p7s4/G2_test.txt
+?? docs/evidence/p7s4/M0_pre.txt
+?? docs/evidence/p7s4/M1_merge.txt
+?? docs/evidence/p7s4/M2_push.txt
+?? docs/evidence/p7s4/M3_verify.txt
+?? docs/evidence/p7s4/M_SUMMARY.txt
+?? docs/evidence/p7s5/
+=== AFTER GATES ===
+1d35e7548717177bbefd520a5f26bbf6ea21a72e
+## phase-7/close-out
+ M lib/features/trips/data/trip_repository.dart
+ M lib/features/trips/data/trips_providers.dart
+ M test/settlements_repository_test.dart
+ M test/settlements_widget_test.dart
+ M trip_planner_project_report.md
+?? docs/evidence/p7s3/G2_analyze.txt
+?? docs/evidence/p7s3/G2_counts.txt
+?? docs/evidence/p7s3/G2_hash.txt
+?? docs/evidence/p7s3/G2_test.json
+?? docs/evidence/p7s3/G2_test.txt
+?? docs/evidence/p7s3/M0_pre.txt
+?? docs/evidence/p7s3/M1_merge.txt
+?? docs/evidence/p7s3/M2_push.txt
+?? docs/evidence/p7s3/M3_verify.txt
+?? docs/evidence/p7s3/M_SUMMARY.txt
+?? docs/evidence/p7s4/G2_analyze.txt
+?? docs/evidence/p7s4/G2_counts.txt
+?? docs/evidence/p7s4/G2_hash.txt
+?? docs/evidence/p7s4/G2_test.json
+?? docs/evidence/p7s4/G2_test.txt
+?? docs/evidence/p7s4/M0_pre.txt
+?? docs/evidence/p7s4/M1_merge.txt
+?? docs/evidence/p7s4/M2_push.txt
+?? docs/evidence/p7s4/M3_verify.txt
+?? docs/evidence/p7s4/M_SUMMARY.txt
+?? docs/evidence/p7s5/

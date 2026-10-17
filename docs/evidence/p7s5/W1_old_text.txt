@@ -1,0 +1,11 @@
+﻿
+lib\features\trips\data\trip_repository.dart:230:          "Couldn't join this trip. If you left it earlier, rejoining 
+isn't supported in this version.",
+lib\features\trips\data\trip_repository.dart:243:          "Couldn't join this trip. If you left it earlier, rejoining 
+isn't supported in this version.",
+test\settlements_repository_test.dart:353:                    "Couldn't join this trip. If you left it earlier, 
+rejoining isn't supported in this version.",
+test\settlements_widget_test.dart:1504:            "Couldn't join this trip. If you left it earlier, rejoining isn't 
+supported in this version.",
+
+

@@ -1,0 +1,66 @@
+=== P7-S5 UPLOAD SUMMARY ===
+
+--- S0_HEAD ---
+1d35e7548717177bbefd520a5f26bbf6ea21a72e
+1d35e7548717177bbefd520a5f26bbf6ea21a72e
+1d35e7548717177bbefd520a5f26bbf6ea21a72e
+
+--- S0_HASH ---
+Algorithm       Hash                                                                   Path                            
+---------       ----                                                                   ----                            
+SHA256          6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6       D:\VsCode\wayfound\firestore....
+
+--- W1 (ALL LINES) ---
+lib\features\trips\data\trip_repository.dart:230:          "Couldn't join this trip. If you left it earlier, rejoining 
+isn't supported in this version.",
+lib\features\trips\data\trip_repository.dart:243:          "Couldn't join this trip. If you left it earlier, rejoining 
+isn't supported in this version.",
+test\settlements_repository_test.dart:353:                    "Couldn't join this trip. If you left it earlier, 
+rejoining isn't supported in this version.",
+test\settlements_widget_test.dart:1504:            "Couldn't join this trip. If you left it earlier, rejoining isn't 
+supported in this version.",
+
+--- G_FORMAT (LAST 3 LINES) ---
+Formatted 120 files (0 changed) in 0.86 seconds.
+EXIT_CODE: 0
+
+--- G_ANALYZE (LAST 3 LINES) ---
+Analyzing wayfound...                                           
+No issues found! (ran in 9.8s)
+
+--- G_COUNTS (LAST 3 LINES) ---
+testDone 353 success 353 failure 0
+
+--- G_HASH (LAST 3 LINES) ---
+Algorithm       Hash                                                                   Path                            
+---------       ----                                                                   ----                            
+SHA256          6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6       D:\VsCode\wayfound\firestore....
+
+--- G_HEAD (LAST 3 LINES) ---
+?? docs/evidence/p7s4/M3_verify.txt
+?? docs/evidence/p7s4/M_SUMMARY.txt
+?? docs/evidence/p7s5/
+
+--- SABOTAGE PROOF (FIRST FAILING TEST & EXPECTATION) ---
+P1 (revert repository message to old text):
+  First failing test: Repository & Domain Tests (R1 - R7) R6b: repository maps permission-denied to rejoin refusal message
+  Failing expectation: Which: threw _Exception:<Exception: Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.>
+
+--- V_FORBIDDEN ---
+(0 hits)
+
+--- V_ENCODING ---
+(0 hits)
+
+--- GIT DIFF --STAT main..HEAD ---
+lib/features/trips/data/trip_repository.dart |  4 ++--
+ lib/features/trips/data/trips_providers.dart |  2 +-
+ test/settlements_repository_test.dart        | 17 ++++++++++-------
+ test/settlements_widget_test.dart            |  2 +-
+ trip_planner_project_report.md               |  8 ++++----
+ 5 files changed, 18 insertions(+), 15 deletions(-)
+
+--- GIT LOG --ONELINE main..HEAD ---
+b385ad3 docs(report): close phase 7
+7297344 test(join): refused-join message
+db356bb fix(join): accurate message for refused joins

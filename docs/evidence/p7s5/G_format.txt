@@ -1,0 +1,3 @@
+Formatted 120 files (0 changed) in 0.86 seconds.
+
+EXIT_CODE: 0
