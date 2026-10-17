@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "996641688296-otq8pqdl0c6790t8s8kni7tie5ugq4k2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ayush.wayfound",
+            "certificate_hash": "44adf6a8cee00d364e4b1ed488bd3da801922d98"
+          }
+        },
+        {
           "client_id": "996641688296-ju9une00fstticn0lp1has9tlck0t7od.apps.googleusercontent.com",
           "client_type": 3
         }
