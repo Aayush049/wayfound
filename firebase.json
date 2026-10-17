@@ -12,7 +12,8 @@
         "lib/firebase_options.dart": {
           "projectId": "wayfound-51b4d",
           "configurations": {
-            "android": "1:996641688296:android:7a176becdb875ea9ab975d"
+            "android": "1:996641688296:android:7a176becdb875ea9ab975d",
+            "web": "1:996641688296:web:46fc9082e52882dcab975d"
           }
         }
       }
