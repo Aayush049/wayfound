@@ -1,0 +1,9 @@
+HARNESS FILE SHA256 (LF-normalised) = c0038609499539d09b37e79b2ba04e971cff79c5fa47c9699670beda08114ead
+RULES SHA256 BEFORE = 6d13feae51d0e6fd56911fc8aeef895c8706763cf147bdd311fbc6933aa31da6
+node v24.19.0 | started 2026-10-16T17:41:26.681Z
+required ids = 65 | defined = 80 | missing required = none | duplicates = none
+BASELINE m0a: total=185 passed=185 failed=0 exit=0
+BASELINE m0b: total=0 passed=0 failed=0 exit=1
+FATAL: baseline m0b is not fully green. Failing: 
+RULES SHA256 AFTER  = 6d13feae51d0e6fd56911fc8aeef895c8706763cf147bdd311fbc6933aa31da6
+HARNESS EXIT 1
