@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path'), cp = require('child_process'), crypto = require('crypto');
 const ROOT = path.resolve(__dirname, '..', '..');
 const RULES = path.join(ROOT, 'firestore.rules');
-const OUTDIR = path.join(ROOT, 'docs', 'evidence', 'fix2d');
+const OUTDIR = path.join(__dirname, 'out_v3');
 const WORK = path.join(__dirname, 'out_v3');
 const MAXFAIL = 40; // a genuine single-condition mutant never fails more than this many tests
 const sha = (b) => crypto.createHash('sha256').update(b).digest('hex');
@@ -50,10 +50,99 @@ const logf = path.join(OUTDIR, 'RUN_' + stamp + '.txt');
 const log = (s) => { console.log(s); fs.appendFileSync(logf, s + '\n'); };
 let counter = 0;
 
+let firestorePort = 8092;
+try {
+  const fb = JSON.parse(fs.readFileSync(path.join(ROOT, 'firebase.json'), 'utf8'));
+  if (fb.emulators && fb.emulators.firestore && fb.emulators.firestore.port) {
+    firestorePort = fb.emulators.firestore.port;
+  }
+} catch (e) {}
+
+function getListeningPids(port) {
+  try {
+    const out = cp.spawnSync('cmd.exe', ['/c', 'netstat -ano -p tcp | findstr LISTENING | findstr :' + port], { encoding: 'utf8', timeout: 5000 });
+    const pids = new Set();
+    for (const line of (out.stdout || '').split('\n')) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length >= 5 && parts[1].endsWith(':' + port) && parts[3] === 'LISTENING') {
+        const pid = parseInt(parts[4], 10);
+        if (pid > 0) pids.add(pid);
+      }
+    }
+    return Array.from(pids);
+  } catch (e) {
+    return [];
+  }
+}
+
+function getProcessDetails(pid) {
+  try {
+    const psCmd = 'Get-CimInstance Win32_Process -Filter "ProcessId = ' + pid + '" | Select-Object Name, CommandLine, @{N=\'CreationDate\';E={$_.CreationDate.ToString(\'o\')}} | ConvertTo-Json -Compress';
+    const out = cp.spawnSync('powershell', ['-NoProfile', '-Command', psCmd], { encoding: 'utf8', timeout: 10000 });
+    if (out.status === 0 && out.stdout.trim()) {
+      return JSON.parse(out.stdout.trim());
+    }
+  } catch (e) {}
+  return null;
+}
+
+function waitPortFree(port, maxMs) {
+  const start = Date.now();
+  const script = 'const net=require("net"),s=net.createServer();s.once("error",()=>process.exit(1));s.once("listening",()=>{s.close(()=>process.exit(0))});s.listen(' + port + ',"127.0.0.1");';
+  while (Date.now() - start < maxMs) {
+    const res = cp.spawnSync(process.execPath, ['-e', script], { encoding: 'utf8', timeout: 5000 });
+    if (res.status === 0) return true;
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);
+  }
+  return false;
+}
+
+function ensureInitialPortFree() {
+  if (process.platform !== 'win32') return;
+  const pids = getListeningPids(firestorePort);
+  for (const pid of pids) {
+    const info = getProcessDetails(pid);
+    if (pid === 30872 && info && info.Name && info.Name.toLowerCase() === 'java.exe' && typeof info.CommandLine === 'string' && info.CommandLine.includes('cloud-firestore-emulator')) {
+      log('[ORPHAN KILL DIAGNOSIS EXCEPTION] pid=' + pid + ' name=' + info.Name + ' created=' + info.CreationDate + ' cmd=' + info.CommandLine.slice(0, 120));
+      cp.spawnSync('taskkill', ['/PID', String(pid), '/T', '/F']);
+      if (!waitPortFree(firestorePort, 30000)) {
+        finish(1, 'FATAL: port ' + firestorePort + ' still busy 30s after terminating diagnosis orphan PID ' + pid);
+      }
+    } else {
+      finish(1, 'FATAL: port ' + firestorePort + ' is busy before first suite. Owning process: ' + JSON.stringify(info));
+    }
+  }
+}
+
 function runSuite(label, rulesPath) {
   const out = path.join(WORK, label + '_' + stamp + '_' + (++counter) + '.json').replace(/\\/g, '/');
   const cmd = 'firebase emulators:exec --only firestore "npm --prefix rules_test test -- --json --outputFile=' + out + '"';
+  const suiteStartTimeMs = Date.now();
   const r = cp.spawnSync(cmd, { cwd: ROOT, shell: true, env: Object.assign({}, process.env, { RULES_PATH: rulesPath }), encoding: 'utf8', maxBuffer: 1 << 28, timeout: 900000 });
+
+  if (process.platform === 'win32') {
+    const pids = getListeningPids(firestorePort);
+    for (const pid of pids) {
+      const info = getProcessDetails(pid);
+      if (!info) {
+        finish(1, 'FATAL: unable to get details for PID ' + pid + ' listening on port ' + firestorePort + ' after ' + label);
+      }
+      const isJava = info.Name && info.Name.toLowerCase() === 'java.exe';
+      const hasCmd = typeof info.CommandLine === 'string' && info.CommandLine.includes('cloud-firestore-emulator');
+      const creationMs = new Date(info.CreationDate).getTime();
+      const isNewer = creationMs >= suiteStartTimeMs - 2000;
+      if (isJava && hasCmd && isNewer) {
+        log('[ORPHAN KILL] suite=' + label + ' pid=' + pid + ' name=' + info.Name + ' created=' + info.CreationDate + ' cmd=' + info.CommandLine.slice(0, 120));
+        cp.spawnSync('taskkill', ['/PID', String(pid), '/T', '/F']);
+      } else {
+        finish(1, 'FATAL: PID ' + pid + ' on port ' + firestorePort + ' failed kill criteria after ' + label + ': ' + JSON.stringify(info));
+      }
+    }
+    if (!waitPortFree(firestorePort, 30000)) {
+      finish(1, 'FATAL: port ' + firestorePort + ' still busy 30s after cleanup for ' + label);
+    }
+  }
+
   let j = null;
   try { j = JSON.parse(fs.readFileSync(out, 'utf8')); } catch (e) { j = null; }
   return { status: r.status, j };
@@ -99,6 +188,7 @@ log('required ids = ' + REQUIRED.length + ' | defined = ' + mutants.length + ' |
 if (missingReq.length || dup.length) finish(1, 'FATAL: mutant set incomplete or duplicated');
 
 // ---- baseline twice ----
+ensureInitialPortFree();
 const copy = path.join(WORK, 'm0.rules');
 fs.writeFileSync(copy, rulesBefore);
 if (sha(fs.readFileSync(copy)) !== sha(rulesBefore)) finish(1, 'FATAL: m0 copy differs from original');
