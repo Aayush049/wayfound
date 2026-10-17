@@ -2,11 +2,12 @@
 
 - **Product:** Wayfound
 - **Version:** 1.0.0+1
-- **Status:** Version 1 build complete; Web platform added; release packaging pending
+- **Status:** Version 1.0.0 released (Tag `v1.0.0` on commit `164ab503a5d9732ae91cf06f5efaea127a371212`)
 - **Repository:** https://github.com/Aayush049/wayfound.git
 - **Baseline Commit (before Phase 8):** `b4bed661e39af8499bdf42daac74bd753c7f9e77`
-- **Report Date:** October 17, 2026
-- **First Commit Date:** October 4, 2026 (13 elapsed calendar days)
+- **Release Commit (v1.0.0):** `164ab503a5d9732ae91cf06f5efaea127a371212`
+- **Report Date:** October 18, 2026
+- **First Commit Date:** October 4, 2026 (14 elapsed calendar days)
 - **Flutter Version:** Flutter 3.47.7 (Channel stable)
 - **Dart Version:** Dart 3.13.5 (SDK constraint: `^3.13.0`)
 - **Flutter Test Total:** 363 passed (0 failed)
@@ -715,24 +716,54 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
 
 ---
 
-## 17. Release Readiness (APK Sideload)
+## 17. Release and Distribution (v1.0.0 Release)
 
-An initial R1 audit of release readiness identified the following findings for an APK sideload release:
-- **Signing:** Release build is currently debug-signed (`android.buildTypes.release.signingConfig = debug`).
-- **Permissions:** Android `INTERNET` permission is present in debug and profile manifests but missing from the main manifest (`android/app/src/main/AndroidManifest.xml`).
-- **Application Label:** `android:label` is currently lowercase `"wayfound"` in `AndroidManifest.xml`.
-- **Firebase Configuration:** No `.firebaserc` file exists in the repository.
-- **Firebase App Check:** Not configured or integrated (`firebase_app_check` absent).
-- **Emulator References:** 14 emulator or localhost references exist across `lib/` and were verified as cleanly scoped behind `USE_EMULATORS` flags.
-- **Build Artifact:** Release build compiles to a single fat APK of approximately 56.8 MB (sideload builds should use `--split-per-abi`).
+### 17.1 Session R2 Release Preparation
+Following the initial audit, Session R2 resolved all release prerequisites:
+- **Permissions:** Added `<uses-permission android:name="android.permission.INTERNET"/>` directly above `<application>` in `android/app/src/main/AndroidManifest.xml`.
+- **Application Label:** Capitalized `android:label="Wayfound"` in `android/app/src/main/AndroidManifest.xml`.
+- **Release Signing:** Configured release `signingConfig` in `android/app/build.gradle.kts` using Kotlin DSL to load `android/key.properties` (`storePassword`, `keyPassword`, `keyAlias`, `storeFile`). If `key.properties` is absent, the build falls back to debug signing and issues a clear logger warning (`RELEASE IS DEBUG-SIGNED: android/key.properties missing`).
+- **Firebase Fingerprints:** Added release SHA-1 and SHA-256 certificate fingerprints to Firebase Console (under project `wayfound-51b4d`) and updated `android/app/google-services.json` (containing 2 client_type 1 entries with distinct hashes).
+- **Git Ignore Security:** Added `*.jks`, `*.keystore`, and `.firebase/` cache to root `.gitignore`.
+- **Commits:**
+  - `3448bdd` `fix(android): add INTERNET permission to main manifest`
+  - `fc614f0` `fix(android): app label Wayfound`
+  - `c09c9f1` `build(android): release signing from key.properties`
+  - `388c1ca` `chore(firebase): refresh google-services with release fingerprints`
+  - `164ab50` `chore(git): ignore keystores and firebase cache`
+- **Release Tag:** Tag `v1.0.0` points to commit `164ab503a5d9732ae91cf06f5efaea127a371212`.
+- **GitHub Release:** Published on GitHub (`Wayfound v1.0.0`) with `wayfound-1.0.0-universal.apk` (59,699,551 bytes) attached.
 
-Status: R2 (release manifest fixes, release keystore creation, and release signing configuration) is **PENDING** (not yet performed).
+### 17.2 Two-Phone Physical Smoke Test
+A comprehensive 14-item smoke test was conducted on physical hardware (CPH2603 running `wayfound-1.0.0-arm64-v8a.apk` as Organizer A, and a second phone running `wayfound-1.0.0-universal.apk` as Member B):
+1. **Trip Creation (A):** Created trip, verified on Home screen, join code generated. (PASS)
+2. **Join with Code (B):** Preview loaded, joined successfully, visible in member roster on both devices. (PASS)
+3. **Suggestions & Voting:** Suggestion created, upvoted/downvoted; real-time counter updates on both devices. (PASS)
+4. **Itinerary Scheduling:** Activity scheduled into day section with correct date and order. (PASS)
+5. **Split Expense (A):** Shared expense created with equal split; balances computed correctly. (PASS)
+6. **Counter Expense (B):** Second expense logged; net balances recalculated in real time. (PASS)
+7. **Two-Step Settlement:** Debtor marked as paid, creditor confirmed; debt reduced accurately. (PASS)
+8. **Theme Switching:** Settings toggle switched between Light and Dark mode without layout overflow. (PASS)
+9. **Persistence:** Sign-out and sign-in restored active trips and user profile cleanly. (PASS)
+10. **Google Sign-In:** Verified Google Authentication on release build for both devices. (PASS)
+11. **Leave Trip (B):** Member departed after balance settled; trip removed from B, roster updated on A. (PASS)
+12. **Trip Archiving (A):** Organizer archived trip; displayed under dimmed "Archived" section, subcollections locked read-only. (PASS)
+13. **Offline Resilience:** Airplane mode enabled on phone A; app launched and rendered cached trips without crashing. (PASS)
+14. **Compact Layout Verification:** Physical phone layouts remained intact with zero overflow regressions following web layout changes. (PASS)
+
+Result: **14 of 14 smoke tests passed.**
+
+### 17.3 Web Deployment
+- **Hosting URL:** `https://wayfound-51b4d.web.app` (Firebase Hosting).
+- **Deployment Base:** Deployed from `main` at `d816670` content via `flutter build web --release` and `firebase deploy --only hosting`.
+- **Live Verifications:** Live email/password authentication, Google Sign-In popup, browser page refresh on trip routes, browser back button navigation, and mobile browser viewing verified operational.
+- **Layout Architecture:** Centered mobile-first responsive layout (breakpoints: compact `< 720px`, medium `720–1099px`, expanded `>= 1100px`). Full desktop redesign is scheduled for v2.
 
 ---
 
 ## 18. README
 
-A standalone project README (`README.md`) exists in the repository root.
+A standalone project README (`README.md`) exists in the repository root documenting installation via release APK, live web access, source compilation, release signing, testing, and roadmap.
 
 ---
 
@@ -740,15 +771,31 @@ A standalone project README (`README.md`) exists in the repository root.
 
 ### 19.1 Known Issues & Test Fragilities
 - **Tab Label Truncation on CPH2603:** Physical device display shows truncated tab labels ("Suggesti", "Expense") due to fixed font size / tab padding on narrower screens.
-- **JPY Assertion Looseness in Tests:** Currency formatting tests for JPY assert relaxed conditions rather than strict zero-decimal spacing in certain helper edge cases.
-- **Per-file Test Counts in Historical Records:** Earlier session notes contained minor variations in per-file breakdown counts; current ground truth is 353 passing Flutter tests.
-- **Navigation Test Fragility:** In `test/add_suggestion_navigation_test.dart`, `.first` widget matching is fragile when multiple matching elements appear in the widget tree.
+- **One-Way Trip Archiving:** Trips can be archived by the organizer, but unarchiving is not supported in v1.
+- **Permanent Leave Policy:** Members who depart a trip cannot rejoin using the join code.
+- **Join-Refused Message Ambiguity:** When join code resolution fails, the client cannot distinguish between archived trips and departed membership states without a schema backfill.
 - **Firebase Major Upgrades Deferred:** Upgrades to major Firebase package versions (`cloud_firestore` 7, `firebase_auth` 7, `firebase_core` 5) are available but deliberately not applied in v1 to preserve stability.
+- **No Firebase App Check in v1:** App Check is not integrated in v1; client requests rely on Firebase security rules.
+- **No Google Play Store / AAB in v1:** Distribution is currently via sideloaded release APKs.
+- **No iOS Support:** The iOS platform is out of scope and not configured.
+- **Offline Cache Scope:** Offline support relies on Firestore local persistence; no custom conflict resolution or guaranteed offline-first synchronization exists.
+- **JPY Assertion Looseness in Tests:** Currency formatting tests for JPY assert relaxed conditions rather than strict zero-decimal spacing in certain helper edge cases.
+- **Navigation Test Fragility:** In `test/add_suggestion_navigation_test.dart`, `.first` widget matching is fragile when multiple matching elements appear in the widget tree.
 - **Legacy Rules Runners:** `rules_test/tools/run_k1.js`, `rules_test/tools/run_k2.js`, and `rules_test/mutation/run.js` are historical legacy scripts and not part of the supported workflow.
 
 ### 19.2 Backlog & Candidate Features (Post-v1)
-- **Firebase App Check:** Not added in v1; plan App Check for production abuse prevention.
-- **Distribution:** Google Play Store listing and Android App Bundle (.aab) generation deferred beyond initial APK release.
+- **Full Desktop Web Redesign:** Collapsible side navigation, split-pane itinerary and suggestion views, and multi-column financial dashboards.
+- **Firebase App Check:** Production abuse prevention with Play Integrity and reCAPTCHA Enterprise.
+- **Distribution:** Google Play Store listing and Android App Bundle (.aab) generation.
 - **Trip Membership Candidates:** Rejoining after leaving, organizer transfer, and unarchiving trips.
 - **Add to Itinerary:** 1-tap shortcut directly from Suggestions tab into the day-by-day itinerary.
-- **Dedicated Archived Join Message:** Join code preview cannot detect if a trip is archived without a Firestore rules and schema change (`joinCodes/{code}` lacks an `archived` field; non-members cannot read `trips/{tripId}`); dedicated messaging requires a rules and backfill update.
+- **Dedicated Archived Join Message:** Join code preview schema backfill (`archived` field on `joinCodes/{code}`).
+
+---
+
+## 20. Change Log
+
+- **2026-10-18:** Session R2 & D1 — Version 1.0.0 released (tag `v1.0.0`, commits `3448bdd..164ab50`). Release APKs built and signed with release key; 14 of 14 physical device smoke tests passed; web version deployed to Firebase Hosting (`https://wayfound-51b4d.web.app`); full documentation updated for v1.0.0 release.
+- **2026-10-17:** Session P8-S3 — Web responsive layout and URL fidelity. Added `CenteredContent` helper, responsive trip grid on Home, left-aligned TabBar on wide viewports, and `optionURLReflectsImperativeAPIs = true`. 363 Flutter tests passing.
+- **2026-10-17:** Session P8-S1 — Web platform scaffold and Firebase Hosting configuration. Added `signInWithPopup` for web Google authentication.
+- **2026-10-17:** Session CLEAN-V1 — Project cleanup, consolidated documentation, and mutation harness v3 isolation.
