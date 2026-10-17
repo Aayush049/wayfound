@@ -21,6 +21,8 @@ const String kHomeRoute = '/home';
 
 /// Provider for the app's [GoRouter] configuration with auth redirect.
 final routerProvider = Provider<GoRouter>((ref) {
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+
   final refreshNotifier = ValueNotifier<AsyncValue<User?>>(
     const AsyncLoading(),
   );
