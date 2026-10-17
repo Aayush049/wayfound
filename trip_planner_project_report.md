@@ -198,8 +198,7 @@ A non-member may update a trip only if:
 ### 7.5 Known limitations & Counter Integrity
 - Stored vote counters (`upCount`, `downCount`) are protected by `getAfter` rules requiring exact correlation with atomic vote document changes. Plain counter updates without matching vote transitions are strictly denied.
 - Short join codes could in theory be brute-forced; plan Firebase App Check as a later hardening step.
-- Subcollections are not removed when a trip document is deleted, which is why trips are archived rather than deleted.
-- **Archive rule exists; UI pending:** Trips support one-way organizer archiving in Firestore security rules (`archived: false -> true` affecting only the `archived` key); client UI implementation remains pending (scheduled for Phase 7 UI).
+- **Trip Archiving:** Trips support one-way organizer archiving in Firestore security rules (`archived: false -> true` affecting only the `archived` key) and client UI (dashboard app-bar menu, confirmation dialog, persistent archived banner and chips, and read-only sweep across all tabs). No unarchive in v1.
 - **No Rejoin in v1:** Once a member leaves or is removed, they cannot rejoin the trip; rules explicitly deny join if the member doc status is 'left'.
 - **No Organizer Transfer in v1:** The trip organizer cannot leave the trip and cannot transfer the organizer role to another member in v1.
 - **Client-Side Leave Eligibility:** The check requiring zero balance and zero pending settlements before leaving is enforced client-side in `checkLeaveEligibility`; security rules enforce membership shape and status transitions, not monetary balances.
@@ -430,8 +429,8 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | 3 | Suggestions and voting | M-L | **DONE** — CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
 | 4 | Itinerary | M | **DONE** — Day-by-day itinerary view, pending suggestions sheet sorted by score, day picker sheet, organizer drag-to-reorder within a day, item scheduling/unscheduling/moving between days, CEL security rules for organizer updates, integer checks, date range bounds, exact key restriction, and status coherence; all verified across 177 Flutter tests, 72 rules unit tests, and 17/17 security rule mutants. |
 | 5 | Expenses and balances | L | **DONE** — Expense CRUD, calculator unit-tested, Balances view with suggested payments |
-| 6 | Settlements | M | **IMPLEMENTED AND MERGED** — deployment of rules and two-account phone test PENDING |
-| 7 | Hardening and polish | M | Rules tests complete, archive trip, all states handled, UI polish |
+| 6 | Settlements | M | **DONE** — payment creation, confirmation, rejection, cancel, balances, leave/remove integration, verified on device |
+| 7 | Hardening and polish | M | **IMPLEMENTED** — archive UI, archived sweep, balances states; PENDING: rules deploy and phone verification |
 | 8 | Version 2 extras | varies | Notifications, comments, photos, packing list, unequal splits |
 
 ---
@@ -644,12 +643,22 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
   - Deploy security rules: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules` (marked PENDING).
   - Two-account phone test: Run phone verification covering payment creation, confirm/reject, leave, remove, rejoin refusal, and keyboard sheet layout (marked PENDING).
 
-### 15.12 Milestone 7 Status (Session P7-R1: Organizer Trip Archive Security Rule Added)
-- **Organizer Trip Archive Rule:** Added one-way transition rule for trip organizer (`archived == false -> archived == true`) affecting strictly only the `archived` key (`request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])`).
-- **Security Rules Status:** Local `firestore.rules` current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` (previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`).
-- **Rules Test Suite:** 185 passing Jest unit tests in `rules_test/firestore_rules.test.js` (13 new archive rule tests added) verified against the Firestore emulator (`docs/evidence/p7r1/R_suite.txt`).
-- **Mutation Testing Suite:** 81 mutants evaluated: 70 KILLED (59 individual mutants plus 11 combined mutants `c1`–`c11`), 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`), 0 unallowlisted survivors (`docs/evidence/p7r1/M_run.txt`, `docs/evidence/p7r1/M_summary.txt`).
-- **Deployment Status:** Deployment of rules to production project `wayfound-51b4d` is PENDING (user runs `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`).
+### 15.12 Milestone 7 Status (Hardening and Polish)
+- **Organizer Trip Archive Action:** Implemented `TripRepository.archiveTrip(tripId)` writing only `{'archived': true}`. Added dashboard app-bar action for trip organizer, confirmation dialog warning that the trip becomes read-only and cannot be undone in v1, readable error mapping (`permission-denied` -> "You can't archive this trip."; generic -> "Couldn't archive the trip. Please try again."), persistent "Archived" banner on the dashboard, and "Archived" status chip on Home trip cards.
+- **Archived Read-Only Sweep:** Verified and hardened read-only behaviour across all tabs:
+  - Suggestions: add suggestion FAB and empty action absent on archived trips; suggestion edit/delete menu absent on archived trips; voting buttons disabled with scores remaining readable.
+  - Expenses: add expense FAB and empty action absent on archived trips; expense card edit/delete menu absent on archived trips; amounts and descriptions remain readable.
+  - Balances: suggested payment "Mark as Paid" button and pending settlement action buttons ("Confirm", "Reject", "Cancel") hidden on archived trips; balance summaries, totals, and history remain readable.
+  - Members: "Leave Trip" and "Remove" buttons absent on archived trips; member list and invite code remain readable.
+  - Itinerary: add suggestion to day button and item tile options menu absent on archived trips; scheduled activities remain readable.
+- **BalancesView States:** Added `AppLoading` when source streams are loading and `AppError` with retry (`ref.invalidate`) on error, while preserving existing empty/settled state cards.
+- **Test Suite:** 348 passing Flutter tests (16 tests in `test/archived_sweep_test.dart`, 11 tests in `test/trip_dashboard_screen_test.dart`, 8 tests in `test/trip_repository_test.dart`, plus existing suites), exit code 0 (`docs/evidence/p7s2/G_test.txt`, `docs/evidence/p7s2/G_counts.txt`).
+- **Security Rules Status:** Local `firestore.rules` SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` confirmed untouched (`docs/evidence/p7s2/G_hash.txt`).
+- **Sabotage Sensitivity Proofs:** 8 out-of-repo sabotage proofs (P1–P8) executed against external copies under `wayfound_archive/sabotage_p7s2`, all failing on their target tests (`docs/evidence/p7s2/SAB_P1_diff.txt` through `SAB_P8_run.txt`).
+- **Known Limitations & Pending Verifications:**
+  - Deployment of rules hash `6D13FEAE...` to production project `wayfound-51b4d` is PENDING.
+  - Phone verification of archive action on physical device is PENDING.
+  - No unarchive in v1.
 
 ---
 
