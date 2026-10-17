@@ -1,0 +1,44 @@
+=== git fetch origin ===
+
+=== git rev-parse main origin/main ===
+958d47784198e7be10805ea8e1ca0028d1f01570
+958d47784198e7be10805ea8e1ca0028d1f01570
+
+=== git status -sb ===
+## main...origin/main
+?? docs/evidence/p7s3/G2_analyze.txt
+?? docs/evidence/p7s3/G2_counts.txt
+?? docs/evidence/p7s3/G2_hash.txt
+?? docs/evidence/p7s3/G2_test.json
+?? docs/evidence/p7s3/G2_test.txt
+?? docs/evidence/p7s3/M0_pre.txt
+?? docs/evidence/p7s3/M1_merge.txt
+?? docs/evidence/p7s3/M2_push.txt
+?? docs/evidence/p7s3/M3_verify.txt
+?? docs/evidence/p7s3/M_SUMMARY.txt
+?? docs/evidence/p7s4/G2_analyze.txt
+?? docs/evidence/p7s4/G2_counts.txt
+?? docs/evidence/p7s4/G2_hash.txt
+?? docs/evidence/p7s4/G2_test.json
+?? docs/evidence/p7s4/G2_test.txt
+?? docs/evidence/p7s4/M0_pre.txt
+?? docs/evidence/p7s4/M1_merge.txt
+?? docs/evidence/p7s4/M2_push.txt
+?? docs/evidence/p7s4/M3_verify.txt
+?? docs/evidence/p7s4/M_SUMMARY.txt
+?? docs/evidence/p7s5/G2_analyze.txt
+?? docs/evidence/p7s5/G2_counts.txt
+?? docs/evidence/p7s5/G2_hash.txt
+?? docs/evidence/p7s5/G2_test.json
+?? docs/evidence/p7s5/G2_test.txt
+?? docs/evidence/p7s5/M0_pre.txt
+?? docs/evidence/p7s5/M1_merge.txt
+?? docs/evidence/p7s5/M2_push.txt
+
+=== git log --oneline -6 ===
+958d477 docs(evidence): p7s5 raw outputs
+b385ad3 docs(report): close phase 7
+7297344 test(join): refused-join message
+db356bb fix(join): accurate message for refused joins
+1d35e75 docs(evidence): p7s4 raw outputs
+8c163c5 docs(report): record home archived fix
