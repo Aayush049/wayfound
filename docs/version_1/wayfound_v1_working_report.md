@@ -1,9 +1,17 @@
-# Wayfound: Project Planning Report
+# Wayfound - Version 1 Working Report
 
-*Wayfound is a collaborative trip planner for groups.*
-
-**Stack:** Flutter (Dart) + Firebase  |  **Level:** Intermediate  |  **Prepared:** October 4, 2026 (Updated: October 6, 2026)
-**Status:** Milestone 0, Milestone 1, Milestone 2, Milestone 3, Milestone 4 & Milestone 5 complete (Phase 0 setup, Phase 1 auth, Phase 2 trips, Phase 3 suggestions & voting, Phase 4 itinerary, Phase 5 expenses & balances finished)
+- **Product:** Wayfound
+- **Version:** 1.0.0+1
+- **Status:** Version 1 build complete; release packaging pending
+- **Repository:** https://github.com/Aayush049/wayfound.git
+- **Main Commit:** `e3e50bd2342251b3fafe408de92b555da5d58628`
+- **Report Date:** October 17, 2026
+- **First Commit Date:** October 4, 2026 (13 elapsed calendar days)
+- **Flutter Version:** Flutter 3.47.7 (Channel stable)
+- **Dart Version:** Dart 3.13.5 (SDK constraint: `^3.13.0`)
+- **Flutter Test Total:** 353 passed (0 failed)
+- **Rules Test Total:** 185 passed (185 total)
+- **Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
 
 ---
 
@@ -204,7 +212,7 @@ A non-member may update a trip only if:
 - **Client-Side Leave Eligibility:** The check requiring zero balance and zero pending settlements before leaving is enforced client-side in `checkLeaveEligibility`; security rules enforce membership shape and status transitions, not monetary balances.
 - **Left Member Doc Read:** A user who has left a trip no longer belongs to `memberIds`, so they cannot read their own previous member document.
 - **BalancesView Layout:** In Session P6-S3c, `lib/features/expenses/presentation/balances_view.dart` was refactored from nested ListViews to Column-based structures with re-laid-out suggested payment tiles to prevent scroll conflicts.
-- **MarkAsPaidSheet Keyboard on Small Screens:** The sheet sets `isScrollControlled: true` (as documented in `docs/evidence/p6s4/S1_sheet.txt`), but keyboard behavior on physical compact screens requires device verification.
+- **MarkAsPaidSheet Keyboard on Small Screens:** The sheet sets `isScrollControlled: true` so the modal bottom sheet resizes above the software keyboard on small devices.
 - **Release SHA-1 and App Check Pending:** Release SHA-1 and Firebase App Check remain pending before production app store release.
 - **Add to Itinerary on Suggestions Pending:** Direct 1-tap "Add to itinerary" shortcut from the suggestions list remains a backlog item.
 
@@ -321,10 +329,10 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 10. Testing Plan
 
-1. **Unit & Widget tests** (Flutter): 353 passing tests (verified in `docs/evidence/p7s4/G_counts.txt`) with 0 analyzer issues and 0 format changes (`docs/evidence/p7s4/G_analyze.txt`, `docs/evidence/p7s4/G_format.txt`). Includes complete coverage across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models, itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, ItineraryTab UI states, 20 dedicated UTC trip days calendar arithmetic unit tests (`test/trip_days_test.dart`), and full Phase 6 settlement, leave eligibility, and responsive layout test suites (`test/settlements_widget_test.dart`, `test/settlements_repository_test.dart`, `test/leave_router_test.dart`, `test/settlements_overflow_test.dart`). Proof of test sensitivity is backed by 23 sabotage mutation proofs (SAB1 through SAB23) documented under `docs/evidence/p6s3b`, `docs/evidence/p6s3c`, and `docs/evidence/p6s3d`.
-2. **Rules tests** (Firebase Emulator): 185 passing unit tests in `rules_test/firestore_rules.test.js` against `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`). Includes 13 dedicated organizer trip archive unit tests. Test execution evidence recorded in `docs/evidence/p7r1/R_suite.txt` and `docs/evidence/p7r1/M_run.txt`.
+1. **Unit & Widget tests** (Flutter): 353 passing tests (verified by test runs, 0 analyzer issues, 0 format changes). Includes complete coverage across theme mode persistence, theme toggle logic, ColorScheme palette checks, shared widgets rendering, router navigation (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`, `/trip/:id`, plus 7 real-router navigation widget tests in `test/add_suggestion_navigation_test.dart`), validators, error mapper, AppUser serialization, create-once logic, widget tests for Welcome, Sign In, Sign Up, Settings, Create Trip, Join Trip, My Trips, Trip Dashboard, Members tab, Suggestions tab, SuggestionCard, AddEditSuggestionScreen, money formatting, vote logic, itinerary domain models, itinerary repository derived providers, pending suggestions modal sheet, day picker sheet, itinerary day sections, drag-to-reorder, ItineraryTab UI states, 20 dedicated UTC trip days calendar arithmetic unit tests (`test/trip_days_test.dart`), and full Phase 6 settlement, leave eligibility, and responsive layout test suites (`test/settlements_widget_test.dart`, `test/settlements_repository_test.dart`, `test/leave_router_test.dart`, `test/settlements_overflow_test.dart`). Proof of test sensitivity is backed by 23 sabotage mutation proofs (SAB1 through SAB23).
+2. **Rules tests** (Firebase Emulator): 185 passing unit tests in `rules_test/firestore_rules.test.js` against `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`). Includes 13 dedicated organizer trip archive unit tests. Test execution evidence recorded in `docs/version_1/evidence/06_rules_tests_final.txt`.
    - Test execution command: `firebase emulators:exec --only firestore "npm --prefix rules_test test"`.
-   - **Mutation Testing Suite:** 81 mutants defined in `rules_test/mutation/mutants.json`. 81 mutants: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`, documented in `rules_test/mutation/equivalent.json` with proof file `docs/evidence/p7r1/P_m66.txt`). Complete mutation harness execution is recorded in `docs/evidence/p7r1/M_run.txt`.
+   - **Mutation Testing Suite:** 81 mutants defined in `rules_test/mutation/mutants.json`. 81 mutants: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`, documented in `rules_test/mutation/equivalent.json` with evidence under `docs/version_1/evidence/equivalence/`). Complete mutation harness execution is recorded in `docs/version_1/evidence/07_mutation_harness_final.txt`.
 
 ### 10.1 Security Rules Mutation Testing Results Table
 
@@ -409,7 +417,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | m63 | trip archive drops resource archived false check | KILLED | Trip archive: organizer sends archived true on an already archived trip: DENIED | Yes |
 | m64 | trip archive drops affectedKeys hasOnly archived check | KILLED | Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED ; Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED | Yes |
 | m65 | trip archive drops request resource archived true check | KILLED | Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED ; Trip archive: organizer sends archived as a string "true": DENIED | Yes |
-| m66 | trip archive drops isSignedIn check | SURVIVED_ALLOWLISTED | Allowlisted equivalent (proved by combined mutant c11; documented in docs/evidence/p7r1/P_m66.txt) | Allowlisted (redundant by design) |
+| m66 | trip archive drops isSignedIn check | SURVIVED_ALLOWLISTED | Allowlisted equivalent (proved by combined mutant c11; documented in rules_test/mutation/equivalent.json) | Allowlisted (redundant by design) |
 | c11 | combined: drops isSignedIn and organizerId check on trip archive (proves m66) | KILLED | Trip archive: signed-out user cannot archive trip: DENIED | Yes |
 
 *Note on Redundant-by-Design Protections:* Certain mutants (e.g. `m4a`, `m4b`, `m4c`, `m66` individually) trigger cascade denials due to strict structural constraints across coupled vote/suggestion rules or redundant authorization checks (such as null evaluation errors on `request.auth.uid`). Evaluating combined mutants (e.g. `c1` through `c11`) proves that security protection holds across all coupled boundaries.
@@ -421,17 +429,17 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 
 ## 11. Build Plan
 
-| # | Milestone | Effort | Done when |
-|---|---|---|---|
-| 0 | Setup | S | **DONE** — App runs, connects to Firebase, emulators work, router and shared widgets exist; light and dark themes built from palette; theme provider in place |
-| 1 | Auth | S-M | **DONE** — Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests implemented |
-| 2 | Trips and joining | L | **DONE** — Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
-| 3 | Suggestions and voting | M-L | **DONE** — CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
-| 4 | Itinerary | M | **DONE** — Day-by-day itinerary view, pending suggestions sheet sorted by score, day picker sheet, organizer drag-to-reorder within a day, item scheduling/unscheduling/moving between days, CEL security rules for organizer updates, integer checks, date range bounds, exact key restriction, and status coherence; all verified across 177 Flutter tests, 72 rules unit tests, and 17/17 security rule mutants. |
-| 5 | Expenses and balances | L | **DONE** — Expense CRUD, calculator unit-tested, Balances view with suggested payments |
-| 6 | Settlements | M | **DONE** — payment creation, confirmation, rejection, cancel, balances, leave/remove integration, verified on device |
-| 7 | Hardening and polish | M | **DONE** — archive UI, archived sweep, balances states; VERIFIED on device (10/10 archive phone test; rules deployed) |
-| 8 | Version 2 extras | varies | Notifications, comments, photos, packing list, unequal splits |
+| # | Milestone | Effort | Final Status | Commit Hash | On-Device Test Results / Details |
+|---|---|---|---|---|---|
+| 0 | Setup | S | **DONE** | `8180735` | Initial setup, Firebase connection, emulators, router, shared widgets, light and dark themes from palette, theme provider |
+| 1 | Auth | S-M | **VERIFIED on device / DONE** | `1f5fd5a` | Email and Google sign-in (7.x API), persistent session, create-once `users/{uid}` doc, auth redirect (`/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`), theme selector in Settings (`SegmentedButton`), rules and tests |
+| 2 | Trips and joining | L | **VERIFIED on device / DONE** | `1b51b5e` | Create, list, join by code, Members tab; join rule tested; quick theme toggle on Home |
+| 3 | Suggestions and voting | M-L | **VERIFIED on device / DONE** | `25afc2d` | CRUD, vote transaction (all six cases), sorting, integer money representation, security rules and comprehensive test suites enforced |
+| 4 | Itinerary | M | **VERIFIED on device / DONE** | `bf8eab1` | Day-by-day itinerary view, pending suggestions sheet sorted by score, day picker sheet, organizer drag-to-reorder within a day, item scheduling/unscheduling/moving between days, CEL security rules for organizer updates, integer checks, date range bounds, exact key restriction, and status coherence; all verified across 177 Flutter tests, 72 rules unit tests, and 17/17 security rule mutants |
+| 5 | Expenses and balances | L | **VERIFIED on device / DONE** | `b435a98` | Expense CRUD, calculator unit-tested, Balances view with suggested payments |
+| 6 | Settlements | M | **VERIFIED on device (12/12) / DONE** | `1bb4614` | Payment creation, confirmation, rejection, cancel, balances, leave/remove integration; verified on physical phone (12/12 test scenarios passed) |
+| 7 | Hardening and polish | M | **VERIFIED on device (10/10) / DONE** | `958d477` | Archive UI, archived sweep, balances states, home archived trips listing; verified on physical phone (10/10 archive scenarios passed; row 8 wording note: join preview cannot know trip is archived without rules change; message covers both archived and left-earlier) |
+| 8 | Version 2 extras | varies | **Deferred** | — | Notifications, comments, photos, packing list, unequal splits |
 
 ---
 
@@ -514,7 +522,7 @@ The supplied palette had no text/icon colours for use on top of brand colours an
 - **Authentication:** Email/Password and Google providers enabled
 - **Firestore:** `(default)` database created in production mode
 - **Google Sign-In SHA-1 status:** Debug SHA-1 (`56:88:48:82:1d:eb:27:9d:61:86:f0:08:c4:77:84:a2:75:10:40:95`) registered in Firebase Console; `android/app/google-services.json` updated with Android client (type 1) and Web client (type 3). Release SHA-1 still needed before a release build.
-- **Firestore Security Rules status:** Local `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`) includes complete rules for `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, `expenses/{expenseId}`, `settlements/{settlementId}`, `joinCodes/{code}`, and organizer trip archiving. Verified via 185 passing Jest unit tests against the Firestore emulator and 81-mutant mutation testing suite: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`). Deployment to production project `wayfound-51b4d` is PENDING (user runs `firebase use wayfound-51b4d; firebase deploy --only firestore:rules`).
+- **Firestore Security Rules status:** Local `firestore.rules` (current SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`; previous hash was `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`) includes complete rules for `users/{uid}`, `trips/{tripId}`, `members/{uid}`, `suggestions/{suggestionId}`, `votes/{uid}`, `expenses/{expenseId}`, `settlements/{settlementId}`, `joinCodes/{code}`, and organizer trip archiving. Verified via 185 passing Jest unit tests against the Firestore emulator and 81-mutant mutation testing suite: 70 KILLED (59 individual mutants including m62-m65 archive mutants, plus 11 combined mutants `c1`-`c11` that prove the allowlisted ones) and 11 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`, `m66`). Deployed to production project `wayfound-51b4d`.
 
 ### 15.3 Milestone 1 Status
 - Email/password sign-up, sign-in, sign-out implemented cleanly.
@@ -621,27 +629,17 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
   - **No Rejoin in v1:** Rejoining after leaving is denied by Firestore security rules. Attempting to join with a join code displays a clean refusal message.
   - **Historical Integrity:** Members who left remain visible in balances marked "(left)" to preserve auditability. Expenses involving a left member cannot be edited.
 - **Security Rules Verification (Phase 6 Baseline):**
-  - Previous rules file SHA-256 hash: `FC5F7525EBD47AD927DAC5A55132810A9589FD74CDC75E2AD87EFD4233440443`.
-  - Firestore emulator suite: 172 tests passed (`docs/evidence/phase6/03_rules_suite.txt`, `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`).
-  - Mutation harness: 75 mutants evaluated: 65 KILLED (55 individual mutants plus 10 combined mutants `c1`-`c10` that prove the allowlisted ones) and 10 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`). Full execution record in `docs/evidence/fix2d/RUN_2026-10-15T08-20-19-461Z.txt`.
+  - Firestore emulator suite: 172 tests passed.
+  - Mutation harness: 75 mutants evaluated: 65 KILLED (55 individual mutants plus 10 combined mutants `c1`-`c10` that prove the allowlisted ones) and 10 SURVIVED_ALLOWLISTED (ids: `m1`, `m4a`, `m4b`, `m4c`, `m49`, `m50`, `m51`, `m54`, `m58`, `m59`).
 - **Flutter Test Suite & Quality Gates:**
-  - Total tests passing: 323 passed (recorded in `docs/evidence/p6s3d/G_counts.txt`, `docs/evidence/p6s3d/G_test.txt`).
-  - Static analysis: `flutter analyze` clean with 0 issues (`docs/evidence/p6s3d/G_analyze.txt`).
-  - Code formatting: `dart format` clean with 0 changed files (`docs/evidence/p6s3d/G_format.txt`).
-  - Sabotage sensitivity proofs: 23 individual sabotage proofs (SAB1 through SAB23) verified against deliberate negative code mutations, with evidence recorded in `docs/evidence/p6s3b`, `docs/evidence/p6s3c`, and `docs/evidence/p6s3d`.
+  - Total tests passing: 323 passed with 0 static analyzer issues and 0 format changes.
+  - Sabotage sensitivity proofs: 23 individual sabotage proofs (SAB1 through SAB23) verified against deliberate negative code mutations.
+  - On-device test: 12/12 physical phone test scenarios verified on physical Android hardware.
 - **Known Limitations & Deferred Items:**
-  - No archive-trip UI in v1.
   - No rejoin in v1.
   - No organizer transfer in v1.
   - Leave-eligibility check is client-side (security rules enforce membership shape and status doc transition, not monetary balance).
   - A left user cannot read their own member document after leaving.
-  - `lib/features/expenses/presentation/balances_view.dart` layout changed in Session P6-S3c to use Column-based scroll structures and re-laid-out suggested payment tiles.
-  - Mark-as-paid sheet keyboard behavior on small screens is unverified on physical hardware (it sets `isScrollControlled: true` as documented in `docs/evidence/p6s4/S1_sheet.txt`).
-  - Production release SHA-1 registration and Firebase App Check are pending.
-  - "Add to itinerary" shortcut on Suggestions tab is pending.
-- **Manual Actions Required from User (PENDING):**
-  - Deploy security rules: `firebase use wayfound-51b4d; firebase deploy --only firestore:rules` (marked PENDING).
-  - Two-account phone test: Run phone verification covering payment creation, confirm/reject, leave, remove, rejoin refusal, and keyboard sheet layout (marked PENDING).
 
 ### 15.12 Milestone 7 Status (Hardening and Polish)
 - **Organizer Trip Archive Action:** Implemented `TripRepository.archiveTrip(tripId)` writing only `{'archived': true}`. Added dashboard app-bar action for trip organizer, confirmation dialog warning that the trip becomes read-only and cannot be undone in v1, readable error mapping (`permission-denied` -> "You can't archive this trip."; generic -> "Couldn't archive the trip. Please try again."), persistent "Archived" banner on the dashboard, and "Archived" status chip on Home trip cards.
@@ -652,11 +650,11 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
   - Members: "Leave Trip" and "Remove" buttons absent on archived trips; member list and invite code remain readable.
   - Itinerary: add suggestion to day button and item tile options menu absent on archived trips; scheduled activities remain readable.
 - **BalancesView States:** Added `AppLoading` when source streams are loading and `AppError` with retry (`ref.invalidate`) on error, while preserving existing empty/settled state cards.
-- **Home List Visibility for Archived Trips:** Home list shows archived trips (after active ones, with an Archived header and chip); fixed after phone test found archived trips hidden.
-- **Test Suite:** 353 passing Flutter tests (16 tests in `test/archived_sweep_test.dart`, 15 tests in `test/home_screen_test.dart`, 11 tests in `test/trip_dashboard_screen_test.dart`, 9 tests in `test/trip_repository_test.dart`, plus existing suites), exit code 0 (`docs/evidence/p7s4/G_test.txt`, `docs/evidence/p7s4/G_counts.txt`).
-- **Security Rules Status:** Local `firestore.rules` SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` confirmed untouched (`docs/evidence/p7s2/G_hash.txt`).
-- **Sabotage Sensitivity Proofs:** 8 out-of-repo sabotage proofs (P1–P8) executed against external copies under `wayfound_archive/sabotage_p7s2`, all failing on their target tests (`docs/evidence/p7s2/SAB_P1_diff.txt` through `SAB_P8_run.txt`).
-- **Verification & Close-Out:** Archive rules deployed; phone test passed 10/10 on physical device. The Home-hides-archived bug was found during phone verification and fixed in P7-S4. The join-refused message now covers both archived and left-earlier because the join preview cannot know a trip is archived without a rules change (joinCodes has no archived field; non-members cannot read trips). A dedicated archived message is a post-v1 candidate.
+- **Home List Visibility for Archived Trips:** Archived trips are listed on Home after active trips with an Archived header and chip (found by the phone test, fixed).
+- **Test Suite:** 353 passing Flutter tests (16 tests in `test/archived_sweep_test.dart`, 15 tests in `test/home_screen_test.dart`, 11 tests in `test/trip_dashboard_screen_test.dart`, 9 tests in `test/trip_repository_test.dart`, plus existing suites), exit code 0.
+- **Security Rules Status:** Local `firestore.rules` SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` confirmed untouched. Rules deployed to production project `wayfound-51b4d`.
+- **Sabotage Sensitivity Proofs:** 8 out-of-repo sabotage proofs (P1–P8) executed against external copies, all failing on their target tests.
+- **Verification & Close-Out:** Archive rules deployed; phone test passed 10/10 on physical device. The Home-hides-archived bug was found during phone verification and fixed in P7-S4. The join-refused message covers both archived and left-earlier because the join preview cannot know a trip is archived without a rules change (joinCodes has no archived field; non-members cannot read trips); a dedicated archived message is a v2 candidate.
 - **Known Limitations & Deferred Items:**
   - No unarchive in v1.
   - Dedicated join-preview message for archived trips deferred to post-v1 (joinCodes has no archived field; non-members cannot read trips without rules change).
@@ -688,11 +686,51 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
 
 ---
 
-## 16. Development Workflow
+## 16. Development Workflow & Working Agreements
 
-- **Branching:** one git branch per development phase (`phase-0/setup`, `phase-1/auth`, `phase-2/trips`, ...). `fix/` branches are explicitly allowed for cross-phase patches like test fixes. No direct feature development on `main`.
-- **Commits:** logical, concise commit messages prefixed by type (`feat`, `fix`, `test`, `refactor`, `docs`, `chore`).
-- **Phase Completion:** a phase branch is merged into `main` only when all phase requirements are complete, `flutter analyze` reports zero issues, and all tests pass.
-- **Remote Synchronization:** after merging into `main`, push both `main` and the phase branch to origin, confirming local `main` equals `origin/main`.
-- **Safety Rules & Safeguards:** Never execute destructive git or filesystem commands (`git clean`, `git reset --hard`, `git checkout .`, `git restore .`, `git stash drop`, `git branch -D`, `git push --force`, `rm -rf`, `del /s`) or modify `firestore.rules` during security rules testing sessions without explicit user approval and prior dry runs.
-- **Documentation:** update `trip_planner_project_report.md` at the completion of each phase.
+- **Branching:** One git branch per development phase (`phase-0/setup`, `phase-1/auth`, `phase-2/trips`, ...). `fix/` branches are explicitly allowed for cross-phase patches like test fixes. No direct feature development on `main`.
+- **Commits:** Logical, concise commit messages prefixed by type (`feat`, `fix`, `test`, `refactor`, `docs`, `chore`).
+- **Phase Completion:** A phase branch is merged into `main` only when all phase requirements are complete, `flutter analyze` reports zero issues, and all tests pass.
+- **Remote Synchronization:** After merging into `main`, push both `main` and the phase branch to origin, confirming local `main` equals `origin/main`.
+- **Safety Safeguards:** Never execute destructive git or filesystem commands (`git clean`, `git reset --hard`, `git checkout .`, `git restore .`, `git stash drop`, `git branch -D`, `git push --force`, `rm -rf`, `del /s`). Claude Code never deploys to production. Always produce and rely on raw verification evidence.
+- **V1 Non-Goals:** Booking flights/hotels, social trip sharing, AI itinerary generation, payment processing, offline-first sync, multi-currency trips.
+
+---
+
+## 17. Release Readiness (APK Sideload)
+
+An initial R1 audit of release readiness identified the following findings for an APK sideload release:
+- **Signing:** Release build is currently debug-signed (`android.buildTypes.release.signingConfig = debug`).
+- **Permissions:** Android `INTERNET` permission is present in debug and profile manifests but missing from the main manifest (`android/app/src/main/AndroidManifest.xml`).
+- **Application Label:** `android:label` is currently lowercase `"wayfound"` in `AndroidManifest.xml`.
+- **Firebase Configuration:** No `.firebaserc` file exists in the repository.
+- **Firebase App Check:** Not configured or integrated (`firebase_app_check` absent).
+- **Emulator References:** 14 emulator or localhost references exist across `lib/` and were verified as cleanly scoped behind `USE_EMULATORS` flags.
+- **Build Artifact:** Release build compiles to a single fat APK of approximately 56.8 MB (sideload builds should use `--split-per-abi`).
+
+Status: R2 (release manifest fixes, release keystore creation, and release signing configuration) is **PENDING** (not yet performed).
+
+---
+
+## 18. README
+
+A standalone project README (`README.md`) exists in the repository root.
+
+---
+
+## 19. Known Issues and Backlog
+
+### 19.1 Known Issues & Test Fragilities
+- **Tab Label Truncation on CPH2603:** Physical device display shows truncated tab labels ("Suggesti", "Expense") due to fixed font size / tab padding on narrower screens.
+- **JPY Assertion Looseness in Tests:** Currency formatting tests for JPY assert relaxed conditions rather than strict zero-decimal spacing in certain helper edge cases.
+- **Per-file Test Counts in Historical Records:** Earlier session notes contained minor variations in per-file breakdown counts; current ground truth is 353 passing Flutter tests.
+- **Navigation Test Fragility:** In `test/add_suggestion_navigation_test.dart`, `.first` widget matching is fragile when multiple matching elements appear in the widget tree.
+- **Firebase Major Upgrades Deferred:** Upgrades to major Firebase package versions (`cloud_firestore` 7, `firebase_auth` 7, `firebase_core` 5) are available but deliberately not applied in v1 to preserve stability.
+- **Legacy Rules Runners:** `rules_test/tools/run_k1.js`, `rules_test/tools/run_k2.js`, and `rules_test/mutation/run.js` are historical legacy scripts and not part of the supported workflow.
+
+### 19.2 Backlog & Candidate Features (Post-v1)
+- **Firebase App Check:** Not added in v1; plan App Check for production abuse prevention.
+- **Distribution:** Google Play Store listing and Android App Bundle (.aab) generation deferred beyond initial APK release.
+- **Trip Membership Candidates:** Rejoining after leaving, organizer transfer, and unarchiving trips.
+- **Add to Itinerary:** 1-tap shortcut directly from Suggestions tab into the day-by-day itinerary.
+- **Dedicated Archived Join Message:** Join code preview cannot detect if a trip is archived without a Firestore rules and schema change (`joinCodes/{code}` lacks an `archived` field; non-members cannot read `trips/{tripId}`); dedicated messaging requires a rules and backfill update.
