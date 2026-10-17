@@ -227,7 +227,7 @@ class TripRepository {
       }
       if (e.code == 'permission-denied') {
         throw Exception(
-          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+          "Couldn't join this trip. It may be archived, or you may have left it earlier. Rejoining isn't supported in this version.",
         );
       }
       throw Exception(
@@ -240,7 +240,7 @@ class TripRepository {
       }
       if (e.toString().contains('permission-denied')) {
         throw Exception(
-          "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+          "Couldn't join this trip. It may be archived, or you may have left it earlier. Rejoining isn't supported in this version.",
         );
       }
       throw Exception(

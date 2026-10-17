@@ -10,7 +10,7 @@ final tripRepositoryProvider = Provider<TripRepository>((ref) {
   return TripRepository(firestore: ref.watch(firestoreProvider));
 });
 
-/// Streams all active trips for the currently signed-in user.
+/// Streams all trips the user is a member of: active first, then archived.
 final myTripsProvider = StreamProvider<List<Trip>>((ref) {
   final authUserAsync = ref.watch(authUserProvider);
   final user = authUserAsync.asData?.value;
