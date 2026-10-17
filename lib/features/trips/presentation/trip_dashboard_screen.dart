@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../expenses/presentation/expenses_tab.dart';
 import '../../itinerary/presentation/itinerary_tab.dart';
@@ -172,6 +173,70 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
 
         final isOrganizer = authUser != null && trip.isOrganizer(authUser.uid);
 
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final isCompact = screenWidth < 720;
+
+        Widget bodyContent = Column(
+          children: [
+            if (trip.archived)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
+                color: theme.colorScheme.surfaceContainerHighest,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.archive_outlined,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This trip is archived and read-only.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Tab 0: Suggestions Tab (Phase 3)
+                  SuggestionsTab(trip: trip),
+
+                  // Tab 1: Itinerary Tab (Phase 4)
+                  ItineraryTab(
+                    tripId: trip.id,
+                    startDate: trip.startDate,
+                    endDate: trip.endDate,
+                    currency: trip.currency,
+                    isOrganizer: trip.isOrganizer(authUser?.uid ?? ''),
+                    isArchived: trip.archived,
+                  ),
+
+                  // Tab 2: Expenses Tab (Phase 5)
+                  ExpensesTab(trip: trip),
+
+                  // Tab 3: Members Tab (Working!)
+                  MembersTab(trip: trip),
+                ],
+              ),
+            ),
+          ],
+        );
+
+        if (!isCompact) {
+          bodyContent = CenteredContent(maxWidth: 1000, child: bodyContent);
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Column(
@@ -238,6 +303,8 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
             ],
             bottom: TabBar(
               controller: _tabController,
+              isScrollable: !isCompact,
+              tabAlignment: !isCompact ? TabAlignment.start : null,
               tabs: const [
                 Tab(icon: Icon(Icons.lightbulb_outline), text: 'Suggestions'),
                 Tab(icon: Icon(Icons.calendar_today), text: 'Itinerary'),
@@ -249,62 +316,7 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
               ],
             ),
           ),
-          body: Column(
-            children: [
-              if (trip.archived)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.archive_outlined,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'This trip is archived and read-only.',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // Tab 0: Suggestions Tab (Phase 3)
-                    SuggestionsTab(trip: trip),
-
-                    // Tab 1: Itinerary Tab (Phase 4)
-                    ItineraryTab(
-                      tripId: trip.id,
-                      startDate: trip.startDate,
-                      endDate: trip.endDate,
-                      currency: trip.currency,
-                      isOrganizer: trip.isOrganizer(authUser?.uid ?? ''),
-                      isArchived: trip.archived,
-                    ),
-
-                    // Tab 2: Expenses Tab (Phase 5)
-                    ExpensesTab(trip: trip),
-
-                    // Tab 3: Members Tab (Working!)
-                    MembersTab(trip: trip),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          body: bodyContent,
         );
       },
     );
