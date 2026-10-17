@@ -430,7 +430,7 @@ go_router with routes `/welcome`, `/sign-in`, `/sign-up`, `/home`, `/settings`. 
 | 4 | Itinerary | M | **DONE** — Day-by-day itinerary view, pending suggestions sheet sorted by score, day picker sheet, organizer drag-to-reorder within a day, item scheduling/unscheduling/moving between days, CEL security rules for organizer updates, integer checks, date range bounds, exact key restriction, and status coherence; all verified across 177 Flutter tests, 72 rules unit tests, and 17/17 security rule mutants. |
 | 5 | Expenses and balances | L | **DONE** — Expense CRUD, calculator unit-tested, Balances view with suggested payments |
 | 6 | Settlements | M | **DONE** — payment creation, confirmation, rejection, cancel, balances, leave/remove integration, verified on device |
-| 7 | Hardening and polish | M | **IMPLEMENTED** — archive UI, archived sweep, balances states; PENDING: rules deploy and phone verification |
+| 7 | Hardening and polish | M | **DONE** — archive UI, archived sweep, balances states; VERIFIED on device (10/10 archive phone test; rules deployed) |
 | 8 | Version 2 extras | varies | Notifications, comments, photos, packing list, unequal splits |
 
 ---
@@ -656,10 +656,10 @@ SuggestionCard header: Category and Day chips wrap in Row 1 with the menu pinned
 - **Test Suite:** 353 passing Flutter tests (16 tests in `test/archived_sweep_test.dart`, 15 tests in `test/home_screen_test.dart`, 11 tests in `test/trip_dashboard_screen_test.dart`, 9 tests in `test/trip_repository_test.dart`, plus existing suites), exit code 0 (`docs/evidence/p7s4/G_test.txt`, `docs/evidence/p7s4/G_counts.txt`).
 - **Security Rules Status:** Local `firestore.rules` SHA-256 hash `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6` confirmed untouched (`docs/evidence/p7s2/G_hash.txt`).
 - **Sabotage Sensitivity Proofs:** 8 out-of-repo sabotage proofs (P1–P8) executed against external copies under `wayfound_archive/sabotage_p7s2`, all failing on their target tests (`docs/evidence/p7s2/SAB_P1_diff.txt` through `SAB_P8_run.txt`).
-- **Known Limitations & Pending Verifications:**
-  - Deployment of rules hash `6D13FEAE...` to production project `wayfound-51b4d` is PENDING.
-  - Phone verification of archive action on physical device is PENDING.
+- **Verification & Close-Out:** Archive rules deployed; phone test passed 10/10 on physical device. The Home-hides-archived bug was found during phone verification and fixed in P7-S4. The join-refused message now covers both archived and left-earlier because the join preview cannot know a trip is archived without a rules change (joinCodes has no archived field; non-members cannot read trips). A dedicated archived message is a post-v1 candidate.
+- **Known Limitations & Deferred Items:**
   - No unarchive in v1.
+  - Dedicated join-preview message for archived trips deferred to post-v1 (joinCodes has no archived field; non-members cannot read trips without rules change).
 
 ---
 
