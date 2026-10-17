@@ -1,0 +1,72 @@
+=== SESSION R2: RELEASE PREP UPLOAD SUMMARY ===
+
+1. STEP 0 KEY LINES
+- Test-Path android/key.properties: True
+- git check-ignore -v android/key.properties: android/.gitignore:12:key.properties android/key.properties
+- git ls-files android/key.properties: <empty - untracked>
+- Test-Path .firebaserc: False
+- git check-ignore -v .firebase: .gitignore:63:.firebase/ .firebase
+
+2. STEP 1 SANITY CHECKS (GOOGLE-SERVICES.JSON)
+- package_name equals com.ayush.wayfound: True
+- oauth_client client_type 1 count: 2
+- distinct certificate_hash count: 2 (debug and release)
+- project_id matches lib/firebase_options.dart: True
+
+3. B1 VS B4 PERMISSION AND LABEL LINES
+- B1 (Before):
+  android/app/src/main/AndroidManifest.xml: INTERNET permission missing
+  merged manifest label: android:label="wayfound"
+- B4 (After):
+  merged manifest permission: <uses-permission android:name="android.permission.INTERNET" />
+  merged manifest label: android:label="Wayfound"
+
+4. STEP 3d EMULATOR GATING VERDICT
+- Gate: kUseEmulators = bool.fromEnvironment('USE_EMULATORS', defaultValue: false)
+- Verdict: Inactive in release build (defaults to false; emulator connection block is bypassed in production).
+
+5. QUALITY GATES (LAST 3 LINES)
+[flutter analyze]
+Analyzing wayfound...
+No issues found! (ran in 114.9s)
+
+[dart format]
+Formatted 125 files (0 changed) in 0.80 seconds.
+
+6. TEST COUNTS
+Total: 363 passed (0 failed, 0 skipped, exit code 0)
+
+7. B3 SPLIT-PER-ABI APK SIZES
+- app-arm64-v8a-release.apk: 22,465,422 bytes
+- app-armeabi-v7a-release.apk: 20,005,208 bytes
+- app-x86_64-release.apk: 23,900,045 bytes
+(Universal: wayfound-1.0.0-universal.apk: 59,699,551 bytes)
+
+8. B5 SIGNER VERDICTS (apksigner verify --print-certs)
+- wayfound-1.0.0-universal.apk: Signer #1 certificate DN: CN=Ayush, OU=Wayfound, O=Wayfound, L=Bhubaneswar, ST=Odisha, C=IN | verdict: release-signed
+- wayfound-1.0.0-arm64-v8a.apk: Signer #1 certificate DN: CN=Ayush, OU=Wayfound, O=Wayfound, L=Bhubaneswar, ST=Odisha, C=IN | verdict: release-signed
+- wayfound-1.0.0-armeabi-v7a.apk: Signer #1 certificate DN: CN=Ayush, OU=Wayfound, O=Wayfound, L=Bhubaneswar, ST=Odisha, C=IN | verdict: release-signed
+- wayfound-1.0.0-x86_64.apk: Signer #1 certificate DN: CN=Ayush, OU=Wayfound, O=Wayfound, L=Bhubaneswar, ST=Odisha, C=IN | verdict: release-signed
+
+9. B6 PUBSPEC.LOCK DIFF RESULT
+<empty - lockfile unchanged>
+
+10. GIT DIFF --STAT MAIN..HEAD
+ .gitignore                               |  7 +++++++
+ android/app/build.gradle.kts             | 31 ++++++++++++++++++++++++++++---
+ android/app/google-services.json         |  8 ++++++++
+ android/app/src/main/AndroidManifest.xml |  3 ++-
+ 4 files changed, 45 insertions(+), 4 deletions(-)
+
+11. GIT DIFF --NAME-ONLY MAIN..HEAD
+.gitignore
+android/app/build.gradle.kts
+android/app/google-services.json
+android/app/src/main/AndroidManifest.xml
+
+12. GIT LOG --ONELINE MAIN..HEAD
+164ab50 chore(git): ignore keystores and firebase cache
+388c1ca chore(firebase): refresh google-services with release fingerprints
+c09c9f1 build(android): release signing from key.properties
+fc614f0 fix(android): app label Wayfound
+3448bdd fix(android): add INTERNET permission to main manifest
