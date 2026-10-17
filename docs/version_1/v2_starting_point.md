@@ -9,11 +9,11 @@
 - **First Commit Date:** October 4, 2026 (13 elapsed calendar days to v1 completion)
 - **Flutter SDK:** Flutter 3.47.7 (Channel stable)
 - **Dart SDK:** Dart 3.13.5 (pubspec environment constraint: `sdk: ^3.13.0`)
-- **Flutter Test Suite:** 353 passed (0 failed, 0 skipped, 100% exit code 0)
+- **Flutter Test Suite:** 357 passed (0 failed, 0 skipped, exit code 0)
 - **Firestore Security Rules Tests:** 185 passed (185 total unit tests in Jest)
 - **Security Rules Mutation Suite:** 81 mutants evaluated (70 killed, 11 allowlisted equivalents)
 - **Firestore Security Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
-- **Current Development Status:** Version 1 build complete; release packaging pending
+- **Current Development Status:** Version 1 build complete; Web platform added; release packaging pending
 
 ## 2. Repo Map
 - `android/`: Native Android platform Gradle project, manifest definitions, and app icons
@@ -47,6 +47,7 @@
   - `rules_test/mutation/equivalent.json`: Documentation of 11 allowlisted equivalent mutants
   - `rules_test/mutation/harness_v3.js`: Automated mutation test harness with orphan cleanup
 - `test/`: Flutter unit, widget, provider, repository, and router integration test suites
+- `web/`: Flutter web platform runner, HTML host file, web app manifest, and icons
 
 ## 3. How to Run Everything
 - **Install dependencies:** `flutter pub get`
@@ -60,7 +61,9 @@
 - **Run application on physical Android phone:**
   - Forward emulator ports over ADB: `adb reverse tcp:9099 tcp:9099 ; adb reverse tcp:8092 tcp:8092`
   - Launch app: `flutter run --dart-define=USE_EMULATORS=true --dart-define=EMULATOR_HOST=127.0.0.1`
+- **Run application locally on Web:** `flutter run -d chrome`
 - **Compile release APK build:** `flutter build apk --release --split-per-abi`
+- **Compile release Web build:** `flutter build web --release`
 
 ## 4. Security-Critical Files and Rule-Change Procedure
 - **Security-critical files:** `firestore.rules`, `rules_test/firestore_rules.test.js`, `rules_test/mutation/mutants.json`, `rules_test/mutation/equivalent.json`, `rules_test/mutation/harness_v3.js`
@@ -88,6 +91,9 @@
 - **Server rules enforce read-only:** Security rules reject any subcollection writes on archived trips at the database layer.
 - **Archived trip ordering:** Archived trips are displayed on Home after active trips under an Archived header with an Archived chip.
 - **Join code preview limitation:** `joinCodes/{code}` does not store trip archive state, and non-members cannot read `trips/{tripId}` prior to joining; dedicated archived join messaging requires a rules and schema backfill.
+- **Web URL strategy:** The web platform uses the default hash URL routing strategy (`/#/welcome`, `/#/home`); path URL strategy without hashes requires custom server rewrites on hosting environments.
+- **Service worker caching:** Firebase Hosting deploys may serve cached assets until a hard refresh or background service worker update completes; critical entry points use `no-cache` headers.
+- **iOS platform:** iOS platform is currently out of scope and not configured or supported (`ios/` does not exist in the repository).
 
 ## 7. Prioritised v2 Backlog
 1. **Dedicated archived join message:** Add `archived` field to `joinCodes` documents and backfill existing codes to allow join preview to show specific archived notices without permission errors.

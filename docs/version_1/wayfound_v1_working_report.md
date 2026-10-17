@@ -2,14 +2,14 @@
 
 - **Product:** Wayfound
 - **Version:** 1.0.0+1
-- **Status:** Version 1 build complete; release packaging pending
+- **Status:** Version 1 build complete; Web platform added; release packaging pending
 - **Repository:** https://github.com/Aayush049/wayfound.git
-- **Main Commit:** `e3e50bd2342251b3fafe408de92b555da5d58628`
+- **Baseline Commit (before Phase 8):** `b4bed661e39af8499bdf42daac74bd753c7f9e77`
 - **Report Date:** October 17, 2026
 - **First Commit Date:** October 4, 2026 (13 elapsed calendar days)
 - **Flutter Version:** Flutter 3.47.7 (Channel stable)
 - **Dart Version:** Dart 3.13.5 (SDK constraint: `^3.13.0`)
-- **Flutter Test Total:** 353 passed (0 failed)
+- **Flutter Test Total:** 357 passed (0 failed)
 - **Rules Test Total:** 185 passed (185 total)
 - **Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
 
@@ -683,6 +683,23 @@ firebase emulators:exec --only firestore "npm --prefix rules_test test"
   ```bash
   flutter run --dart-define=USE_EMULATORS=true --dart-define=EMULATOR_HOST=127.0.0.1
   ```
+
+---
+
+### 15.7 Phase 8: Web Platform
+- **Platform Scaffold:** Added web platform support via `web/index.html`, `web/manifest.json`, and web icons generated via `flutter_launcher_icons` from existing assets without touching Android.
+- **Google Sign-In on Web:** Added `FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider())` when operating in web mode (`isWeb: true`), preserving existing mobile `authenticate()` flow when `false`.
+- **Responsive Wrapper:** Added global `WebResponsiveWrapper` via `MaterialApp.builder` with stable key `Key('web_responsive_wrapper')` that centers the application and clamps content width to 720 logical pixels on wide screens, keeping native layout below 720.
+- **Firebase Hosting Configuration:** Configured `"hosting"` in `firebase.json` with public path `build/web`, single-page app rewrite to `/index.html`, and `no-cache` headers for entry and service worker files.
+- **Verified Facts:**
+  - `flutter analyze`: Zero issues.
+  - `dart format`: Zero files changed (clean format).
+  - `flutter test`: 357 passed (0 failed).
+  - Sabotage sensitivity proofs P1 and P2 verified on external copies.
+  - `flutter build web --release`: Compiled successfully (total output 41.7 MB).
+  - `flutter build apk --debug`: Compiled successfully, confirming Android platform did not regress.
+  - `firestore.rules` SHA-256 untouched (`6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`).
+- **What is NOT Verified:** Public deployment to Firebase Hosting and interactive browser testing in live production are manual user steps.
 
 ---
 

@@ -5,7 +5,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.47.7-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-FFCA28?logo=firebase&logoColor=black)
-![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-3DDC84?logo=android&logoColor=white)
 ![Status](https://img.shields.io/badge/Version-1.0.0-success)
 
 ---
@@ -131,6 +131,16 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
 
 ---
 
+## Running on the Web
+
+To run the application locally in Google Chrome:
+
+```bash
+flutter run -d chrome
+```
+
+---
+
 ## Building a Release APK
 
 To compile an optimized release APK for Android devices:
@@ -143,6 +153,36 @@ The compiled APKs will be generated in:
 ```text
 build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
+
+---
+
+## Building for the Web
+
+To compile an optimized production web build:
+
+```bash
+flutter build web --release
+```
+
+The output files will be generated in `build/web/`.
+
+---
+
+## Deploying to Firebase Hosting
+
+To host the web application on Firebase:
+
+1. Select your target Firebase project:
+   ```bash
+   firebase use <your-project-id>
+   ```
+
+2. Deploy the web build artifacts:
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+> **Note on Authentication:** Google Sign-In on the web requires your Firebase Hosting domain (or custom domain) to be listed under **Authentication** > **Settings** > **Authorized domains** in the Firebase Console. Local development on `localhost` is authorized by default.
 
 ---
 
@@ -164,8 +204,11 @@ flutter test --reporter expanded
 
 - **Firebase Initialization Errors**: Ensure `lib/firebase_options.dart` and `android/app/google-services.json` are present with your Firebase project configuration.
 - **Permission Denied in Firestore**: Ensure you deployed the project rules using `firebase deploy --only firestore:rules`.
-- **Google Sign-In Error Code 10**: Verify that your Android signing keystore certificate fingerprint (SHA-1 / SHA-256) is added to your Firebase project settings.
-- **Release APK Network Access**: Ensure `<uses-permission android:name="android.permission.INTERNET"/>` is declared in `android/app/src/main/AndroidManifest.xml`.
+- **Google Sign-In Error Code 10 (Android)**: Verify that your Android signing keystore certificate fingerprint (SHA-1 / SHA-256) is added to your Firebase project settings.
+- **Release APK Network Access (Android)**: Ensure `<uses-permission android:name="android.permission.INTERNET"/>` is declared in `android/app/src/main/AndroidManifest.xml`.
+- **Popup Blocked (Web)**: If Google Sign-In does not open on web browsers, verify that popups are not blocked by browser settings or extensions.
+- **Unauthorized Domain Error (Web)**: If Google Sign-In fails with an unauthorized domain error on a deployed web build, add your hosting domain to Firebase Console under Authentication > Settings > Authorized domains.
+- **Stale Cache After Deploy (Web)**: If previous versions appear after deployment, perform a hard browser refresh (Ctrl+F5 or Cmd+Shift+R) to allow the service worker cache to update.
 
 ---
 
