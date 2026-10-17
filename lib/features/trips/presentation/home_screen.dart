@@ -6,6 +6,7 @@ import '../../../app/theme/theme_provider.dart';
 import '../../../core/widgets/app_empty.dart';
 import '../../../core/widgets/app_error.dart';
 import '../../../core/widgets/app_loading.dart';
+import '../../../core/widgets/centered_content.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/trips_providers.dart';
 import 'trip_card.dart';
@@ -134,35 +135,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 final activeTrips = trips.where((t) => !t.archived).toList();
                 final archivedTrips = trips.where((t) => t.archived).toList();
 
-                return ListView(
-                  padding: const EdgeInsets.only(top: 8, bottom: 120),
-                  children: [
-                    for (final trip in activeTrips)
-                      TripCard(
-                        trip: trip,
-                        currentUid: authUser?.uid ?? '',
-                        onTap: () => context.push('/trip/${trip.id}/members'),
-                      ),
-                    if (archivedTrips.isNotEmpty) ...[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: Text(
-                          'Archived',
-                          key: const Key('home_archived_section_header'),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      for (final trip in archivedTrips)
+                final screenWidth = MediaQuery.sizeOf(context).width;
+                final isCompact = screenWidth < 720;
+
+                if (isCompact) {
+                  return ListView(
+                    padding: const EdgeInsets.only(top: 8, bottom: 120),
+                    children: [
+                      for (final trip in activeTrips)
                         TripCard(
                           trip: trip,
                           currentUid: authUser?.uid ?? '',
                           onTap: () => context.push('/trip/${trip.id}/members'),
                         ),
+                      if (archivedTrips.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                          child: Text(
+                            'Archived',
+                            key: const Key('home_archived_section_header'),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        for (final trip in archivedTrips)
+                          TripCard(
+                            trip: trip,
+                            currentUid: authUser?.uid ?? '',
+                            onTap: () =>
+                                context.push('/trip/${trip.id}/members'),
+                          ),
+                      ],
                     ],
-                  ],
+                  );
+                }
+
+                final columns = screenWidth >= 1100 ? 3 : 2;
+
+                return CenteredContent(
+                  maxWidth: 1200,
+                  child: CustomScrollView(
+                    key: const Key('home_trips_grid'),
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.only(
+                          top: 16,
+                          left: 16,
+                          right: 16,
+                        ),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                                mainAxisExtent: 220,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => TripCard(
+                              trip: activeTrips[index],
+                              currentUid: authUser?.uid ?? '',
+                              onTap: () => context.push(
+                                '/trip/${activeTrips[index].id}/members',
+                              ),
+                            ),
+                            childCount: activeTrips.length,
+                          ),
+                        ),
+                      ),
+                      if (archivedTrips.isNotEmpty) ...[
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                            child: Text(
+                              'Archived',
+                              key: const Key('home_archived_section_header'),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.only(
+                            bottom: 120,
+                            left: 16,
+                            right: 16,
+                          ),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: columns,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  mainAxisExtent: 220,
+                                ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => TripCard(
+                                trip: archivedTrips[index],
+                                currentUid: authUser?.uid ?? '',
+                                onTap: () => context.push(
+                                  '/trip/${archivedTrips[index].id}/members',
+                                ),
+                              ),
+                              childCount: archivedTrips.length,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 );
               },
             ),
