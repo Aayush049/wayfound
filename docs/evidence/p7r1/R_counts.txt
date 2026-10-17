@@ -1,1 +1,0 @@
-Rules suite results: 185 passed, 185 total (exit code: 0)

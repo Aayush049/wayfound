@@ -1,7 +1,0 @@
-
-lib\features\trips\presentation\home_screen.dart:97:                    child: (user?.photoUrl == null || 
-user!.photoUrl!.isEmpty)
-lib\features\trips\presentation\home_screen.dart:122:                if (trips.isEmpty) {
-lib\features\trips\presentation\home_screen.dart:123:                  return AppEmpty(
-
-

@@ -1,2 +1,0 @@
-﻿Analyzing wayfound...                                            No issues found! (ran in 9.2s)
-EXIT CODE: 0

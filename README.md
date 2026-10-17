@@ -24,27 +24,27 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
 
 ## Core Features
 
-### ✈️ Trips & Instant Invites
-- **Trip Dashboard**: Create a trip with custom destinations, travel dates, and base currencies (USD, EUR, GBP, JPY).
+### Trips & Instant Invites
+- **Trip Dashboard**: Create a trip with custom destinations, travel dates, and base currencies (INR, USD, EUR, GBP, AED, AUD, CAD, SGD, JPY, CHF).
 - **6-Character Join Codes**: Share a short invite code with friends. Joining members can preview trip details before joining with one tap.
 - **Member Roster**: View all active participants and their roles (Organizer vs. Member).
 
-### 💡 Suggestions & Community Voting
+### Suggestions & Community Voting
 - **Categorized Idea Boards**: Propose suggestions across Activity, Dining, Lodging, or Other categories with descriptions and estimated costs.
 - **Up & Down Voting**: Every member can vote (+1 / -1) on ideas. Net scores update in real time to establish group consensus.
 - **Direct Scheduling**: High-voted suggestions can be scheduled directly into the trip itinerary.
 
-### 📅 Visual Daily Itinerary
+### Visual Daily Itinerary
 - **Day-by-Day View**: Organized into sequential daily sections (Day 1, Day 2, etc.) matching your trip calendar.
 - **Drag-to-Reorder**: Organizers can effortlessly drag and drop activities to rearrange the sequence of events within a day.
 - **Flexible Management**: Move activities between days or unschedule them back to the suggestions board without losing details.
 
-### 💰 Expense Tracking & Smart Splits
+### Expense Tracking & Smart Splits
 - **Quick Expense Logging**: Record purchases with the payer, total amount, date, and a checklist of participating members.
 - **Penny-Accurate Splits**: Costs are split equally with penny-remainder distribution, ensuring the sum of all individual shares matches the receipt exactly.
 - **Live Share Preview**: See each participant's calculated share in real time before saving.
 
-### ⚖️ Balances & Two-Step Settlements
+### Balances & Two-Step Settlements
 - **Dynamic Net Balances**: Balances are calculated on the fly by combining all expenses and confirmed payments.
 - **Simplified Debt Payments**: Wayfound automatically computes the most efficient, minimal transactions required to settle all debts.
 - **Two-Step Confirmation**:
@@ -52,7 +52,7 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
   2. Creditor (or organizer) reviews and confirms or rejects the settlement.
 - **Safe Departures**: Members can leave a trip only once their net balance is completely settled, preserving financial peace of mind.
 
-### 📦 Trip Archiving
+### Trip Archiving
 - When a vacation wraps up, the organizer can archive the trip with one tap.
 - Archiving locks all data into a permanent read-only digital journal across all tabs.
 
@@ -92,7 +92,7 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
 ## Getting Started
 
 ### Prerequisites
-- [Flutter SDK](https://flutter.dev) (3.13+)
+- [Flutter SDK](https://flutter.dev) (Flutter 3.47.7, Dart SDK constraint `^3.13.0`)
 - [Android Studio](https://developer.android.com/studio) with Android SDK
 - A [Firebase](https://firebase.google.com) project
 
@@ -175,4 +175,4 @@ No licence has been specified yet; all rights are reserved by the author until o
 
 ## Author
 
-Wayfound is designed and built with passion by [Aayush049](https://github.com/Aayush049).
+Wayfound is built by [Aayush049](https://github.com/Aayush049).

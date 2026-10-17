@@ -1,3 +1,0 @@
-Lines: 508
-Bytes: 43252
-Path: d:\VsCode\wayfound\trip_planner_project_report.md

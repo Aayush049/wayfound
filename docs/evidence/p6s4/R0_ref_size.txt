@@ -1,3 +1,0 @@
-Lines: 560
-Bytes: 48528
-Path: D:\VsCode\wayfound_archive\tools\report_2bce7d7.md

@@ -1,2 +1,0 @@
-Formatted 119 files (0 changed) in 0.70 seconds.
-ExitCode: 0 

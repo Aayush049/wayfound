@@ -1,6 +1,0 @@
-
-Algorithm       Hash                                                                   Path                            
----------       ----                                                                   ----                            
-SHA256          6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6       D:\VsCode\wayfound\firestore....
-
-

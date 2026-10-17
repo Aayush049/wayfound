@@ -1,2 +1,0 @@
-To https://github.com/Aayush049/wayfound.git
-   e0d36e9..bbd7374  main -> main
