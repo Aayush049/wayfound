@@ -346,13 +346,16 @@ void main() {
             currentMemberCount: 2,
           ),
           throwsA(
-            predicate(
-              (e) =>
-                  e is Exception &&
-                  e.toString().contains(
-                    "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
-                  ),
-            ),
+            predicate((e) {
+              if (e is! Exception) return false;
+              final msg = e.toString();
+              final hasExactMsg = msg.contains(
+                "Couldn't join this trip. It may be archived, or you may have left it earlier. Rejoining isn't supported in this version.",
+              );
+              final hasKeywords =
+                  msg.contains('archived') && msg.contains('left it earlier');
+              return hasExactMsg && hasKeywords;
+            }),
           ),
         );
       },

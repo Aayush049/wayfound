@@ -1501,7 +1501,7 @@ void main() {
 
         expect(
           find.text(
-            "Couldn't join this trip. If you left it earlier, rejoining isn't supported in this version.",
+            "Couldn't join this trip. It may be archived, or you may have left it earlier. Rejoining isn't supported in this version.",
           ),
           findsOneWidget,
         );
