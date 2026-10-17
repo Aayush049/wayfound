@@ -53,3 +53,4 @@ app.*.map.json
 
 # Mutation testing output
 rules_test/mutation/out/
+rules_test/mutation/out_v3/
