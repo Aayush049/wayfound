@@ -5,7 +5,7 @@
 - **Application ID:** `com.ayush.wayfound` (Android, Kotlin)
 - **Application Version:** `1.0.0+1` (from `pubspec.yaml`)
 - **Repository URL:** `https://github.com/Aayush049/wayfound.git`
-- **Main Commit:** `e3e50bd2342251b3fafe408de92b555da5d58628`
+- **Main Commit:** `164ab503a5d9732ae91cf06f5efaea127a371212` (Tag: `v1.0.0`)
 - **First Commit Date:** October 4, 2026 (13 elapsed calendar days to v1 completion)
 - **Flutter SDK:** Flutter 3.47.7 (Channel stable)
 - **Dart SDK:** Dart 3.13.5 (pubspec environment constraint: `sdk: ^3.13.0`)
@@ -13,7 +13,7 @@
 - **Firestore Security Rules Tests:** 185 passed (185 total unit tests in Jest)
 - **Security Rules Mutation Suite:** 81 mutants evaluated (70 killed, 11 allowlisted equivalents)
 - **Firestore Security Rules SHA-256:** `6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6`
-- **Current Development Status:** Version 1 build complete; Web platform added; release packaging pending
+- **Current Development Status:** Version 1.0.0 released (Android release APK signed and smoke-tested on physical devices; Web application deployed to Firebase Hosting)
 
 ## 2. Repo Map
 - `android/`: Native Android platform Gradle project, manifest definitions, and app icons
@@ -95,15 +95,22 @@
 - **Service worker caching:** Firebase Hosting deploys may serve cached assets until a hard refresh or background service worker update completes; critical entry points use `no-cache` headers.
 - **iOS platform:** iOS platform is currently out of scope and not configured or supported (`ios/` does not exist in the repository).
 - **Web layout breakpoints:** The responsive web layout defines breakpoints at compact (< 720 logical px, unchanged mobile layout), medium (720–1099 px), and expanded (>= 1100 px). Shared width constraints use `CenteredContent` with default max width 1000 px (560 px for forms, 440 px for auth cards).
+- **Web layout vs dedicated desktop redesign:** The v1 web app uses a centered, mobile-first responsive layout (breakpoints 720/1100). A full desktop redesign (side navigation, split views, multi-column dashboards) was deliberately deferred to v2 to avoid introducing regressions to the verified mobile layout.
+- **Android release signing:** Release APK builds require `android/key.properties` (git-ignored) specifying `storePassword`, `keyPassword`, `keyAlias`, and `storeFile`. If missing, the build falls back to debug signing with a build warning.
+- **Firebase major upgrades:** Major version upgrades for Firebase packages (`cloud_firestore` 7, `firebase_auth` 7, `firebase_core` 5) were intentionally deferred in v1 to preserve stability.
 - **Lockfile discipline:** `pubspec.lock` is version-controlled and must not change unless dependencies are upgraded deliberately (`flutter create` commands can silently trigger unconstrained dependency re-resolution); use `flutter pub get --enforce-lockfile` to detect accidental changes.
 
 ## 7. Prioritised v2 Backlog
-1. **Dedicated archived join message:** Add `archived` field to `joinCodes` documents and backfill existing codes to allow join preview to show specific archived notices without permission errors.
-2. **Rejoin after leaving:** Redesign join rules and member document state transitions to allow previously departed members to rejoin when eligible.
-3. **Organizer role transfer:** Allow organizers to transfer the organizer role to an active member prior to leaving the trip.
-4. **Unarchive trips:** Implement reversible trip archiving with corresponding security rules updates and read-only sweep reversibility.
-5. **Add to itinerary shortcut:** Provide a 1-tap action directly on suggestion cards to schedule top suggestions into itinerary days without opening the bottom sheet.
-6. **Phase 8 feature expansions:** Push notifications for voting deadlines, comments on suggestions, photo attachments, shared packing checklists, and unequal splits.
+1. **Full desktop web redesign:** Redesign the web app layout for desktop viewports with collapsible side navigation, split-pane views (suggestions alongside day itinerary), and multi-column financial dashboards, replacing the centered mobile-first responsive column (deferred from v1 to eliminate regression risk to the verified mobile layout).
+2. **Dedicated archived join message:** Add `archived` field to `joinCodes` documents and backfill existing codes to allow join preview to show specific archived notices without permission errors.
+3. **Rejoin after leaving:** Redesign join rules and member document state transitions to allow previously departed members to rejoin when eligible.
+4. **Organizer role transfer:** Allow organizers to transfer the organizer role to an active member prior to leaving the trip.
+5. **Unarchive trips:** Implement reversible trip archiving with corresponding security rules updates and read-only sweep reversibility.
+6. **Add to itinerary shortcut:** Provide a 1-tap action directly on suggestion cards to schedule top suggestions into itinerary days without opening the bottom sheet.
+7. **Firebase App Check integration:** Protect Firestore and join code endpoints against automated abuse and brute-force probing using Play Integrity on Android and reCAPTCHA Enterprise on Web.
+8. **Google Play Store / AAB packaging:** Build Android App Bundle (`.aab`) and satisfy Google Play Console target API and privacy policy requirements for store distribution.
+9. **Tab label layout polish on narrow viewports:** Address label text truncation on narrow Android screens (e.g. CPH2603 "Suggesti", "Expense") by adapting tab sizing or icon-based tab indicators.
+10. **Phase 8 feature expansions:** Push notifications for voting deadlines, comments on suggestions, photo attachments, shared packing checklists, and unequal splits.
 
 ## 8. Evidence Index
 | File | What It Proves | Regeneration Command |
@@ -117,6 +124,7 @@
 | `docs/version_1/evidence/07_mutation_harness_final.txt` | Mutation harness kills all 70 non-equivalent mutants | `node rules_test/mutation/harness_v3.js` |
 | `docs/version_1/evidence/08_main_origin_verify_final.txt` | Local main commit equals origin/main commit | `git rev-parse HEAD main origin/main` |
 | `docs/version_1/evidence/09_r1_release_audit_summary.txt` | Baseline release readiness findings | `git show release/r1-audit:docs/evidence/r1/UPLOAD_SUMMARY.txt` |
+| `docs/version_1/evidence/10_r2_release_summary.txt` | Release prep verification (INTERNET permission, Wayfound label, release signing, clean gates) | Session R2 verification suite |
 | `docs/version_1/evidence/equivalence/P1_real.txt` | Real rule evaluation for equivalence probe 1 | Probe test run |
 | `docs/version_1/evidence/equivalence/P1_m54.txt` | Mutant m54 evaluation for equivalence probe 1 | Probe test run |
 | `docs/version_1/evidence/equivalence/P2_real.txt` | Real rule evaluation for equivalence probe 2 | Probe test run |
