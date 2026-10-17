@@ -102,6 +102,48 @@ void main() {
         expect(trips[0].name, equals('Future Trip'));
         expect(trips[1].name, equals('Past Trip'));
       });
+
+      test('T1: member of active and archived trip gets both from watchMyTrips; non-member trip excluded', () async {
+        final now = DateTime.now();
+        final activeResult = await repository.createTrip(
+          name: 'Active Trip',
+          destination: 'Dest 1',
+          startDate: now.add(const Duration(days: 5)),
+          endDate: now.add(const Duration(days: 10)),
+          currency: 'INR',
+          userUid: 'user-123',
+          displayName: 'Organizer',
+        );
+
+        final archivedResult = await repository.createTrip(
+          name: 'Archived Trip',
+          destination: 'Dest 2',
+          startDate: now.add(const Duration(days: 1)),
+          endDate: now.add(const Duration(days: 4)),
+          currency: 'INR',
+          userUid: 'user-123',
+          displayName: 'Organizer',
+        );
+        await repository.archiveTrip(archivedResult.tripId);
+
+        await repository.createTrip(
+          name: 'Other Trip',
+          destination: 'Dest 3',
+          startDate: now.add(const Duration(days: 2)),
+          endDate: now.add(const Duration(days: 6)),
+          currency: 'USD',
+          userUid: 'user-other',
+          displayName: 'Other',
+        );
+
+        final trips = await repository.watchMyTrips('user-123').first;
+
+        expect(trips.length, equals(2));
+        expect(trips[0].id, equals(activeResult.tripId));
+        expect(trips[0].archived, isFalse);
+        expect(trips[1].id, equals(archivedResult.tripId));
+        expect(trips[1].archived, isTrue);
+      });
     });
 
     group('getJoinPreview', () {

@@ -50,6 +50,12 @@ void main() {
                 builder: (context, state) =>
                     const Scaffold(body: Text('Join Trip Screen Target')),
               ),
+              GoRoute(
+                path: '/trip/:id/members',
+                builder: (context, state) => Scaffold(
+                  body: Text('Trip Dashboard: ${state.pathParameters['id']}'),
+                ),
+              ),
             ],
           ),
         ),
@@ -299,5 +305,111 @@ void main() {
       await tester.tap(themeToggleBtn);
       await tester.pumpAndSettle();
     });
+
+    final testActiveTrip = Trip(
+      id: 'trip-active-1',
+      name: 'Active Paris Trip',
+      destination: 'Paris, France',
+      startDate: DateTime.now().add(const Duration(days: 2)),
+      endDate: DateTime.now().add(const Duration(days: 5)),
+      currency: 'EUR',
+      organizerId: 'user-123',
+      joinCode: 'PAR123',
+      memberIds: ['user-123'],
+      memberCount: 1,
+      archived: false,
+    );
+
+    final testArchivedTrip = Trip(
+      id: 'trip-archived-1',
+      name: 'Archived Rome Trip',
+      destination: 'Rome, Italy',
+      startDate: DateTime.now().subtract(const Duration(days: 20)),
+      endDate: DateTime.now().subtract(const Duration(days: 15)),
+      currency: 'EUR',
+      organizerId: 'user-123',
+      joinCode: 'ROM123',
+      memberIds: ['user-123'],
+      memberCount: 1,
+      archived: true,
+    );
+
+    testWidgets(
+      'T2: Home with one active and one archived trip shows both cards, active first, Archived header present, chip on archived card only',
+      (tester) async {
+        await tester.pumpWidget(
+          buildRouterHomeScreen(
+            tripsValue: AsyncData([testActiveTrip, testArchivedTrip]),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Active Paris Trip'), findsOneWidget);
+        expect(find.text('Archived Rome Trip'), findsOneWidget);
+
+        // Active first (above archived)
+        final activePos = tester.getTopLeft(find.text('Active Paris Trip'));
+        final archivedPos = tester.getTopLeft(find.text('Archived Rome Trip'));
+        expect(activePos.dy, lessThan(archivedPos.dy));
+
+        // Archived header is present
+        expect(
+          find.byKey(const Key('home_archived_section_header')),
+          findsOneWidget,
+        );
+
+        // Chip on archived card only: exactly 2 'Archived' widgets exist (1 header + 1 chip)
+        expect(find.text('Archived'), findsNWidgets(2));
+      },
+    );
+
+    testWidgets(
+      'T3: Home with only an archived trip shows the card, not the empty state',
+      (tester) async {
+        await tester.pumpWidget(
+          buildRouterHomeScreen(tripsValue: AsyncData([testArchivedTrip])),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Archived Rome Trip'), findsOneWidget);
+        expect(find.text('No trips yet'), findsNothing);
+        expect(
+          find.byKey(const Key('home_archived_section_header')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'T4: Home with no archived trips shows no Archived header (positive control)',
+      (tester) async {
+        await tester.pumpWidget(
+          buildRouterHomeScreen(tripsValue: AsyncData([testActiveTrip])),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Active Paris Trip'), findsOneWidget);
+        expect(
+          find.byKey(const Key('home_archived_section_header')),
+          findsNothing,
+        );
+        expect(find.text('Archived'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'T5: tap on the archived card navigates to the trip dashboard route',
+      (tester) async {
+        await tester.pumpWidget(
+          buildRouterHomeScreen(tripsValue: AsyncData([testArchivedTrip])),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Archived Rome Trip'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Trip Dashboard: trip-archived-1'), findsOneWidget);
+      },
+    );
   });
 }
