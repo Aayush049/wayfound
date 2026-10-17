@@ -5,8 +5,8 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.47.7-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-FFCA28?logo=firebase&logoColor=black)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-3DDC84?logo=android&logoColor=white)
-![Status](https://img.shields.io/badge/Version-1.0.0-success)
+![Platform](https://img.shields.io/badge/Platform-Android%20(Release%20APK)%20%7C%20Web%20(Live)-3DDC84?logo=android&logoColor=white)
+![Status](https://img.shields.io/badge/Version-1.0.0%20(Released)-success)
 
 ---
 
@@ -14,11 +14,33 @@
 
 Planning a trip with friends usually turns into a chaotic mess of scattered group chats, lost activity suggestions, and stressful post-vacation expense calculations.
 
-**Wayfound** brings everything your travel group needs into one unified mobile app:
+**Wayfound** brings everything your travel group needs into one unified application:
 - **Collaborate on ideas**: Pitch places to visit, restaurants to try, or places to stay, and let the group vote.
 - **Build the schedule**: Turn popular suggestions into a cohesive day-by-day itinerary with intuitive drag-and-drop ordering.
 - **Track shared expenses**: Log who paid for what and automatically split costs among participants without penny-rounding errors.
 - **Settle debts transparently**: See exactly who owes whom at any moment, settle up with a two-step confirmation flow, and archive completed journeys.
+
+---
+
+## Table of Contents
+
+- [Core Features](#core-features)
+- [How It Works](#how-it-works)
+- [Download and Install (Android)](#download-and-install-android)
+- [Web Version](#web-version)
+- [Tech Stack](#tech-stack)
+- [Build from Source](#build-from-source)
+  - [Prerequisites](#prerequisites)
+  - [Clone and Setup](#clone-and-setup)
+  - [Running in Development](#running-in-development)
+  - [Android Release Signing Setup](#android-release-signing-setup)
+  - [Compiling Release APKs](#compiling-release-apks)
+  - [Building and Deploying the Web App](#building-and-deploying-the-web-app)
+- [Automated Testing](#automated-testing)
+- [Roadmap & Known Limitations](#roadmap--known-limitations)
+- [Troubleshooting](#troubleshooting)
+- [Licence](#licence)
+- [Author](#author)
 
 ---
 
@@ -76,27 +98,63 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
 
 ---
 
+## Download and Install (Android)
+
+The signed Android APK is the primary and recommended way to use Wayfound on mobile devices.
+
+### 1. Download the APK
+Download the universal release APK from the official GitHub Release:
+- **Direct Download:** [Wayfound v1.0.0 Release](https://github.com/Aayush049/wayfound/releases/tag/v1.0.0)
+- **Asset Name:** `wayfound-1.0.0-universal.apk` (~57 MB, compatible with all modern Android device architectures)
+
+### 2. Install on Your Device
+1. Open the downloaded `wayfound-1.0.0-universal.apk` file on your Android phone.
+2. If prompted by Android security, enable **Install unknown apps** for your browser or file manager in Settings.
+3. If Google Play Protect displays an unrecognised app alert, tap **More details**, then select **Install anyway**.
+4. **Previous Builds Note:** If you previously installed a debug or test build signed with a different key, Android will block the installation due to signature mismatch. Uninstall any earlier version first before installing the release build. Your trip data is safely stored in the cloud and will restore immediately upon sign-in.
+
+### 3. First-Use Walkthrough
+1. **Launch App**: Open **Wayfound** from your home screen or app drawer.
+2. **Sign In**: Tap **Continue with Google** or sign up with your email and password.
+3. **Create a Trip**: Tap the **+** button on the Home screen, select **Create Trip**, enter a title, destination, dates, and base currency.
+4. **Invite Friends**: Copy the generated 6-character join code shown on your trip dashboard.
+5. **Collaborate**: When friends enter your join code, they instantly join the roster. Pitch ideas in Suggestions, vote on favorites, schedule the itinerary, log shared expenses, and settle balances seamlessly.
+
+---
+
+## Web Version
+
+Wayfound is also available directly in the browser:
+
+- **Live URL:** [https://wayfound-51b4d.web.app](https://wayfound-51b4d.web.app)
+- **Hosting Platform:** Firebase Hosting with real-time Cloud Firestore synchronization and Firebase Authentication.
+- **Layout Architecture:** The web app currently uses a centered, mobile-first responsive layout (compact `< 720px`, medium `720–1099px`, expanded `>= 1100px`). It provides full feature parity with real-time voting, itineraries, and expense settlement.
+- **Future Redesign:** A dedicated multi-pane desktop experience (collapsible side navigation, side-by-side itinerary boards, and multi-column ledger tables) is planned for Version 2.0. The Android APK remains the recommended primary experience for travel.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology | Description |
 |---|---|---|
-| **Frontend** | [Flutter](https://flutter.dev) (Dart 3) | Cross-platform mobile framework |
+| **Frontend** | [Flutter](https://flutter.dev) (Dart 3) | Cross-platform mobile and web framework |
 | **State Management** | [Riverpod](https://riverpod.dev) | Compile-safe, reactive state management |
-| **Navigation** | [GoRouter](https://pub.dev/packages/go_router) | Declarative routing with authentication guards |
-| **Backend & Database** | [Cloud Firestore](https://firebase.google.com) | Real-time cloud database with security rules |
-| **Authentication** | [Firebase Auth](https://firebase.google.com) | Secure email/password and Google Sign-In |
-| **Local Storage** | [Shared Preferences](https://pub.dev/packages/shared_preferences) | Theme preferences (Light / Dark mode) |
+| **Navigation** | [GoRouter](https://pub.dev/packages/go_router) | Declarative routing with URL reflection and auth guards |
+| **Backend & Database** | [Cloud Firestore](https://firebase.google.com) | Real-time database with declarative security rules |
+| **Authentication** | [Firebase Auth](https://firebase.google.com) | Email/password and Google Sign-In (Credential & Popup) |
+| **Hosting** | [Firebase Hosting](https://firebase.google.com/docs/hosting) | Single-page application web hosting with cache control |
+| **Local Storage** | [Shared Preferences](https://pub.dev/packages/shared_preferences) | Device-persistent theme settings (Light / Dark mode) |
 
 ---
 
-## Getting Started
+## Build from Source
 
 ### Prerequisites
-- [Flutter SDK](https://flutter.dev) (Flutter 3.47.7, Dart SDK constraint `^3.13.0`)
-- [Android Studio](https://developer.android.com/studio) with Android SDK
-- A [Firebase](https://firebase.google.com) project
+- [Flutter SDK](https://flutter.dev) (Version 3.47.7, Dart SDK constraint `^3.13.0`)
+- [Android Studio](https://developer.android.com/studio) with Android SDK (API 34+)
+- A [Firebase](https://firebase.google.com) project with Authentication and Cloud Firestore enabled
 
-### Installation
+### Clone and Setup
 
 1. **Clone the repository**:
    ```bash
@@ -104,93 +162,98 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
    cd wayfound
    ```
 
-2. **Install Flutter packages**:
+2. **Install Flutter packages with locked dependencies**:
    ```bash
-   flutter pub get
+   flutter pub get --enforce-lockfile
    ```
 
-3. **Connect Firebase**:
+3. **Configure Firebase**:
    - Create a project in the [Firebase Console](https://console.firebase.google.com).
    - Add an Android app with package name `com.ayush.wayfound`.
-   - Enable **Email/Password** and **Google** sign-in methods under Authentication.
+   - Add a Web app under project settings.
+   - Enable **Email/Password** and **Google** sign-in providers under Authentication.
    - Create a **Cloud Firestore** database.
-   - Run the FlutterFire CLI or download your `google-services.json` into `android/app/`:
-     ```bash
-     dart pub global activate flutterfire_cli
-     flutterfire configure
-     ```
+   - Place your `google-services.json` file in `android/app/google-services.json`.
    - Deploy the project security rules:
      ```bash
      firebase deploy --only firestore:rules
      ```
 
-4. **Run the app**:
+### Running in Development
+
+- **Run on connected Android device or emulator**:
+  ```bash
+  flutter run
+  ```
+
+- **Run locally in Google Chrome**:
+  ```bash
+  flutter run -d chrome
+  ```
+
+### Android Release Signing Setup
+
+1. **Generate a release keystore** (replace with your desired secure keystore location):
    ```bash
-   flutter run
+   keytool -genkeypair -v -keystore <path-to-your-keystore>.jks -alias wayfound -keyalg RSA -keysize 2048 -validity 10000
    ```
 
----
+2. **Configure `android/key.properties`**:
+   Create a file named `android/key.properties` (this file is git-ignored and never committed to source control):
+   ```properties
+   storePassword=<your-store-password>
+   keyPassword=<your-key-password>
+   keyAlias=wayfound
+   storeFile=<path-to-your-keystore>.jks
+   ```
 
-## Running on the Web
+   *Note: If `android/key.properties` is omitted, the release build type automatically falls back to debug signing with a console build warning.*
 
-To run the application locally in Google Chrome:
+3. **Register SHA Fingerprints in Firebase**:
+   Display your keystore's fingerprints:
+   ```bash
+   keytool -list -v -keystore <path-to-your-keystore>.jks -alias wayfound
+   ```
+   Copy the SHA-1 and SHA-256 fingerprints, add them under **Your apps** > **com.ayush.wayfound** in the Firebase Console to enable Google Sign-In on release builds, and replace `android/app/google-services.json` with the updated configuration.
 
-```bash
-flutter run -d chrome
-```
+### Compiling Release APKs
 
-Wayfound adapts its presentation based on window width. On viewports below 720 logical pixels, the interface uses a single-column layout tailored for mobile interaction. On viewports of 720 logical pixels and wider, the app utilizes available desktop space with multi-column trip grids on the home screen, centered content containers with bounded widths, left-aligned dashboard navigation tabs, and structured card containers for authentication flows.
+- **Compile Universal Release APK**:
+  ```bash
+  flutter build apk --release
+  ```
+  Output file: `build/app/outputs/flutter-apk/app-release.apk`
 
----
+- **Compile Split Release APKs** (generates smaller, architecture-specific APKs):
+  ```bash
+  flutter build apk --release --split-per-abi
+  ```
+  Output files:
+  - `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (modern 64-bit devices, ~21 MB)
+  - `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` (32-bit legacy devices, ~19 MB)
+  - `build/app/outputs/flutter-apk/app-x86_64-release.apk` (x86_64 emulators/devices, ~23 MB)
 
-## Building a Release APK
+### Building and Deploying the Web App
 
-To compile an optimized release APK for Android devices:
+1. **Compile optimized web release**:
+   ```bash
+   flutter build web --release
+   ```
+   Output files will be generated in `build/web/`.
 
-```bash
-flutter build apk --release --split-per-abi
-```
-
-The compiled APKs will be generated in:
-```text
-build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-```
-
----
-
-## Building for the Web
-
-To compile an optimized production web build:
-
-```bash
-flutter build web --release
-```
-
-The output files will be generated in `build/web/`.
-
----
-
-## Deploying to Firebase Hosting
-
-To host the web application on Firebase:
-
-1. Select your target Firebase project:
+2. **Deploy to Firebase Hosting**:
    ```bash
    firebase use <your-project-id>
-   ```
-
-2. Deploy the web build artifacts:
-   ```bash
    firebase deploy --only hosting
    ```
 
-> **Note on Authentication:** Google Sign-In on the web requires your Firebase Hosting domain (or custom domain) to be listed under **Authentication** > **Settings** > **Authorized domains** in the Firebase Console. Local development on `localhost` is authorized by default.
+   *Note on Web Authentication:* Google Sign-In on the web requires your Firebase Hosting domain (or custom domain) to be listed under **Authentication** > **Settings** > **Authorized domains** in the Firebase Console. Local testing on `localhost` is authorized by default.
 
 ---
 
 ## Automated Testing
 
-Wayfound includes an extensive automated test suite covering unit math, widget rendering, navigation guards, and accessibility overflow testing:
+Wayfound includes an extensive automated test suite covering unit math, widget rendering, security rules validation, and responsive layouts:
 
 ```bash
 # Run all Flutter tests
@@ -198,7 +261,34 @@ flutter test
 
 # Run tests with verbose expanded output
 flutter test --reporter expanded
+
+# Run Firestore security rules unit tests (against emulator)
+firebase emulators:exec --only firestore "npm --prefix rules_test test"
+
+# Run mutation testing harness
+node rules_test/mutation/harness_v3.js
 ```
+
+---
+
+## Roadmap & Known Limitations
+
+### Roadmap (Version 2 Candidates)
+- **Full Desktop Web Redesign**: Implement a dedicated desktop user experience with collapsible side navigation, split-pane suggestion and itinerary boards, and multi-column financial dashboards.
+- **Rejoin Policy**: Design secure rules transitions allowing departing members to rejoin a trip when their balance is settled.
+- **Organizer Role Transfer**: Enable trip organizers to hand off the organizer role to another member before leaving a trip.
+- **Dedicated Archived Join Message**: Add an `archived` property to join codes so non-members previewing trips receive an explicit archive message.
+- **Firebase App Check**: Integrate App Check with Play Integrity on Android and reCAPTCHA Enterprise on Web to prevent automated endpoint abuse.
+- **Google Play Store Distribution**: Prepare Android App Bundle (`.aab`) packaging and Play Console compliance.
+- **Direct Suggestion Scheduling**: Provide a 1-tap shortcut directly on suggestion cards to schedule activities into itinerary days.
+
+### Known Limitations
+- **Narrow Device Tab Truncation**: On narrow Android screens (such as 360px display widths), tab labels ("Suggestions", "Expenses") may truncate due to standard tab bar padding.
+- **One-Way Trip Archiving**: Archiving locks trips into a permanent read-only journal; unarchiving is not supported in v1.
+- **Permanent Departure**: Once a member leaves or is removed from a trip, security rules explicitly prevent rejoining with the invite code in v1.
+- **Offline Cache Scope**: Offline support relies on Firestore local persistence; no custom offline conflict resolution or offline-first synchronization guarantees exist.
+- **Major Firebase Packages Deferred**: Major upgrades (`cloud_firestore` 7, `firebase_auth` 7, `firebase_core` 5) are intentionally deferred in v1 to preserve stability.
+- **iOS Platform**: iOS configuration is currently out of scope and not supported.
 
 ---
 
