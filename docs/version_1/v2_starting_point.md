@@ -94,6 +94,7 @@
 - **Web URL strategy:** The web platform uses the default hash URL routing strategy (`/#/welcome`, `/#/home`); path URL strategy without hashes requires custom server rewrites on hosting environments.
 - **Service worker caching:** Firebase Hosting deploys may serve cached assets until a hard refresh or background service worker update completes; critical entry points use `no-cache` headers.
 - **iOS platform:** iOS platform is currently out of scope and not configured or supported (`ios/` does not exist in the repository).
+- **Lockfile discipline:** `pubspec.lock` is version-controlled and must not change unless dependencies are upgraded deliberately (`flutter create` commands can silently trigger unconstrained dependency re-resolution); use `flutter pub get --enforce-lockfile` to detect accidental changes.
 
 ## 7. Prioritised v2 Backlog
 1. **Dedicated archived join message:** Add `archived` field to `joinCodes` documents and backfill existing codes to allow join preview to show specific archived notices without permission errors.
