@@ -20,6 +20,7 @@ class TripCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isOrganizer = trip.isOrganizer(currentUid);
     final isPast = trip.isPast;
+    final isPastOrArchived = isPast || trip.archived;
 
     final dateFormat = DateFormat('MMM d, yyyy');
     final dateRangeStr =
@@ -27,8 +28,8 @@ class TripCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: isPast ? 0 : 2,
-      color: isPast
+      elevation: isPastOrArchived ? 0 : 2,
+      color: isPastOrArchived
           ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
           : theme.colorScheme.surface,
       shape: RoundedRectangleBorder(
@@ -53,7 +54,7 @@ class TripCard extends StatelessWidget {
                       trip.name,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isPast
+                        color: isPastOrArchived
                             ? theme.colorScheme.onSurfaceVariant
                             : theme.colorScheme.onSurface,
                       ),

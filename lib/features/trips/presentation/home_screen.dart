@@ -131,17 +131,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }
 
-                return ListView.builder(
+                final activeTrips = trips.where((t) => !t.archived).toList();
+                final archivedTrips = trips.where((t) => t.archived).toList();
+
+                return ListView(
                   padding: const EdgeInsets.only(top: 8, bottom: 120),
-                  itemCount: trips.length,
-                  itemBuilder: (context, index) {
-                    final trip = trips[index];
-                    return TripCard(
-                      trip: trip,
-                      currentUid: authUser?.uid ?? '',
-                      onTap: () => context.push('/trip/${trip.id}/members'),
-                    );
-                  },
+                  children: [
+                    for (final trip in activeTrips)
+                      TripCard(
+                        trip: trip,
+                        currentUid: authUser?.uid ?? '',
+                        onTap: () => context.push('/trip/${trip.id}/members'),
+                      ),
+                    if (archivedTrips.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          'Archived',
+                          key: const Key('home_archived_section_header'),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      for (final trip in archivedTrips)
+                        TripCard(
+                          trip: trip,
+                          currentUid: authUser?.uid ?? '',
+                          onTap: () => context.push('/trip/${trip.id}/members'),
+                        ),
+                    ],
+                  ],
                 );
               },
             ),

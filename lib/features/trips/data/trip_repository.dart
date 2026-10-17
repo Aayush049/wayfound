@@ -87,9 +87,8 @@ class TripRepository {
 
   /// Streams trips where [uid] is in [memberIds].
   /// Sorts client-side without composite index:
-  /// - Excludes archived trips
-  /// - Upcoming/ongoing (endDate >= midnight today) by startDate ASC
-  /// - Past trips by startDate DESC
+  /// - Active trips first (upcoming/ongoing by startDate ASC, then past trips by startDate DESC)
+  /// - Archived trips last
   Stream<List<Trip>> watchMyTrips(String uid) {
     return _firestore
         .collection('trips')
@@ -98,7 +97,6 @@ class TripRepository {
         .map((snapshot) {
           final trips = snapshot.docs
               .map((doc) => Trip.fromFirestore(doc))
-              .where((t) => !t.archived)
               .toList();
 
           return sortTripsClientSide(trips);
@@ -112,8 +110,13 @@ class TripRepository {
 
     final activeTrips = <Trip>[];
     final pastTrips = <Trip>[];
+    final archivedTrips = <Trip>[];
 
     for (final trip in trips) {
+      if (trip.archived) {
+        archivedTrips.add(trip);
+        continue;
+      }
       final endDay = DateTime(
         trip.endDate.year,
         trip.endDate.month,
@@ -132,7 +135,10 @@ class TripRepository {
     // Past trips by startDate descending
     pastTrips.sort((a, b) => b.startDate.compareTo(a.startDate));
 
-    return [...activeTrips, ...pastTrips];
+    // Archived trips by startDate descending
+    archivedTrips.sort((a, b) => b.startDate.compareTo(a.startDate));
+
+    return [...activeTrips, ...pastTrips, ...archivedTrips];
   }
 
   /// Streams a single [Trip] document.
