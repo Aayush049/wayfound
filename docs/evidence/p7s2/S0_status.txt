@@ -1,0 +1,8 @@
+﻿## phase-7/archive-and-hardening
+?? docs/evidence/fix2d/RUN_2026-10-16T17-41-26-675Z.txt
+?? docs/evidence/fix2d/RUN_2026-10-16T18-03-45-443Z.txt
+?? docs/evidence/fix2d/RUN_2026-10-16T19-05-26-866Z.txt
+?? docs/evidence/p6s5/M_verify.txt
+?? docs/evidence/p7s1/D1_SUPERSEDED.txt
+?? docs/evidence/p7s2/
+?? rules_test/mutation/out_v3/

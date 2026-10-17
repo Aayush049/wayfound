@@ -1,0 +1,10 @@
+﻿lib/features/trips/data/trip_repository.dart : OK
+test/archived_sweep_test.dart : OK
+test/trip_dashboard_screen_test.dart : OK
+test/trip_repository_test.dart : OK
+docs/evidence/p7s2/G_test.txt : OK
+docs/evidence/p7s2/G_counts.txt : OK
+docs/evidence/p7s2/G_hash.txt : OK
+docs/evidence/p7s2/SAB_P1_diff.txt : OK
+docs/evidence/p7s2/SAB_P8_run.txt : OK
+firestore.rules : OK

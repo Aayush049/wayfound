@@ -1,0 +1,1 @@
+D1_archive_rules.txt in this folder was not a verbatim quote (settlements lines used payerId and wrong line numbers). Superseded by docs/evidence/p7r1/F1_rules_trips.txt and F2_settlements_rule.txt.

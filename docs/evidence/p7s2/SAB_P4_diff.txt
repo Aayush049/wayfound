@@ -1,0 +1,15 @@
+diff --git a/lib/features/suggestions/presentation/suggestions_tab.dart b/lib/features/suggestions/presentation/suggestions_tab.dart
+index 20b20d7..63c63a5 100644
+--- a/lib/features/suggestions/presentation/suggestions_tab.dart
++++ b/lib/features/suggestions/presentation/suggestions_tab.dart
+@@ -65,9 +65,7 @@ class SuggestionsTab extends ConsumerWidget {
+           );
+         },
+       ),
+-      floatingActionButton: trip.archived
+-          ? null
+-          : FloatingActionButton.extended(
++      floatingActionButton: FloatingActionButton.extended(
+               onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
+               icon: const Icon(Icons.add),
+               label: const Text('Add Suggestion'),

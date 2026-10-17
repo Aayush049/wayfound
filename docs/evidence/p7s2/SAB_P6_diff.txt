@@ -1,0 +1,13 @@
+diff --git a/lib/features/expenses/presentation/expense_card.dart b/lib/features/expenses/presentation/expense_card.dart
+index 959e9af..7e60335 100644
+--- a/lib/features/expenses/presentation/expense_card.dart
++++ b/lib/features/expenses/presentation/expense_card.dart
+@@ -117,7 +117,7 @@ class ExpenseCard extends StatelessWidget {
+                       color: theme.colorScheme.primary,
+                     ),
+                   ),
+-                  if (canManage && !isArchived)
++                  if (canManage)
+                     PopupMenuButton<String>(
+                       icon: const Icon(Icons.more_vert, size: 20),
+                       tooltip: 'Expense Options',

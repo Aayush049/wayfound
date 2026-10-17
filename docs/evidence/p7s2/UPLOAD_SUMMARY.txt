@@ -1,0 +1,366 @@
+================================================================================
+STEP 0 BASELINE VERIFICATION
+================================================================================
+
+--- S0_head ---
+4faa5608560cd3cd5d0c8e263b4d3086c9c3d4d5
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+9ea3a2ac61be6f32dbfdd35f7824881191ccd636
+
+--- S0_hash ---
+Algorithm : SHA256
+Hash      : 6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6
+Path      : D:\VsCode\wayfound\firestore.rules
+
+--- S0_mutants ---
+=== ACTUAL JSON ENTRIES FROM mutants.json ===
+
+--- Mutant m62 ---
+{
+  "id": "m62",
+  "description": "trip archive drops organizer check",
+  "find": "\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: plain member cannot archive trip: DENIED",
+    "Trip archive: signed-in non-member cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m63 ---
+{
+  "id": "m63",
+  "description": "trip archive drops resource archived false check",
+  "find": "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived true->false on an archived trip (unarchive): DENIED",
+    "Trip archive: organizer sends archived true on an already archived trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m64 ---
+{
+  "id": "m64",
+  "description": "trip archive drops affectedKeys hasOnly archived check",
+  "find": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED",
+    "Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m65 ---
+{
+  "id": "m65",
+  "description": "trip archive drops request resource archived true check",
+  "find": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived']);",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED",
+    "Trip archive: organizer sends archived as a string \"true\": DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m66 ---
+{
+  "id": "m66",
+  "description": "trip archive drops isSignedIn check",
+  "find": "allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid",
+  "replace": "allow update: if resource.data.organizerId == request.auth.uid",
+  "expectedKillers": [
+    "Trip archive: signed-out user cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant c11 ---
+{
+  "id": "c11",
+  "description": "combined: drops isSignedIn and organizerId check on trip archive (proves m66)",
+  "find": "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false",
+  "replace": "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if resource.data.archived == false",
+  "expectedKillers": [
+    "Trip archive: signed-out user cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+=== 8 LINES OF firestore.rules AROUND ARCHIVE RULE (lines 126-133) ===
+
+126:       // Trip archive rule: organizer transitions trip from active to archived (one-way)
+127:       allow update: if isSignedIn()
+128:         && resource.data.organizerId == request.auth.uid
+129:         && resource.data.archived == false
+130:         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+131:         && request.resource.data.archived == true;
+132: 
+133:       allow delete: if false;
+
+=== MUTANT LINE MATCH ANALYSIS ===
+
+Mutant m62 (trip archive drops organizer check):
+  line field: undefined
+  find: "\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 127
+  matched rules text:
+
+        && resource.data.organizerId == request.auth.uid
+        && resource.data.archived == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m63 (trip archive drops resource archived false check):
+  line field: undefined
+  find: "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 128
+  matched rules text:
+
+        && resource.data.archived == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m64 (trip archive drops affectedKeys hasOnly archived check):
+  line field: undefined
+  find: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 129
+  matched rules text:
+
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m65 (trip archive drops request resource archived true check):
+  line field: undefined
+  find: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived']);"
+  exact 1-indexed line in firestore.rules: 129
+  matched rules text:
+
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m66 (trip archive drops isSignedIn check):
+  line field: undefined
+  find: "allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid"
+  replace: "allow update: if resource.data.organizerId == request.auth.uid"
+  exact 1-indexed line in firestore.rules: 127
+  matched rules text:
+allow update: if isSignedIn()
+        && resource.data.organizerId == request.auth.uid
+
+Mutant c11 (combined: drops isSignedIn and organizerId check on trip archive (proves m66)):
+  line field: undefined
+  find: "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false"
+  replace: "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if resource.data.archived == false"
+  exact 1-indexed line in firestore.rules: 126
+  matched rules text:
+      // Trip archive rule: organizer transitions trip from active to archived (one-way)
+      allow update: if isSignedIn()
+        && resource.data.organizerId == request.auth.uid
+        && resource.data.archived == false
+
+================================================================================
+STEP 2 B0 GUARDS AUDIT
+================================================================================
+=== RAW GREP OF WRITE CONTROLS AND CURRENT GUARDS (B0) ===
+
+--- File: lib/features/suggestions/presentation/suggestions_tab.dart [Pattern: actionLabel|FloatingActionButton|context\.push] ---
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:43: actionLabel: 'Add Suggestion',
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:44: onAction: () => context.push('/trip/${trip.id}/suggestions/add'),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:65: floatingActionButton: FloatingActionButton.extended(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:66: onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
+
+--- File: lib/features/suggestions/presentation/suggestion_card.dart [Pattern: _canEditOrDelete|PopupMenuButton|VoteButtons|_handleVote] ---
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:36: bool get _canEditOrDelete =>
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:53: Future<void> _handleVote(int targetVoteValue) async {
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:164: // Row 1: Chips in Expanded Wrap, PopupMenuButton pinned to top-right when present
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:204: if (_canEditOrDelete) ...[
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:206: PopupMenuButton<String>(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:337: child: VoteButtons(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:341: onUpVote: () => _handleVote(1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:342: onDownVote: () => _handleVote(-1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:384: VoteButtons(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:388: onUpVote: () => _handleVote(1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:389: onDownVote: () => _handleVote(-1),
+
+--- File: lib/features/expenses/presentation/expenses_tab.dart [Pattern: actionLabel|canManage|FloatingActionButton] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:93: actionLabel: isArchived ? null : 'Add Expense',
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:107: final canManage =
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:115: canManage: canManage,
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:158: floatingActionButton:
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:160: ? FloatingActionButton.extended(
+
+--- File: lib/features/expenses/presentation/expense_card.dart [Pattern: canManage|PopupMenuButton|_confirmDelete] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:13: final bool canManage;
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:22: required this.canManage,
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:118: if (canManage)
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:119: PopupMenuButton<String>(
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:136: _confirmDelete(context);
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:194: void _confirmDelete(BuildContext context) {
+
+--- File: lib/features/expenses/presentation/balances_view.dart [Pattern: isMyPayment|!trip\.archived|MarkAsPaidSheet|Confirm|Reject|Cancel] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:22: void _showMarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:33: builder: (ctx) => MarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:290: final isMyPayment = p.fromUid == currentUid;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:342: if (isMyPayment && !trip.archived)
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:344: onPressed: () => _showMarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:406: case SettlementStatus.confirmed:
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:407: statusLabel = 'Confirmed';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:412: case SettlementStatus.rejected:
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:413: statusLabel = 'Rejected';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:418: statusLabel = 'Awaiting confirmation';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:424: final isMyPayment = s.fromUid == currentUid;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:431: !trip.archived;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:484: if (canActOnPending && isMyPayment)
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:489: .cancelPending(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:495: Icons.cancel_outlined,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:498: label: const Text('Cancel'),
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:509: confirmed: false,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:513: 'Reject',
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:526: confirmed: true,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:529: child: const Text('Confirm'),
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:549: class MarkAsPaidSheet extends ConsumerStatefulWidget {
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:554: const MarkAsPaidSheet({
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:562: ConsumerState<MarkAsPaidSheet> createState() => _MarkAsPaidSheetState();
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:565: class _MarkAsPaidSheetState extends ConsumerState<MarkAsPaidSheet> {
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:623: content: Text('Payment marked as paid (awaiting confirmation).'),
+
+--- File: lib/features/itinerary/presentation/itinerary_day_section.dart [Pattern: isArchived|isOrganizer] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:12: final bool isOrganizer;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:13: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:25: required this.isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:26: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:69: if (isOrganizer && !isArchived)
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:97: else if (isOrganizer &&
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:98: !isArchived &&
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:114: isOrganizer: isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:115: isArchived: isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:133: isOrganizer: isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:134: isArchived: isArchived,
+
+--- File: lib/features/itinerary/presentation/itinerary_item_tile.dart [Pattern: isArchived|isOrganizer|PopupMenuButton] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:10: final bool isOrganizer;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:11: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:19: required this.isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:20: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:95: if (isOrganizer && !isArchived)
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:96: PopupMenuButton<String>(
+
+--- File: lib/features/itinerary/presentation/itinerary_tab.dart [Pattern: isArchived|FloatingActionButton|showModalBottomSheet] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:21: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:30: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:38: showModalBottomSheet(
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:92: showModalBottomSheet(
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:240: isArchived: isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:269: isArchived: isArchived,
+
+--- File: lib/features/trips/presentation/members_tab.dart [Pattern: canRemove|!trip\.archived|_handleLeaveTrip|_handleRemoveMember] ---
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:34: Future<void> _handleLeaveTrip(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:112: Future<void> _handleRemoveMember(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:284: final canRemove =
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:288: !trip.archived;
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:356: trailing: canRemove
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:358: onPressed: () => _handleRemoveMember(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:378: if (!isOrganizer && !trip.archived)
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:387: onPressed: () => _handleLeaveTrip(
+
+================================================================================
+STEP 5 GATES (LAST 5 LINES EACH)
+================================================================================
+
+--- G_format (last 5 lines) ---
+Formatted 120 files (0 changed) in 0.76 seconds.
+EXIT CODE: 0
+
+--- G_analyze (last 5 lines) ---
+Analyzing wayfound...                                            No issues found! (ran in 9.2s)
+EXIT CODE: 0
+
+--- G_counts (last 5 lines) ---
+testDone 348 success 348 failure 0
+
+--- G_hash (last 5 lines) ---
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          6D13FEAE51D0E6FD56911FC8AEEF895C8706763CF147BDD311FBC6933AA31DA6       D:\VsCode\wayfound\firestore.rules
+
+--- G_head (last 5 lines) ---
+adcd5f66c04f9aa1dfbf39b9777e4125b2921fd7
+## phase-7/archive-and-hardening
+AFTER:
+3cfadd649fba9183e31f566fca67ad8d8f2364ac
+## phase-7/archive-and-hardening ?? docs/evidence/fix2d/RUN_2026-10-16T17-41-26-675Z.txt ?? docs/evidence/fix2d/RUN_2026-10-16T18-03-45-443Z.txt ?? docs/evidence/fix2d/RUN_2026-10-16T19-05-26-866Z.txt ?? docs/evidence/p6s5/M_verify.txt ?? docs/evidence/p7s1/D1_SUPERSEDED.txt ?? docs/evidence/p7s2/ ?? rules_test/mutation/out_v3/
+
+================================================================================
+STEP 4 SABOTAGE SENSITIVITY PROOFS (P1 - P8)
+================================================================================
+P1:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p1/test/trip_repository_test.dart: TripRepository archiveTrip updates only archived: true and leaves other fields untouched
+  Failing expectation: Expected: Set:[
+P2:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p2/test/trip_dashboard_screen_test.dart: TripDashboardScreen plain member does not see archive trip option
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p2/test/trip_dashboard_screen_test.dart line 202
+P3:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p3/test/trip_dashboard_screen_test.dart: TripDashboardScreen archived trip does not show archive trip option and displays persistent indicators
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p3/test/trip_dashboard_screen_test.dart line 225
+P4:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p4/test/archived_sweep_test.dart: Archived Sweep Tests (B & C) Suggestions Tab and Card add suggestion FAB and empty action are absent when archived
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p4/test/archived_sweep_test.dart line 141
+P5:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p5/test/archived_sweep_test.dart: Archived Sweep Tests (B & C) Suggestions Tab and Card vote buttons are enabled on active trip and disabled on archived trip
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p5/test/archived_sweep_test.dart line 237
+P6:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p6/test/archived_sweep_test.dart: Archived Sweep Tests (B & C) Expenses Tab and Expense Card expense card edit/delete menu is present on active trip and absent on archived trip
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p6/test/archived_sweep_test.dart line 353
+P7:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p7/test/archived_sweep_test.dart: Archived Sweep Tests (B & C) Members Tab Leave trip button present for member on active trip, absent on archived trip
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p7/test/archived_sweep_test.dart line 820
+P8:
+  Failing test: D:/VsCode/wayfound_archive/sabotage_p7s2/p8/test/archived_sweep_test.dart: Archived Sweep Tests (B & C) Balances View BalancesView displays AppError when any stream has an error
+  Failing expectation: file:///D:/VsCode/wayfound_archive/sabotage_p7s2/p8/test/archived_sweep_test.dart line 604
+
+================================================================================
+STEP 6 REPORT INTEGRITY
+================================================================================
+V_forbidden hits count: 0 (0 expected)
+V_paths counts: 10 OK, 0 MISSING (10 total)
+
+================================================================================
+GIT STATS & LOG
+================================================================================
+
+--- git diff --stat main..HEAD -- lib/ test/ ---
+.../expenses/presentation/balances_view.dart       |  39 +-
+ .../expenses/presentation/expense_card.dart        |   4 +-
+ .../expenses/presentation/expenses_tab.dart        |   1 +
+ .../suggestions/presentation/suggestion_card.dart  |  22 +-
+ .../suggestions/presentation/suggestions_tab.dart  |  19 +-
+ lib/features/trips/data/trip_repository.dart       |   6 +
+ .../trips/domain/trip_payload_builders.dart        |   5 +
+ lib/features/trips/presentation/trip_card.dart     |  20 +
+ .../trips/presentation/trip_dashboard_screen.dart  | 167 +++-
+ test/add_suggestion_navigation_test.dart           |   2 +-
+ test/archived_sweep_test.dart                      | 868 +++++++++++++++++++++
+ test/trip_dashboard_screen_test.dart               | 344 ++++++++
+ test/trip_repository_test.dart                     |  35 +
+ 13 files changed, 1498 insertions(+), 34 deletions(-)
+
+--- git log --oneline main..HEAD ---
+3cfadd6 docs(report): record phase 7
+b07d22e feat(ui): balances loading and error states
+bfd731e fix(ui): archived trips are read-only in suggestions and expenses
+0d54782 feat(trips): archive trip action
+4faa560 docs(evidence): p7r1 raw outputs
+a9a4b55 docs(report): record archive rule
+9e6ab59 test(mutation): archive rule mutants
+f45ee5e test(rules): trip archive rule tests
+5a4e25a feat(rules): organizer archive trip rule
+adcd5f6 docs(evidence): p7s1 discovery outputs

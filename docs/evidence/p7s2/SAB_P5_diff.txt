@@ -1,0 +1,26 @@
+diff --git a/lib/features/suggestions/presentation/suggestion_card.dart b/lib/features/suggestions/presentation/suggestion_card.dart
+index 7c4ae94..bc21eb5 100644
+--- a/lib/features/suggestions/presentation/suggestion_card.dart
++++ b/lib/features/suggestions/presentation/suggestion_card.dart
+@@ -342,9 +342,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
+                           upCount: widget.suggestion.upCount,
+                           downCount: widget.suggestion.downCount,
+                           myVote: myVote,
+-                          onUpVote: widget.isArchived
+-                              ? null
+-                              : () => _handleVote(1),
++                          onUpVote: () => _handleVote(1),
+                           onDownVote: widget.isArchived
+                               ? null
+                               : () => _handleVote(-1),
+@@ -393,9 +391,7 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
+                       upCount: widget.suggestion.upCount,
+                       downCount: widget.suggestion.downCount,
+                       myVote: myVote,
+-                      onUpVote: widget.isArchived
+-                          ? null
+-                          : () => _handleVote(1),
++                      onUpVote: () => _handleVote(1),
+                       onDownVote: widget.isArchived
+                           ? null
+                           : () => _handleVote(-1),

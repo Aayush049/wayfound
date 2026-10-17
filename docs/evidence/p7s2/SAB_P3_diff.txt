@@ -1,0 +1,13 @@
+diff --git a/lib/features/trips/presentation/trip_dashboard_screen.dart b/lib/features/trips/presentation/trip_dashboard_screen.dart
+index ab40979..010ee77 100644
+--- a/lib/features/trips/presentation/trip_dashboard_screen.dart
++++ b/lib/features/trips/presentation/trip_dashboard_screen.dart
+@@ -222,7 +222,7 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
+                     ),
+                   ),
+                 ),
+-              if (isOrganizer && !trip.archived)
++              if (isOrganizer)
+                 PopupMenuButton<String>(
+                   icon: const Icon(Icons.more_vert),
+                   tooltip: 'Trip options',

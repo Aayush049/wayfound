@@ -1,0 +1,102 @@
+﻿=== RAW GREP OF WRITE CONTROLS AND CURRENT GUARDS (B0) ===
+
+--- File: lib/features/suggestions/presentation/suggestions_tab.dart [Pattern: actionLabel|FloatingActionButton|context\.push] ---
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:43: actionLabel: 'Add Suggestion',
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:44: onAction: () => context.push('/trip/${trip.id}/suggestions/add'),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:65: floatingActionButton: FloatingActionButton.extended(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestions_tab.dart:66: onPressed: () => context.push('/trip/${trip.id}/suggestions/add'),
+
+--- File: lib/features/suggestions/presentation/suggestion_card.dart [Pattern: _canEditOrDelete|PopupMenuButton|VoteButtons|_handleVote] ---
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:36: bool get _canEditOrDelete =>
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:53: Future<void> _handleVote(int targetVoteValue) async {
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:164: // Row 1: Chips in Expanded Wrap, PopupMenuButton pinned to top-right when present
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:204: if (_canEditOrDelete) ...[
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:206: PopupMenuButton<String>(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:337: child: VoteButtons(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:341: onUpVote: () => _handleVote(1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:342: onDownVote: () => _handleVote(-1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:384: VoteButtons(
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:388: onUpVote: () => _handleVote(1),
+D:\VsCode\wayfound\lib\features\suggestions\presentation\suggestion_card.dart:389: onDownVote: () => _handleVote(-1),
+
+--- File: lib/features/expenses/presentation/expenses_tab.dart [Pattern: actionLabel|canManage|FloatingActionButton] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:93: actionLabel: isArchived ? null : 'Add Expense',
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:107: final canManage =
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:115: canManage: canManage,
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:158: floatingActionButton:
+D:\VsCode\wayfound\lib\features\expenses\presentation\expenses_tab.dart:160: ? FloatingActionButton.extended(
+
+--- File: lib/features/expenses/presentation/expense_card.dart [Pattern: canManage|PopupMenuButton|_confirmDelete] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:13: final bool canManage;
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:22: required this.canManage,
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:118: if (canManage)
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:119: PopupMenuButton<String>(
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:136: _confirmDelete(context);
+D:\VsCode\wayfound\lib\features\expenses\presentation\expense_card.dart:194: void _confirmDelete(BuildContext context) {
+
+--- File: lib/features/expenses/presentation/balances_view.dart [Pattern: isMyPayment|!trip\.archived|MarkAsPaidSheet|Confirm|Reject|Cancel] ---
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:22: void _showMarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:33: builder: (ctx) => MarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:290: final isMyPayment = p.fromUid == currentUid;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:342: if (isMyPayment && !trip.archived)
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:344: onPressed: () => _showMarkAsPaidSheet(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:406: case SettlementStatus.confirmed:
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:407: statusLabel = 'Confirmed';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:412: case SettlementStatus.rejected:
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:413: statusLabel = 'Rejected';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:418: statusLabel = 'Awaiting confirmation';
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:424: final isMyPayment = s.fromUid == currentUid;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:431: !trip.archived;
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:484: if (canActOnPending && isMyPayment)
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:489: .cancelPending(
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:495: Icons.cancel_outlined,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:498: label: const Text('Cancel'),
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:509: confirmed: false,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:513: 'Reject',
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:526: confirmed: true,
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:529: child: const Text('Confirm'),
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:549: class MarkAsPaidSheet extends ConsumerStatefulWidget {
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:554: const MarkAsPaidSheet({
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:562: ConsumerState<MarkAsPaidSheet> createState() => _MarkAsPaidSheetState();
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:565: class _MarkAsPaidSheetState extends ConsumerState<MarkAsPaidSheet> {
+D:\VsCode\wayfound\lib\features\expenses\presentation\balances_view.dart:623: content: Text('Payment marked as paid (awaiting confirmation).'),
+
+--- File: lib/features/itinerary/presentation/itinerary_day_section.dart [Pattern: isArchived|isOrganizer] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:12: final bool isOrganizer;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:13: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:25: required this.isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:26: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:69: if (isOrganizer && !isArchived)
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:97: else if (isOrganizer &&
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:98: !isArchived &&
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:114: isOrganizer: isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:115: isArchived: isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:133: isOrganizer: isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_day_section.dart:134: isArchived: isArchived,
+
+--- File: lib/features/itinerary/presentation/itinerary_item_tile.dart [Pattern: isArchived|isOrganizer|PopupMenuButton] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:10: final bool isOrganizer;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:11: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:19: required this.isOrganizer,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:20: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:95: if (isOrganizer && !isArchived)
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_item_tile.dart:96: PopupMenuButton<String>(
+
+--- File: lib/features/itinerary/presentation/itinerary_tab.dart [Pattern: isArchived|FloatingActionButton|showModalBottomSheet] ---
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:21: final bool isArchived;
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:30: required this.isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:38: showModalBottomSheet(
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:92: showModalBottomSheet(
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:240: isArchived: isArchived,
+D:\VsCode\wayfound\lib\features\itinerary\presentation\itinerary_tab.dart:269: isArchived: isArchived,
+
+--- File: lib/features/trips/presentation/members_tab.dart [Pattern: canRemove|!trip\.archived|_handleLeaveTrip|_handleRemoveMember] ---
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:34: Future<void> _handleLeaveTrip(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:112: Future<void> _handleRemoveMember(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:284: final canRemove =
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:288: !trip.archived;
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:356: trailing: canRemove
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:358: onPressed: () => _handleRemoveMember(
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:378: if (!isOrganizer && !trip.archived)
+D:\VsCode\wayfound\lib\features\trips\presentation\members_tab.dart:387: onPressed: () => _handleLeaveTrip(
+

@@ -1,0 +1,154 @@
+=== ACTUAL JSON ENTRIES FROM mutants.json ===
+
+--- Mutant m62 ---
+{
+  "id": "m62",
+  "description": "trip archive drops organizer check",
+  "find": "\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: plain member cannot archive trip: DENIED",
+    "Trip archive: signed-in non-member cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m63 ---
+{
+  "id": "m63",
+  "description": "trip archive drops resource archived false check",
+  "find": "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived true->false on an archived trip (unarchive): DENIED",
+    "Trip archive: organizer sends archived true on an already archived trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m64 ---
+{
+  "id": "m64",
+  "description": "trip archive drops affectedKeys hasOnly archived check",
+  "find": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.archived == true;",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived:true plus another key (e.g. name): DENIED",
+    "Trip archive: organizer sends memberIds/memberCount changes together with archived: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m65 ---
+{
+  "id": "m65",
+  "description": "trip archive drops request resource archived true check",
+  "find": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;",
+  "replace": "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived']);",
+  "expectedKillers": [
+    "Trip archive: organizer sends archived:false on an active trip (no-op write): DENIED",
+    "Trip archive: organizer sends archived as a string \"true\": DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant m66 ---
+{
+  "id": "m66",
+  "description": "trip archive drops isSignedIn check",
+  "find": "allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid",
+  "replace": "allow update: if resource.data.organizerId == request.auth.uid",
+  "expectedKillers": [
+    "Trip archive: signed-out user cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+--- Mutant c11 ---
+{
+  "id": "c11",
+  "description": "combined: drops isSignedIn and organizerId check on trip archive (proves m66)",
+  "find": "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false",
+  "replace": "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if resource.data.archived == false",
+  "expectedKillers": [
+    "Trip archive: signed-out user cannot archive trip: DENIED"
+  ],
+  "reconstructed": false
+}
+
+=== 8 LINES OF firestore.rules AROUND ARCHIVE RULE (lines 126-133) ===
+
+126:       // Trip archive rule: organizer transitions trip from active to archived (one-way)
+127:       allow update: if isSignedIn()
+128:         && resource.data.organizerId == request.auth.uid
+129:         && resource.data.archived == false
+130:         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+131:         && request.resource.data.archived == true;
+132: 
+133:       allow delete: if false;
+
+=== MUTANT LINE MATCH ANALYSIS ===
+
+Mutant m62 (trip archive drops organizer check):
+  line field: undefined
+  find: "\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 127
+  matched rules text:
+
+        && resource.data.organizerId == request.auth.uid
+        && resource.data.archived == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m63 (trip archive drops resource archived false check):
+  line field: undefined
+  find: "\r\n        && resource.data.archived == false\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 128
+  matched rules text:
+
+        && resource.data.archived == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m64 (trip archive drops affectedKeys hasOnly archived check):
+  line field: undefined
+  find: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.archived == true;"
+  exact 1-indexed line in firestore.rules: 129
+  matched rules text:
+
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m65 (trip archive drops request resource archived true check):
+  line field: undefined
+  find: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])\r\n        && request.resource.data.archived == true;"
+  replace: "\r\n        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived']);"
+  exact 1-indexed line in firestore.rules: 129
+  matched rules text:
+
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+        && request.resource.data.archived == true;
+
+Mutant m66 (trip archive drops isSignedIn check):
+  line field: undefined
+  find: "allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid"
+  replace: "allow update: if resource.data.organizerId == request.auth.uid"
+  exact 1-indexed line in firestore.rules: 127
+  matched rules text:
+allow update: if isSignedIn()
+        && resource.data.organizerId == request.auth.uid
+
+Mutant c11 (combined: drops isSignedIn and organizerId check on trip archive (proves m66)):
+  line field: undefined
+  find: "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if isSignedIn()\r\n        && resource.data.organizerId == request.auth.uid\r\n        && resource.data.archived == false"
+  replace: "      // Trip archive rule: organizer transitions trip from active to archived (one-way)\r\n      allow update: if resource.data.archived == false"
+  exact 1-indexed line in firestore.rules: 126
+  matched rules text:
+      // Trip archive rule: organizer transitions trip from active to archived (one-way)
+      allow update: if isSignedIn()
+        && resource.data.organizerId == request.auth.uid
+        && resource.data.archived == false
+

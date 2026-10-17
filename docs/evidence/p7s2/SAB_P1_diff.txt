@@ -1,0 +1,12 @@
+diff --git a/lib/features/trips/domain/trip_payload_builders.dart b/lib/features/trips/domain/trip_payload_builders.dart
+index 31ad363..dee8802 100644
+--- a/lib/features/trips/domain/trip_payload_builders.dart
++++ b/lib/features/trips/domain/trip_payload_builders.dart
+@@ -86,5 +86,6 @@ Map<String, dynamic> buildJoinCodeUpdatePayload({required int newMemberCount}) {
+ 
+ /// Pure payload builder for archiving a `trips/{tripId}` document.
+ Map<String, dynamic> buildArchiveTripUpdatePayload() {
+-  return {'archived': true};
++  return {'archived': true, 'extraKey': 'sabotaged'};
++
+ }
