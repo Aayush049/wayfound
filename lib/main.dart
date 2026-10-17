@@ -7,6 +7,7 @@ import 'app/router.dart';
 import 'app/theme/app_theme.dart';
 import 'app/theme/theme_provider.dart';
 import 'core/firebase_providers.dart';
+import 'core/widgets/web_responsive_wrapper.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -41,6 +42,8 @@ class WayfoundApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) =>
+          WebResponsiveWrapper(child: child ?? const SizedBox.shrink()),
     );
   }
 }

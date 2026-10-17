@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../domain/app_user.dart';
@@ -10,12 +11,14 @@ class AuthRepository {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
+  final bool isWeb;
   bool _googleInitialized = false;
 
   AuthRepository({
     FirebaseAuth? auth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
+    this.isWeb = kIsWeb,
   }) : _auth = auth ?? FirebaseAuth.instance,
        _googleSignIn = googleSignIn ?? GoogleSignIn.instance,
        _firestore = firestore ?? FirebaseFirestore.instance;
@@ -174,8 +177,37 @@ class AuthRepository {
     return credential;
   }
 
-  /// Signs in with Google using 7.x API.
+  /// Signs in with Google using 7.x API on mobile or signInWithPopup on web.
   Future<UserCredential?> signInWithGoogle() async {
+    if (isWeb) {
+      try {
+        final userCredential = await _auth.signInWithPopup(
+          GoogleAuthProvider(),
+        );
+        if (userCredential.user != null) {
+          await createOnceUserDoc(
+            uid: userCredential.user!.uid,
+            email: userCredential.user!.email ?? '',
+            displayName: userCredential.user!.displayName,
+            photoUrl: userCredential.user!.photoURL,
+          );
+        }
+        return userCredential;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'popup-closed-by-user' ||
+            e.code == 'cancelled-popup-request') {
+          return null;
+        }
+        rethrow;
+      } catch (e) {
+        if (e.toString().contains('popup-closed-by-user') ||
+            e.toString().contains('cancelled')) {
+          return null;
+        }
+        rethrow;
+      }
+    }
+
     _ensureGoogleInitialized();
 
     final GoogleSignInAccount account;
@@ -219,6 +251,10 @@ class AuthRepository {
 
   /// Signs out from all providers (FirebaseAuth and GoogleSignIn).
   Future<void> signOut() async {
-    await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
+    if (isWeb) {
+      await _auth.signOut();
+    } else {
+      await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
+    }
   }
 }

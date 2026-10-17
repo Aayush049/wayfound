@@ -7,22 +7,26 @@ const bool kUseEmulators = bool.fromEnvironment(
   'USE_EMULATORS',
   defaultValue: false,
 );
+const String _kDefaultEmulatorHost = kIsWeb ? 'localhost' : '10.0.2.2';
 const String kEmulatorHost = String.fromEnvironment(
   'EMULATOR_HOST',
-  defaultValue: '10.0.2.2',
+  defaultValue: _kDefaultEmulatorHost,
 );
 
 /// Configures Firebase services to use local emulators if [kUseEmulators] is true.
 Future<void> setupFirebaseEmulators() async {
   if (kUseEmulators) {
+    final host = (kIsWeb && kEmulatorHost == '10.0.2.2')
+        ? 'localhost'
+        : kEmulatorHost;
     if (kDebugMode) {
-      debugPrint('Connecting to Firebase Emulators at $kEmulatorHost');
+      debugPrint('Connecting to Firebase Emulators at $host');
     }
     // Connect Auth emulator
-    await FirebaseAuth.instance.useAuthEmulator(kEmulatorHost, 9099);
+    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
 
     // Connect Firestore emulator
-    FirebaseFirestore.instance.useFirestoreEmulator(kEmulatorHost, 8092);
+    FirebaseFirestore.instance.useFirestoreEmulator(host, 8092);
   }
 }
 
