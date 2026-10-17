@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import '../../expenses/presentation/expenses_tab.dart';
 import '../../itinerary/presentation/itinerary_tab.dart';
 import '../../suggestions/presentation/suggestions_tab.dart';
 import '../data/trips_providers.dart';
+import '../domain/trip.dart';
 import 'members_tab.dart';
 
 class TripDashboardScreen extends ConsumerStatefulWidget {
@@ -74,6 +76,59 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
     super.dispose();
   }
 
+  Future<void> _handleArchiveTrip(
+    BuildContext context,
+    WidgetRef ref,
+    Trip trip,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Archive trip'),
+        content: const Text(
+          'The trip becomes read-only for everyone and this cannot be undone in this version.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Archive trip'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final repo = ref.read(tripRepositoryProvider);
+        await repo.archiveTrip(trip.id);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Trip archived.')));
+        }
+      } on FirebaseException catch (e) {
+        if (context.mounted) {
+          final message = e.code == 'permission-denied'
+              ? "You can't archive this trip."
+              : "Couldn't archive the trip. Please try again.";
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(message)));
+        }
+      } catch (e) {
+        if (context.mounted) {
+          final message = e.toString().contains('permission-denied')
+              ? "You can't archive this trip."
+              : "Couldn't archive the trip. Please try again.";
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(message)));
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -115,6 +170,8 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
           );
         }
 
+        final isOrganizer = authUser != null && trip.isOrganizer(authUser.uid);
+
         return Scaffold(
           appBar: AppBar(
             title: Column(
@@ -138,6 +195,47 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/home'),
             ),
+            actions: [
+              if (trip.archived)
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Archived',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (isOrganizer && !trip.archived)
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: 'Trip options',
+                  onSelected: (value) {
+                    if (value == 'archive') {
+                      _handleArchiveTrip(context, ref, trip);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'archive',
+                      child: Text('Archive trip'),
+                    ),
+                  ],
+                ),
+            ],
             bottom: TabBar(
               controller: _tabController,
               tabs: const [
@@ -151,27 +249,60 @@ class _TripDashboardScreenState extends ConsumerState<TripDashboardScreen>
               ],
             ),
           ),
-          body: TabBarView(
-            controller: _tabController,
+          body: Column(
             children: [
-              // Tab 0: Suggestions Tab (Phase 3)
-              SuggestionsTab(trip: trip),
+              if (trip.archived)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.archive_outlined,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'This trip is archived and read-only.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // Tab 0: Suggestions Tab (Phase 3)
+                    SuggestionsTab(trip: trip),
 
-              // Tab 1: Itinerary Tab (Phase 4)
-              ItineraryTab(
-                tripId: trip.id,
-                startDate: trip.startDate,
-                endDate: trip.endDate,
-                currency: trip.currency,
-                isOrganizer: trip.isOrganizer(authUser?.uid ?? ''),
-                isArchived: trip.archived,
+                    // Tab 1: Itinerary Tab (Phase 4)
+                    ItineraryTab(
+                      tripId: trip.id,
+                      startDate: trip.startDate,
+                      endDate: trip.endDate,
+                      currency: trip.currency,
+                      isOrganizer: trip.isOrganizer(authUser?.uid ?? ''),
+                      isArchived: trip.archived,
+                    ),
+
+                    // Tab 2: Expenses Tab (Phase 5)
+                    ExpensesTab(trip: trip),
+
+                    // Tab 3: Members Tab (Working!)
+                    MembersTab(trip: trip),
+                  ],
+                ),
               ),
-
-              // Tab 2: Expenses Tab (Phase 5)
-              ExpensesTab(trip: trip),
-
-              // Tab 3: Members Tab (Working!)
-              MembersTab(trip: trip),
             ],
           ),
         );

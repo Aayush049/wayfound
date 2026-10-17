@@ -311,4 +311,10 @@ class TripRepository {
           return members;
         });
   }
+
+  /// Archives a trip. Only the organizer may archive, and payload must contain only `{'archived': true}`.
+  Future<void> archiveTrip(String tripId) async {
+    final tripDocRef = _firestore.collection('trips').doc(tripId);
+    await tripDocRef.update(buildArchiveTripUpdatePayload());
+  }
 }

@@ -83,3 +83,8 @@ Map<String, dynamic> buildJoinTripUpdatePayload({required String callerUid}) {
 Map<String, dynamic> buildJoinCodeUpdatePayload({required int newMemberCount}) {
   return {'memberCount': newMemberCount};
 }
+
+/// Pure payload builder for archiving a `trips/{tripId}` document.
+Map<String, dynamic> buildArchiveTripUpdatePayload() {
+  return {'archived': true};
+}

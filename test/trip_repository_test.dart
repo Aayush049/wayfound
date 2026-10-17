@@ -221,5 +221,40 @@ void main() {
         expect(members.first.isOrganizer, isTrue);
       });
     });
+
+    group('archiveTrip', () {
+      test(
+        'updates only archived: true and leaves other fields untouched',
+        () async {
+          final initialData = {
+            'name': 'Tokyo Trip',
+            'destination': 'Tokyo',
+            'startDate': DateTime(2026, 11, 1),
+            'endDate': DateTime(2026, 11, 7),
+            'currency': 'JPY',
+            'organizerId': 'org-1',
+            'joinCode': 'TOK123',
+            'memberIds': ['org-1', 'user-2'],
+            'memberCount': 2,
+            'archived': false,
+          };
+          final docRef = await firestore.collection('trips').add(initialData);
+
+          await repository.archiveTrip(docRef.id);
+
+          final doc = await firestore.collection('trips').doc(docRef.id).get();
+          final data = doc.data()!;
+          expect(data['archived'], isTrue);
+          expect(data['name'], 'Tokyo Trip');
+          expect(data['destination'], 'Tokyo');
+          expect(data['currency'], 'JPY');
+          expect(data['organizerId'], 'org-1');
+          expect(data['joinCode'], 'TOK123');
+          expect(data['memberIds'], ['org-1', 'user-2']);
+          expect(data['memberCount'], 2);
+          expect(data.keys.toSet(), initialData.keys.toSet());
+        },
+      );
+    });
   });
 }
