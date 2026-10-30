@@ -235,9 +235,9 @@ class _AddEditSuggestionScreenState
                       value: catKey,
                       child: Row(
                         children: [
-                          Icon(info.icon, size: 20),
-                          const SizedBox(width: 8),
                           Text(info.label),
+                          const SizedBox(width: 8),
+                          Icon(info.icon, size: 20),
                         ],
                       ),
                     );
