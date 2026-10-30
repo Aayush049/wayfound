@@ -108,7 +108,8 @@ void main() {
         expect(find.text('Sightseeing'), findsOneWidget);
         expect(find.textContaining('5.00'), findsOneWidget);
         expect(find.text('Suggested by Former member'), findsOneWidget);
-        expect(find.text('Score: +2'), findsOneWidget);
+        expect(find.textContaining('Score:'), findsNothing);
+        expect(find.text('2'), findsOneWidget);
 
         // Overflow menu should be visible for author/organizer
         expect(find.byIcon(Icons.more_vert), findsOneWidget);

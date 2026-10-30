@@ -282,6 +282,7 @@ class _AddEditSuggestionScreenState
                     hintText: 'Add details, link, or notes...',
                     prefixIcon: Icon(Icons.notes),
                   ),
+                  minLines: 1,
                   maxLines: 4,
                   maxLength: 500,
                   validator: SuggestionValidators.validateNote,

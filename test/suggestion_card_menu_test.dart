@@ -78,19 +78,11 @@ void main() {
                 expect(tester.takeException(), isNull);
                 expect(find.byType(SuggestionCard), findsOneWidget);
 
-                // 2. Score badge verification (on its own row, left-aligned)
-                final scoreFinder = find.textContaining('Score:');
-                expect(scoreFinder, findsOneWidget);
-                final scoreRect = tester.getRect(scoreFinder);
+                // 2. Score badge is removed completely from the suggestion card
+                expect(find.textContaining('Score:'), findsNothing);
                 final categoryFinder = find.text('Food & Drink');
                 expect(categoryFinder, findsOneWidget);
                 final categoryRect = tester.getRect(categoryFinder);
-
-                // Score badge top must be below the category chip bottom (on its own row)
-                expect(scoreRect.top >= categoryRect.bottom - 2, isTrue);
-
-                // Score badge left edge should be left-aligned (near the card content start, around 24-32 dp)
-                expect(scoreRect.left < 45.0, isTrue);
 
                 // 3. Menu verification when canManage is true
                 if (canManage) {

@@ -161,121 +161,94 @@ class _SuggestionCardState extends ConsumerState<SuggestionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Row 1 (chips wrap, menu top-right), Row 2 (Score badge left-aligned)
-            Column(
+            // Header: Chips in Expanded Wrap, PopupMenuButton pinned to top-right when present
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row 1: Chips in Expanded Wrap, PopupMenuButton pinned to top-right when present
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Chip(
-                            avatar: Icon(categoryInfo.icon, size: 16),
-                            label: Text(categoryInfo.label),
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          if (widget.suggestion.isScheduled &&
-                              widget.suggestion.dayIndex != null)
-                            Chip(
-                              avatar: Icon(
-                                Icons.event,
-                                size: 14,
-                                color: theme.colorScheme.onSecondaryContainer,
-                              ),
-                              label: Text(
-                                'Day ${widget.suggestion.dayIndex! + 1}',
-                              ),
-                              backgroundColor:
-                                  theme.colorScheme.secondaryContainer,
-                              labelStyle: TextStyle(
-                                color: theme.colorScheme.onSecondaryContainer,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                        ],
-                      ),
-                    ),
-                    if (_canEditOrDelete) ...[
-                      const SizedBox(width: 8),
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert),
+                Expanded(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Chip(
+                        avatar: Icon(categoryInfo.icon, size: 16),
+                        label: Text(categoryInfo.label),
                         padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            context.push(
-                              '/trip/${widget.suggestion.tripId}/suggestions/${widget.suggestion.id}/edit',
-                            );
-                          } else if (value == 'delete') {
-                            _confirmDelete();
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit, size: 20),
-                                SizedBox(width: 8),
-                                Text('Edit'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.delete,
-                                  size: 20,
-                                  color: theme.colorScheme.error,
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Delete',
-                                  style: TextStyle(
-                                    color: theme.colorScheme.error,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        visualDensity: VisualDensity.compact,
                       ),
+                      if (widget.suggestion.isScheduled &&
+                          widget.suggestion.dayIndex != null)
+                        Chip(
+                          avatar: Icon(
+                            Icons.event,
+                            size: 14,
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
+                          label: Text(
+                            'Day ${widget.suggestion.dayIndex! + 1}',
+                          ),
+                          backgroundColor:
+                              theme.colorScheme.secondaryContainer,
+                          labelStyle: TextStyle(
+                            color: theme.colorScheme.onSecondaryContainer,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
                     ],
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Row 2: Score badge left-aligned
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Score: ${widget.suggestion.score >= 0 ? '+' : ''}${widget.suggestion.score}',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                 ),
+                if (_canEditOrDelete) ...[
+                  const SizedBox(width: 8),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        context.push(
+                          '/trip/${widget.suggestion.tripId}/suggestions/${widget.suggestion.id}/edit',
+                        );
+                      } else if (value == 'delete') {
+                        _confirmDelete();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit, size: 20),
+                            SizedBox(width: 8),
+                            Text('Edit'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete,
+                              size: 20,
+                              color: theme.colorScheme.error,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: theme.colorScheme.error,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
 
