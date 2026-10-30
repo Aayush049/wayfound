@@ -2,7 +2,7 @@ name: wayfound
 description: "Collaborative trip planner for groups"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.13.0
