@@ -6,7 +6,7 @@
 ![Dart](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-FFCA28?logo=firebase&logoColor=black)
 ![Platform](https://img.shields.io/badge/Platform-Android%20(Release%20APK)%20%7C%20Web%20(Live)-3DDC84?logo=android&logoColor=white)
-![Status](https://img.shields.io/badge/Version-1.0.0%20(Released)-success)
+![Status](https://img.shields.io/badge/Version-1.0.1%20(Released)-success)
 
 ---
 
@@ -53,7 +53,7 @@ Planning a trip with friends usually turns into a chaotic mess of scattered grou
 
 ### Suggestions & Community Voting
 - **Categorized Idea Boards**: Propose suggestions across Activity, Dining, Lodging, or Other categories with descriptions and estimated costs.
-- **Up & Down Voting**: Every member can vote (+1 / -1) on ideas. Net scores update in real time to establish group consensus.
+- **Up & Down Voting**: Every member can vote (+1 / -1) on ideas with direct upvote and downvote counters on each card to establish group consensus.
 - **Direct Scheduling**: High-voted suggestions can be scheduled directly into the trip itinerary.
 
 ### Visual Daily Itinerary
@@ -104,11 +104,11 @@ The signed Android APK is the primary and recommended way to use Wayfound on mob
 
 ### 1. Download the APK
 Download the universal release APK from the official GitHub Release:
-- **Direct Download:** [Wayfound v1.0.0 Release](https://github.com/Aayush049/wayfound/releases/tag/v1.0.0)
-- **Asset Name:** `wayfound-1.0.0-universal.apk` (~57 MB, compatible with all modern Android device architectures)
+- **Direct Download:** [Wayfound v1.0.1 Release](https://github.com/Aayush049/wayfound/releases/tag/v1.0.1)
+- **Asset Name:** `Wayfound-v1.0.1.apk` (~57 MB, compatible with all modern Android device architectures)
 
 ### 2. Install on Your Device
-1. Open the downloaded `wayfound-1.0.0-universal.apk` file on your Android phone.
+1. Open the downloaded `Wayfound-v1.0.1.apk` file on your Android phone.
 2. If prompted by Android security, enable **Install unknown apps** for your browser or file manager in Settings.
 3. If Google Play Protect displays an unrecognised app alert, tap **More details**, then select **Install anyway**.
 4. **Previous Builds Note:** If you previously installed a debug or test build signed with a different key, Android will block the installation due to signature mismatch. Uninstall any earlier version first before installing the release build. Your trip data is safely stored in the cloud and will restore immediately upon sign-in.
